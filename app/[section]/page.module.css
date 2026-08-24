@@ -1,0 +1,73 @@
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so a component's own
+   styles can never be overridden by the global reset or utilities,
+   whatever order the bundler happens to emit the files in. */
+.head {
+  min-block-size: 62svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.crumb {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+  margin-block-end: var(--space-l);
+}
+
+.title {
+  margin-block-end: var(--space-m);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 60rem) {
+  .body {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+}
+
+/* Phase 2 drops real entries into this shape. Until then it states plainly
+   that it is a shape, rather than pretending to be content. */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+}
+
+.slot {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  gap: var(--space-s);
+  align-items: baseline;
+  padding-block: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+  color: var(--muted);
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.step {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  text-decoration: none;
+  max-inline-size: 20rem;
+}
+
+.stepNext {
+  text-align: end;
+  margin-inline-start: auto;
+}

@@ -1,257 +1,100 @@
-@layer components {
-  /* --- Hero ------------------------------------------------------------ */
-  .hero {
-    min-block-size: 100svh;
-    display: flex;
-    align-items: center;
-    padding-block: var(--section-y);
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so a component's own
+   styles can never be overridden by the global reset or utilities,
+   whatever order the bundler happens to emit the files in. */
+.hero {
+  min-block-size: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--section-y);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+}
+
+.heroTitle {
+  margin-block: var(--space-xs) var(--space-m);
+}
+
+.heroFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-m);
+  margin-block-start: var(--space-xl);
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  color: var(--muted);
+}
+
+/* --- Chapter ---------------------------------------------------------- */
+
+.chapter {
+  display: grid;
+  gap: var(--space-l);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 60rem) {
+  .chapter {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    gap: var(--space-2xl);
+    align-items: end;
   }
+}
 
-  .heroInner {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-l);
-    inline-size: 100%;
-  }
+.chapterQuestion {
+  color: var(--muted);
+  margin-block-end: var(--space-xs);
+}
 
-  .heroTitle {
-    margin-block: var(--space-xs) var(--space-s);
-  }
+.chapterAside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
 
-  .heroFoot {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-m);
-    margin-block-start: var(--space-xl);
-    padding-block-start: var(--space-s);
-    border-block-start: var(--rule-w) solid var(--rule);
-  }
+/* --- Enter affordance -------------------------------------------------- */
 
-  .axes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-m);
-    color: var(--muted);
-  }
+.enter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6em;
+  text-decoration: none;
+  align-self: flex-start;
+  padding-block: var(--space-2xs);
+  border-block-start: var(--rule-w) solid var(--figure);
+  inline-size: 100%;
+}
 
-  /* --- Generic two-column prose + figure ------------------------------- */
-  .split {
-    display: grid;
-    gap: var(--space-xl);
-    grid-template-columns: 1fr;
-  }
+.enterLabel {
+  transition: color var(--dur-quick) var(--ease-standard);
+}
 
-  @media (min-width: 60rem) {
-    .split {
-      grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
-      gap: var(--space-2xl);
-    }
-  }
+.enterArrow {
+  margin-inline-start: auto;
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
 
-  /* --- Tone demonstration --------------------------------------------- */
-  .tonePair {
-    display: grid;
-    gap: var(--space-m);
-    grid-template-columns: 1fr;
-  }
+.enter:hover .enterArrow,
+.enter:focus-visible .enterArrow {
+  transform: translateX(0.4em);
+}
 
-  @media (min-width: 48rem) {
-    .tonePair {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
+/* --- Closing ----------------------------------------------------------- */
 
-  /* A panel that repaints itself from its own data-tone, so the swatches
-     below are reading live token values rather than repeating hex codes. */
-  .panel {
-    background-color: var(--ground);
-    color: var(--figure);
-    border: var(--rule-w) solid var(--rule);
-    padding: var(--space-m);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-s);
-  }
-
-  .panelHead {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-s);
-    padding-block-end: var(--space-2xs);
-    border-block-end: var(--rule-w) solid var(--rule);
-  }
-
-  .swatchList {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2xs);
-  }
-
-  .swatchRow {
-    display: grid;
-    grid-template-columns: 1.25rem minmax(0, 1fr) auto;
-    align-items: center;
-    gap: var(--space-xs);
-    padding-block: var(--space-3xs);
-  }
-
-  .chip {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
-    border: var(--rule-w) solid var(--rule);
-  }
-
-  .chipFigure { background-color: var(--figure); }
-  .chipMuted { background-color: var(--muted); }
-  .chipAccent { background-color: var(--accent); }
-  .chipAccentText { background-color: var(--accent-text); }
-  .chipOnAccent { background-color: var(--accent); box-shadow: inset 0 0 0 5px var(--on-accent); }
-  .chipFocus { background-color: transparent; outline: var(--focus-w) solid var(--focus); outline-offset: -4px; }
-
-  .ratio {
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  .pass { color: var(--accent-text); }
-
-  /* --- Type specimen --------------------------------------------------- */
-  .specimen {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .specimenRow {
-    display: grid;
-    gap: var(--space-2xs);
-    padding-block: var(--space-m);
-    border-block-start: var(--rule-w) solid var(--rule);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 60rem) {
-    .specimenRow {
-      grid-template-columns: 10rem minmax(0, 1fr);
-      gap: var(--space-l);
-      align-items: baseline;
-    }
-  }
-
-  .specimenMeta {
-    color: var(--muted);
-  }
-
-  .specimenSample {
-    min-inline-size: 0;
-    overflow-wrap: anywhere;
-  }
-
-  /* --- Accent law ------------------------------------------------------ */
-  .lawGrid {
-    display: grid;
-    gap: var(--space-m);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 48rem) {
-    .lawGrid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .lawCard {
-    background-color: var(--ground);
-    color: var(--figure);
-    border: var(--rule-w) solid var(--rule);
-    padding: var(--space-m);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-s);
-    min-block-size: 12rem;
-  }
-
-  .lawVerdict {
-    margin-block-start: auto;
-    padding-block-start: var(--space-2xs);
-    border-block-start: var(--rule-w) solid var(--rule);
-    color: var(--muted);
-  }
-
-  /* --- Motion ---------------------------------------------------------- */
-  .motionList {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .motionRow {
-    display: grid;
-    grid-template-columns: minmax(0, 9rem) minmax(0, 4rem) minmax(0, 1fr);
-    gap: var(--space-s);
-    align-items: center;
-    padding-block: var(--space-s);
-    border-block-start: var(--rule-w) solid var(--rule);
-  }
-
-  .track {
-    position: relative;
-    block-size: var(--rule-w);
-    background-color: var(--rule);
-    overflow: visible;
-  }
-
-  .tick {
-    position: absolute;
-    inset-block-start: -0.3125rem;
-    inset-inline-start: 0;
-    inline-size: 0.375rem;
-    block-size: 0.75rem;
-    background-color: var(--accent);
-    animation: sweep var(--sweep, 420ms) var(--ease-inout-quart) infinite alternate;
-  }
-
-  @keyframes sweep {
-    from { inset-inline-start: 0; }
-    to { inset-inline-start: calc(100% - 0.375rem); }
-  }
-
-  /* Motion is the subject of this section, so it must not be the one place
-     the product ignores the visitor's setting. The tick parks at the start
-     and the duration is read as a number instead. */
-  @media (prefers-reduced-motion: reduce) {
-    .tick { animation: none; }
-  }
-
-  /* --- Roadmap --------------------------------------------------------- */
-  .roadmap {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .phaseRow {
-    display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
-    gap: var(--space-s);
-    align-items: baseline;
-    padding-block: var(--space-s);
-    border-block-start: var(--rule-w) solid var(--rule);
-  }
-
-  .phaseDone { color: var(--figure); }
-  .phaseNext { color: var(--figure); }
-  .phaseTodo { color: var(--muted); }
-
-  .phaseState {
-    justify-self: end;
-    color: var(--muted);
-  }
-
-  .closing {
-    margin-block-start: var(--space-2xl);
-    padding-block-start: var(--space-m);
-    border-block-start: var(--rule-w) solid var(--figure);
-  }
+.closing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
 }

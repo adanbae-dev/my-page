@@ -112,6 +112,9 @@ Calm → Dense → Calm structure as cuts instead of transitions. Nothing is hid
 build. Set now, while the page is nearly empty, so every later phase has to
 argue for the weight it adds.
 
+Enforced **per route** since Phase 1 — see `docs/GOLDEN-PATH.md` for the
+current numbers. At the end of Phase 0 the single route measured:
+
 | | Used | Budget |
 |---|---|---|
 | html | 7.1 KB | 23.4 KB |
@@ -129,7 +132,7 @@ check, which the brief already anticipates ("WebGL 실패 대비").
 ## Verify
 
 ```bash
-pnpm verify     # typecheck → lint → contrast → build → budget
+pnpm verify     # typecheck → lint → contrast → build → layers → budget
 ```
 
 `eslint` additionally forbids raw hex literals outside `styles/tokens.css`.
@@ -147,3 +150,11 @@ guard asserts those literals still match the stylesheet.
   divergent mobile hero belongs to Phase 1.
 - **The name.** `site.name` is still `[name]`, confined to one constant in
   `lib/site.config.ts`.
+
+## Cascade layers
+
+Global styles are layered `reset < tokens < base < layout < utilities`.
+**CSS Modules are deliberately unlayered**, so a component's own styles
+outrank every global rule regardless of what order the bundler emits files
+in. `pnpm check:layers` enforces both halves of that on the built CSS —
+see `docs/GOLDEN-PATH.md` for why it exists.

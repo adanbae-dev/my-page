@@ -70,7 +70,12 @@
     padding: 0;
   }
 
+  html {
+    /* Anchor jumps stop below the fixed index bar, never behind it. */
+    scroll-padding-block-start: calc(var(--nav-h) + var(--space-s));
+  }
+
   :target {
-    scroll-margin-block-start: var(--space-2xl);
+    scroll-margin-block-start: calc(var(--nav-h) + var(--space-s));
   }
 }

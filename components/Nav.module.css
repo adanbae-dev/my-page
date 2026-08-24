@@ -1,0 +1,111 @@
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so a component's own
+   styles can never be overridden by the global reset or utilities,
+   whatever order the bundler happens to emit the files in. */
+
+.nav {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 50;
+  block-size: var(--nav-h);
+
+  /* The bar adopts the ground it is currently standing over, so a single
+     accent and a single figure colour stay legible across the inversion
+     without the bar ever changing its own design. */
+  background-color: var(--ground);
+  color: var(--figure);
+  border-block-end: var(--rule-w) solid var(--rule);
+  transition:
+    background-color var(--dur-quick) var(--ease-standard),
+    color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard);
+}
+
+.inner {
+  block-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 40rem) {
+  .list {
+    gap: var(--space-2xs);
+  }
+}
+
+/* WCAG 2.2 SC 2.5.8 asks for 24x24 CSS px. 44px is the comfortable target
+   and it fits inside the 52px bar, so the bar is sized by the target rather
+   than the target being squeezed into the bar. */
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+  padding-inline: 0.5em;
+  text-decoration: none;
+  color: var(--muted);
+  transition:
+    color var(--dur-quick) var(--ease-standard),
+    background-color var(--dur-quick) var(--ease-standard);
+}
+
+.item:hover {
+  color: var(--figure);
+}
+
+/* The chapter you are standing in, marked as a solid accent block with ink
+   on top — the one accent treatment that is legal on both grounds. */
+.item[aria-current] {
+  background-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.num {
+  display: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Below 40rem the numbers go and the NAMES stay. A number is ornament; the
+   name is the only part that tells a visitor where the link goes. */
+@media (min-width: 40rem) {
+  .num {
+    display: inline;
+  }
+}
+
+.brandSuffix {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .brandSuffix {
+    display: inline;
+  }
+}
+
+/* Always visible: this is the part that carries meaning. */
+.itemName {
+  display: inline;
+}

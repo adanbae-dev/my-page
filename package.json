@@ -15,7 +15,8 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run check:contrast",
     "check:budget": "node scripts/check-budget.mjs",
-    "verify": "pnpm run check && pnpm run build && pnpm run check:budget"
+    "verify": "pnpm run check && pnpm run build && pnpm run check:layers && pnpm run check:budget",
+    "check:layers": "node scripts/check-layers.mjs"
   },
   "dependencies": {
     "next": "16.3.2",

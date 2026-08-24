@@ -1,11 +1,10 @@
 {
   "$comment": [
-    "First-load budget for the / route, measured on the production build as",
-    "gzip-compressed transfer size. Set in Phase 0 while the page is nearly",
-    "empty, so that every later phase has to argue for the weight it adds.",
-    "Headroom is deliberately small: a budget with slack is a suggestion."
+    "First-load budget measured on the production build as gzip transfer size.",
+    "Set in Phase 0 while the page was nearly empty, so every later phase has",
+    "to argue for the weight it adds. Every prerendered route is checked; the",
+    "limits apply per route, so no page can quietly become the heavy one."
   ],
-  "route": "/",
   "unit": "gzip-bytes",
   "budgets": {
     "html": 24000,
@@ -13,5 +12,13 @@
     "js": 185000,
     "font": 100000,
     "total": 300000
-  }
+  },
+  "routes": [
+    "/",
+    "/think",
+    "/make",
+    "/live",
+    "/trace",
+    "/art-direction"
+  ]
 }

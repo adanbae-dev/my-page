@@ -92,6 +92,10 @@
 
     --rule-w: 1px;
 
+    /* Height of the fixed index bar. Anchors and :target offsets are all
+       derived from it, so the bar can never land on top of a heading. */
+    --nav-h: 3.25rem;
+
     /* ---------------------------------------------------------------- */
     /* MOTION                                                            */
     /* ---------------------------------------------------------------- */

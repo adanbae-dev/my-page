@@ -1,3 +1,9 @@
-/* Cascade layer order. Declared once, before anything else is loaded, so
-   that source order of the imports below can never change specificity. */
-@layer reset, tokens, base, layout, components, utilities;
+/* Order for the global layers. CSS Modules deliberately sit outside these:
+   see the header of any *.module.css.
+
+   Layer order is established by FIRST APPEARANCE, so this statement has to
+   be parsed before any @layer block. It is the first stylesheet imported by
+   app/layout.tsx, and `pnpm check:layers` asserts it really does come first
+   in the built CSS — an inverted order fails silently and is very hard to
+   see by eye. */
+@layer reset, tokens, base, layout, utilities;

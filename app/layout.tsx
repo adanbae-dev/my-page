@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
 import type { ReactNode } from 'react'
+
+import { Nav } from '@/components/Nav'
 import { site } from '@/lib/site.config'
 import { GROUND_HEX } from '@/lib/tokens.data'
 import { boundingTone, type ToneStep } from '@/lib/tone'
@@ -24,7 +26,12 @@ const archivo = Archivo({
   fallback: ['Helvetica Neue', 'Arial', 'system-ui', 'sans-serif'],
 })
 
-/** The score this shell opens and closes on. Kept in sync with app/page.tsx. */
+/**
+ * Every page in the product performs the same Calm → Dense → Calm arc, so
+ * every page opens and closes on the light ground. That is what makes the
+ * browser canvas — the colour revealed by overscroll, and the colour behind
+ * the address bar — a single unambiguous value.
+ */
 const ROOT_SCORE: readonly ToneStep[] = [
   { tone: 'light', density: 'calm' },
   { tone: 'light', density: 'calm' },
@@ -35,15 +42,13 @@ const ground = boundingTone(ROOT_SCORE)
 export const metadata: Metadata = {
   title: {
     default: `${site.title} — ${site.name}`,
-    template: `%s · ${site.name}`,
+    template: `%s · ${site.title}`,
   },
   description: site.description,
   applicationName: site.title,
 }
 
 export const viewport: Viewport = {
-  // Matches the ground the page opens and closes on, so the browser chrome
-  // never disagrees with the first and last thing the visitor sees.
   themeColor: GROUND_HEX[ground],
   colorScheme: 'light dark',
 }
@@ -55,6 +60,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="skipLink" href="#main">
           본문으로 건너뛰기
         </a>
+        <Nav initialTone={ground} />
         <main id="main">{children}</main>
       </body>
     </html>
