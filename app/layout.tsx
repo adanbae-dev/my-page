@@ -42,7 +42,9 @@ const ground = boundingTone(ROOT_SCORE)
 export const metadata: Metadata = {
   title: {
     default: `${site.title} — ${site.name}`,
-    template: `%s · ${site.title}`,
+    // The person, not the product: an entry titled the same as the site
+    // would otherwise render as "PERSONAL INTERFACE · PERSONAL INTERFACE".
+    template: `%s · ${site.name}`,
   },
   description: site.description,
   applicationName: site.title,

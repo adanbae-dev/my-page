@@ -1,0 +1,39 @@
+---
+title: PERSONAL INTERFACE
+date: 2026-08-24
+summary: 한 사람의 생각과 삶을 인터페이스로 번역하면서, 그것을 만드는 능력까지 동시에 증명하려는 개인 웹 제품.
+role: 기획 · 디자인 · 프론트엔드 전부
+period: 2026.08 —
+stack: [Next.js 16, React 19, TypeScript, MDX, modern CSS, View Transition API]
+constraint: JS 예산 180.7KB 중 프레임워크 베이스라인만으로 168.6KB. 기능 코드가 쓸 수 있는 여유는 12KB였다.
+tradeoff: 스크롤 구동 애니메이션과 WebGL을 초기 번들에서 뺐다. 화려함보다 첫 로드를 지켰다.
+outcome: 전 라우트 정적 프리렌더, JS 173.7KB, JavaScript 없이도 네비게이션과 전체 구조가 동작.
+tags: [nextjs, design-system, portfolio]
+---
+
+이 사이트다.
+
+## 제약
+
+성능 예산을 **페이지가 거의 비어 있을 때** 먼저 고정했다. 나중에 정하면
+이미 무거워진 상태가 기준선이 되기 때문이다.
+
+측정해 보니 Next 16 + React 19 베이스라인만으로 168.6KB였다. 예산 180.7KB의
+93%. 기능 코드를 한 줄도 쓰기 전이었다.
+
+## 포기한 것
+
+이 숫자가 Phase 3의 방향을 결정했다. Three.js + React Three Fiber + drei는
+gzip 약 150KB다. **초기 번들에 들어갈 수 없다.**
+
+그래서 WebGL은 capability check 뒤에서 동적으로 불러오기로 했다.
+기획서에 이미 "WebGL 실패 대비"라고 적혀 있었는데, 예산을 재고 나서야
+그게 선택이 아니라 구조적 요구라는 걸 알았다.
+
+## 남은 것
+
+내비게이션 전체 — 톤 미러링, 스크롤 스파이, 라우트 인지 — 에 쓴 JS는
+**5.1KB**다. 나머지는 전부 서버에서 렌더된 HTML이다.
+
+JavaScript를 끈 상태로 확인했다: 색인 바, 앵커 4개, 심화 링크 4개,
+스킵 링크, 그리고 접근 가능한 이름이 온전한 `<h1>`. 전부 있었다.

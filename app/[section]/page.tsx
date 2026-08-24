@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
+import { EntryList } from '@/components/EntryList'
 import { Section } from '@/components/Section'
+import { archive, entriesFor } from '@/lib/content/load'
 import { cx } from '@/lib/cx'
 import { SECTIONS, getSection, neighbours } from '@/lib/sections'
 import styles from './page.module.css'
@@ -52,6 +54,11 @@ export default async function SectionPage({
 
   const { prev, next } = neighbours(def.id)
 
+  // TRACE is the archive of everything, not a fifth pile of posts: it merges
+  // every chapter's entries with its own logs into one chronological stream.
+  const isArchive = def.id === 'trace'
+  const entries = isArchive ? archive() : entriesFor(def.id)
+
   return (
     <>
       {/* Calm — arrival */}
@@ -92,20 +99,24 @@ export default async function SectionPage({
           <div className="stack">
             <h2 className="h3">{def.question}</h2>
             <p className="small muted measure">
-              이 구간의 내용은 Phase 2(Personal System)에서 채웁니다. 지금은
-              들어갈 자리와 그 자리가 지켜야 할 규칙만 정해져 있습니다.
+              {isArchive
+                ? '이 구간은 다른 세 구간에서 쌓인 기록과 이곳의 자체 기록을 하나의 시간축으로 합칩니다. 별도로 관리되는 목록이 아니라, 작업에서 파생된 흔적입니다.'
+                : def.blurb}
+            </p>
+            <p className={cx('label', styles.count)}>
+              {entries.length} {isArchive ? 'RECORDS' : 'ENTRIES'}
             </p>
           </div>
 
-          <div className={styles.placeholder}>
-            {[1, 2, 3].map((n) => (
-              <div key={n} className={cx('label', styles.slot)}>
-                <span>{String(n).padStart(2, '0')}</span>
-                <span>{def.label} entry — Phase 2</span>
-                <span>—</span>
-              </div>
-            ))}
-          </div>
+          <EntryList
+            entries={entries}
+            showOrigin={isArchive}
+            emptyMessage={
+              isArchive
+                ? '아직 기록이 없습니다.'
+                : `${def.label} 구간은 아직 비어 있습니다.`
+            }
+          />
         </div>
       </Section>
 

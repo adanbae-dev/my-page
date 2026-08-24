@@ -34,21 +34,9 @@
   }
 }
 
-/* Phase 2 drops real entries into this shape. Until then it states plainly
-   that it is a shape, rather than pretending to be content. */
-.placeholder {
-  display: flex;
-  flex-direction: column;
-}
-
-.slot {
-  display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr) auto;
-  gap: var(--space-s);
-  align-items: baseline;
-  padding-block: var(--space-m);
-  border-block-start: var(--rule-w) solid var(--rule);
+.count {
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .foot {

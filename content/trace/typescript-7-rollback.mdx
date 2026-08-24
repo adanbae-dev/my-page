@@ -1,0 +1,29 @@
+---
+title: TypeScript 7을 넣었다가 되돌렸다
+date: 2026-08-24
+kind: abandoned
+summary: 네이티브 포트의 속도를 얻으려다 린트 파이프라인 전체를 잃을 뻔했다.
+tags: [tooling, typescript]
+---
+
+레지스트리 최신이 TypeScript **7.0.2**였다. 네이티브 포트, 훨씬 빠른 타입체크.
+당연히 넣었다.
+
+`pnpm lint`에서 터졌다.
+
+```
+typescript-eslint does not support TS 7.0.
+```
+
+`typescript-eslint`가 아직 TS 7 API를 지원하지 않는다.
+`eslint-config-next`가 그걸 내부에서 import하기 때문에 규칙을 하나도
+쓰지 않아도 크래시한다.
+
+## 판단
+
+빌드의 타입체크는 **872ms**였다. 병목이 아니었다.
+얻는 것은 체감되지 않는 속도, 잃는 것은 린트 파이프라인 전체.
+
+5.9.3으로 내렸다. 생태계가 따라오면 그때 다시 올린다.
+
+> 최신 버전은 기본값이 아니라 선택이다. 그리고 선택에는 근거가 있어야 한다.

@@ -1,0 +1,164 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+
+import { Prose } from '@/components/Prose'
+import { Section } from '@/components/Section'
+import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
+import { LOG_KIND_LABEL, type Entry } from '@/lib/content/schema'
+import { cx } from '@/lib/cx'
+import { formatDate } from '@/lib/format'
+import { getSection, isSectionId } from '@/lib/sections'
+import styles from './page.module.css'
+
+type Params = { section: string; slug: string }
+
+export const dynamicParams = false
+
+export function generateStaticParams(): Params[] {
+  return allParams()
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>
+}): Promise<Metadata> {
+  const { section, slug } = await params
+  if (!isSectionId(section)) return {}
+  const entry = getEntry(section, slug)
+  if (!entry) return {}
+  return { title: entry.title, description: entry.summary }
+}
+
+/** The metadata line under the title — different per chapter, on purpose. */
+function byline(entry: Entry): string[] {
+  const base = [formatDate(entry.date)]
+  switch (entry.chapter) {
+    case 'think':
+      return [
+        ...base,
+        ...(entry.updated ? [`고침 ${formatDate(entry.updated)}`] : []),
+        `약 ${entry.readingMinutes}분`,
+      ]
+    case 'make':
+      return [...base, entry.period, entry.role]
+    case 'live':
+      return entry.place ? [...base, entry.place] : base
+    case 'trace':
+      return [...base, LOG_KIND_LABEL[entry.kind]]
+  }
+}
+
+export default async function EntryPage({
+  params,
+}: {
+  params: Promise<Params>
+}) {
+  const { section, slug } = await params
+  if (!isSectionId(section)) notFound()
+
+  const entry = getEntry(section, slug)
+  const chapter = getSection(section)
+  if (!entry || !chapter) notFound()
+
+  const { newer, older } = entryNeighbours(section, slug)
+
+  return (
+    <>
+      {/* Calm — arrival */}
+      <Section tone="light" density="calm">
+        <div className={styles.head}>
+          <p className={cx('label', styles.crumb)}>
+            <Link href={`/${chapter.id}`}>
+              ← {chapter.index} {chapter.label}
+            </Link>
+            <span>{chapter.question}</span>
+          </p>
+
+          <h1 className={cx('h2', styles.title)} lang="ko">
+            {entry.title}
+          </h1>
+
+          <p className="lead measure">{entry.summary}</p>
+
+          <p className={cx('label', styles.byline)}>
+            {byline(entry).map((bit) => (
+              <span key={bit}>{bit}</span>
+            ))}
+          </p>
+        </div>
+      </Section>
+
+      {/* Dense — the decisions. Only MAKE carries the full slab; the fields
+          exist because the brief promised decisions rather than screenshots. */}
+      {isWork(entry) && (
+        <Section tone="dark" density="dense" index={chapter.index} title="Decisions">
+          <div className={styles.decisions}>
+            <div className={styles.decision}>
+              <p className={cx('label', styles.decisionLabel)}>제약</p>
+              <p className="small">{entry.constraint}</p>
+            </div>
+            <div className={styles.decision}>
+              <p className={cx('label', styles.decisionLabel)}>포기한 것</p>
+              <p className="small">{entry.tradeoff}</p>
+            </div>
+            <div className={styles.decision}>
+              <p className={cx('label', styles.decisionLabel)}>남은 것</p>
+              <p className="small">{entry.outcome}</p>
+            </div>
+          </div>
+
+          <div className={cx('label', styles.facts)}>
+            <span className={styles.stack}>
+              {entry.stack.map((s) => (
+                <span key={s} className={styles.chip}>
+                  {s}
+                </span>
+              ))}
+            </span>
+          </div>
+        </Section>
+      )}
+
+      {/* The body. Long-form stays on the light ground: reading is the job
+          here, and sustained reading on the dark ground costs more than the
+          rhythm gains. Density carries the beat instead. */}
+      <Section tone="light" density="dense">
+        <Prose source={entry.body} />
+
+        {entry.tags.length > 0 && (
+          <div className={cx('label', styles.facts)}>
+            {entry.tags.map((t) => (
+              <span key={t} className={styles.chip}>
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {/* Calm — departure */}
+      <Section tone="light" density="calm">
+        <hr className="ruleStrong" />
+        <div className={styles.foot}>
+          {newer && (
+            <Link href={`/${newer.chapter}/${newer.slug}`} className={styles.step}>
+              <span className="label muted">← 다음 글</span>
+              <span className={styles.stepTitle}>{newer.title}</span>
+            </Link>
+          )}
+          {older && (
+            <Link
+              href={`/${older.chapter}/${older.slug}`}
+              className={cx(styles.step, styles.stepOlder)}
+            >
+              <span className="label muted">이전 글 →</span>
+              <span className={styles.stepTitle}>{older.title}</span>
+            </Link>
+          )}
+        </div>
+      </Section>
+    </>
+  )
+}

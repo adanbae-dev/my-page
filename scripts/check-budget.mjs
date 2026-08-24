@@ -12,7 +12,7 @@
  * Run after `pnpm build`.
  */
 
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, basename } from 'node:path'
@@ -25,6 +25,28 @@ const gz = (buf) => gzipSync(buf, { level: 9 }).length
 const CATEGORY = { '.js': 'js', '.css': 'css', '.woff2': 'font' }
 const kb = (n) => (n / 1024).toFixed(1).padStart(7) + ' KB'
 const line = (s) => process.stdout.write(s + '\n')
+
+/**
+ * Every prerendered route is discovered from the build output rather than
+ * listed in config. A route that has to be added to a list by hand is a
+ * route that will eventually be forgotten — and forgotten routes are
+ * exactly the ones that get heavy.
+ */
+function discoverRoutes(dir = APP, prefix = '') {
+  const out = []
+  for (const name of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, name.name)
+    if (name.isDirectory()) {
+      out.push(...discoverRoutes(full, `${prefix}/${name.name}`))
+      continue
+    }
+    if (!name.name.endsWith('.html')) continue
+    const base = name.name.replace(/\.html$/, '')
+    if (base === '_global-error') continue
+    out.push(base === 'index' ? prefix || '/' : `${prefix}/${base}`)
+  }
+  return out
+}
 
 /** Route path -> prerendered file. "/" is emitted as index.html. */
 const fileFor = (route) =>
@@ -58,29 +80,32 @@ function measure(route) {
 }
 
 const KEYS = ['html', 'css', 'js', 'font', 'total']
-const results = budget.routes.map(measure)
+const routes = discoverRoutes().sort(
+  (a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b),
+)
+const results = routes.map(measure)
 
 line('')
-line(`  PERFORMANCE BUDGET — gzip transfer, per route`)
-line('  ' + '-'.repeat(72))
+line(`  PERFORMANCE BUDGET — gzip transfer, ${routes.length} prerendered routes`)
+line('  ' + '-'.repeat(84))
 line(
-  '  route'.padEnd(20) +
+  '  route'.padEnd(32) +
     KEYS.map((k) => k.padStart(10)).join('') +
     '   verdict',
 )
-line('  ' + '-'.repeat(72))
+line('  ' + '-'.repeat(84))
 
 let failures = 0
 for (const r of results) {
   if (r.missing) {
-    line(`  ${r.route.padEnd(18)} not prerendered — run \`pnpm build\``)
+    line(`  ${r.route.padEnd(36)} not prerendered — run \`pnpm build\``)
     failures++
     continue
   }
   const over = KEYS.filter((k) => r.used[k] > budget.budgets[k])
   if (over.length) failures++
   line(
-    `  ${r.route.padEnd(18)}` +
+    `  ${r.route.padEnd(36)}` +
       KEYS.map((k) => {
         const s = (r.used[k] / 1024).toFixed(1)
         return (over.includes(k) ? `!${s}` : s).padStart(10)
@@ -89,8 +114,8 @@ for (const r of results) {
   )
 }
 
-line('  ' + '-'.repeat(72))
-line('  limit'.padEnd(20) + KEYS.map((k) => (budget.budgets[k] / 1024).toFixed(1).padStart(10)).join(''))
+line('  ' + '-'.repeat(84))
+line('  limit'.padEnd(32) + KEYS.map((k) => (budget.budgets[k] / 1024).toFixed(1).padStart(10)).join(''))
 
 // Report the tightest route per category so the next phase knows where the
 // headroom actually is, rather than guessing from the total.
@@ -100,7 +125,7 @@ if (ok.length) {
   for (const k of KEYS) {
     const worst = ok.reduce((a, b) => (b.used[k] > a.used[k] ? b : a))
     const pct = ((worst.used[k] / budget.budgets[k]) * 100).toFixed(0)
-    line(`  ${k.padEnd(6)} tightest: ${worst.route.padEnd(16)} ${kb(worst.used[k])}  ${pct.padStart(3)}% of budget`)
+    line(`  ${k.padEnd(6)} tightest: ${worst.route.padEnd(34)} ${kb(worst.used[k])}  ${pct.padStart(3)}% of budget`)
   }
 }
 

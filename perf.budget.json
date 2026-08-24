@@ -2,8 +2,9 @@
   "$comment": [
     "First-load budget measured on the production build as gzip transfer size.",
     "Set in Phase 0 while the page was nearly empty, so every later phase has",
-    "to argue for the weight it adds. Every prerendered route is checked; the",
-    "limits apply per route, so no page can quietly become the heavy one."
+    "to argue for the weight it adds. Routes are DISCOVERED from the build",
+    "output, not listed here: a route that must be added by hand is a route",
+    "that will eventually be forgotten, and forgotten routes get heavy."
   ],
   "unit": "gzip-bytes",
   "budgets": {
@@ -12,13 +13,5 @@
     "js": 185000,
     "font": 100000,
     "total": 300000
-  },
-  "routes": [
-    "/",
-    "/think",
-    "/make",
-    "/live",
-    "/trace",
-    "/art-direction"
-  ]
+  }
 }

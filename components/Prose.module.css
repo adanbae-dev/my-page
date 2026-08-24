@@ -1,0 +1,137 @@
+/* Unlayered on purpose — see any *.module.css header. */
+
+/* Long-form reading.
+   Every value below is a role token or a step on the existing type scale.
+   Nothing here introduces a second design system for "article pages". */
+.prose {
+  max-inline-size: var(--measure);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+}
+
+.prose > * + * {
+  margin-block-start: var(--space-m);
+}
+
+/* Headings get more air above than below, so a section reads as attached to
+   the text that follows it rather than floating between two blocks. */
+.prose h2,
+.prose h3 {
+  margin-block-start: var(--space-xl);
+  margin-block-end: var(--space-xs);
+  text-wrap: balance;
+}
+
+.prose h2 {
+  font-size: var(--t-h3);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--wt-bold);
+}
+
+.prose h3 {
+  font-size: var(--t-lead);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--wt-bold);
+}
+
+.prose p {
+  text-wrap: pretty;
+}
+
+.prose strong {
+  font-weight: var(--wt-bold);
+}
+
+.prose a {
+  color: var(--accent-text);
+  text-decoration-color: var(--accent-text);
+  text-underline-offset: 0.22em;
+}
+
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.35em;
+}
+
+.prose li + li {
+  margin-block-start: var(--space-2xs);
+}
+
+.prose li::marker {
+  color: var(--muted);
+}
+
+.prose blockquote {
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-m);
+  color: var(--figure);
+  font-size: var(--t-lead);
+  line-height: 1.4;
+  letter-spacing: var(--tr-tight);
+}
+
+/* Code is set in the same grotesk at a tighter size rather than a mono
+   family: adding a second typeface for six code blocks would break the
+   "grotesk only" discipline for very little legibility gain. Tabular
+   figures and a wider tracking carry the machine voice instead. */
+.prose code {
+  font-size: 0.875em;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  background-color: color-mix(in srgb, var(--figure) 8%, transparent);
+  padding-inline: 0.32em;
+  padding-block: 0.1em;
+}
+
+.prose pre {
+  background-color: color-mix(in srgb, var(--figure) 6%, transparent);
+  border-inline-start: 2px solid var(--rule);
+  padding: var(--space-s) var(--space-m);
+  /* Wide code scrolls inside its own box; the page never scrolls sideways. */
+  overflow-x: auto;
+  font-size: var(--t-small);
+  line-height: 1.6;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Tables scroll in their own container for the same reason. */
+.prose table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-small);
+  font-variant-numeric: tabular-nums;
+  display: block;
+  overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+  text-align: start;
+  padding: var(--space-2xs) var(--space-s) var(--space-2xs) 0;
+  border-block-end: var(--rule-w) solid var(--rule);
+  white-space: nowrap;
+}
+
+.prose th {
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: var(--wt-medium);
+}
+
+.prose hr {
+  margin-block: var(--space-xl);
+}
+
+/* Anchored headings land clear of the fixed index bar. */
+.prose :where(h2, h3)[id] {
+  scroll-margin-block-start: calc(var(--nav-h) + var(--space-m));
+}

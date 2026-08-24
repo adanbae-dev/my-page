@@ -1,0 +1,114 @@
+/* Unlayered on purpose — see any *.module.css header. */
+
+.head {
+  display: flex;
+  flex-direction: column;
+}
+
+.crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+  margin-block-end: var(--space-l);
+}
+
+.title {
+  max-inline-size: 22ch;
+  margin-block-end: var(--space-m);
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+/* --- The decision slab ------------------------------------------------ */
+
+/* MAKE promises to show decisions rather than screenshots. This is that
+   promise made structural: the constraint, what was given up, and what
+   survived are fields in the content model, not paragraphs an author may
+   or may not remember to write. */
+.decisions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-l);
+}
+
+@media (min-width: 60rem) {
+  .decisions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xl);
+  }
+}
+
+.decision {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.decisionLabel {
+  color: var(--muted);
+  padding-block-end: var(--space-2xs);
+  border-block-end: var(--rule-w) solid var(--rule);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  margin-block-start: var(--space-l);
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+  color: var(--muted);
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.chip {
+  border: var(--rule-w) solid var(--rule);
+  padding-inline: 0.5em;
+  padding-block: 0.15em;
+}
+
+/* --- Foot -------------------------------------------------------------- */
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  justify-content: space-between;
+  align-items: baseline;
+  margin-block-start: var(--space-m);
+}
+
+.step {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  text-decoration: none;
+  max-inline-size: 22rem;
+}
+
+.stepOlder {
+  text-align: end;
+  margin-inline-start: auto;
+}
+
+.stepTitle {
+  font-size: var(--t-lead);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--wt-bold);
+}
