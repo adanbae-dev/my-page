@@ -1,0 +1,143 @@
+/* ==========================================================================
+   PERSONAL INTERFACE — DESIGN TOKENS
+   Art direction: INVERTED DUOTONE
+   --------------------------------------------------------------------------
+   Two grounds, one accent. Nothing else.
+
+   Every colour in the product is a SEMANTIC ROLE, never a raw hex. A section
+   declares `data-tone="light|dark"` and the roles below re-point. That single
+   attribute is the entire Calm -> Dense -> Calm mechanism: no theme provider,
+   no JS, no class explosion. It works with JavaScript disabled because it is
+   just an attribute in the server-rendered HTML.
+
+   Every value in the TONE MAP below is derived from a WCAG contrast target,
+   not picked by eye. `pnpm check:contrast` re-derives and fails the build if
+   an edit breaks a threshold. Do not hand-edit these without running it.
+   ========================================================================== */
+
+@layer tokens {
+  :root {
+    /* ---------------------------------------------------------------- */
+    /* PRIMITIVES — the only raw colours that may appear in this codebase */
+    /* ---------------------------------------------------------------- */
+    --pi-paper: #f7f5f0;
+    --pi-ink: #0b0b0c;
+    --pi-accent: #ff4d00;
+
+    /* Accent darkened until it clears 4.5:1 on paper. Body-size text only. */
+    --pi-accent-deep: #cc3e00;
+
+    /* ---------------------------------------------------------------- */
+    /* TYPE — one grotesk family, two optical widths                     */
+    /* ---------------------------------------------------------------- */
+    --font-grotesk: var(--font-archivo, 'Archivo'), 'Archivo', 'Helvetica Neue', Arial,
+      system-ui, sans-serif;
+    /* Archivo carries no Hangul. Korean falls through to the platform
+       grotesk. See docs/ART-DIRECTION.md -> "Open: Korean typeface". */
+    --font-kr: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo',
+      'Malgun Gothic', system-ui, sans-serif;
+    --font-body: var(--font-grotesk), var(--font-kr);
+
+    /* Fluid scale, 360px -> 1600px viewport. */
+    --t-label: clamp(0.6875rem, 0.66rem + 0.14vw, 0.75rem);
+    --t-small: clamp(0.8125rem, 0.79rem + 0.12vw, 0.875rem);
+    --t-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    --t-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+    --t-h3: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+    --t-h2: clamp(2rem, 1.4rem + 2.8vw, 3.5rem);
+    --t-h1: clamp(2.75rem, 1.6rem + 5.4vw, 6rem);
+    /* Ceiling derived by measuring the longest headline line ("An interface")
+       in the real face: it occupies 9.36px of width per 1px of font-size.
+       Container width is vw - 2*gutter, so anything above ~10.2vw wraps the
+       controlled line breaks into an uncontrolled mess. 9.2vw keeps a margin. */
+    --t-display: clamp(1.75rem, 9.2vw, 9rem);
+
+    --lh-display: 0.86;
+    --lh-tight: 0.94;
+    --lh-snug: 1.12;
+    --lh-body: 1.55;
+
+    --tr-display: -0.035em;
+    --tr-tight: -0.025em;
+    --tr-normal: 0em;
+    --tr-label: 0.14em;
+
+    --wt-regular: 400;
+    --wt-medium: 500;
+    --wt-bold: 700;
+    --wt-black: 900;
+
+    /* Archivo width axis. Display type runs expanded, body runs normal. */
+    --wd-normal: 100;
+    --wd-expanded: 125;
+
+    /* ---------------------------------------------------------------- */
+    /* SPACE + GRID                                                      */
+    /* ---------------------------------------------------------------- */
+    --space-3xs: 0.25rem;
+    --space-2xs: 0.5rem;
+    --space-xs: 0.75rem;
+    --space-s: 1rem;
+    --space-m: 1.5rem;
+    --space-l: 2.5rem;
+    --space-xl: 4rem;
+    --space-2xl: 6rem;
+    --space-3xl: 9rem;
+
+    --gutter: clamp(1.25rem, 0.8rem + 2.2vw, 4rem);
+    --section-y: clamp(4.5rem, 2.5rem + 9vw, 12rem);
+    --measure: 62ch;
+    --grid-cols: 12;
+    --max-w: 96rem;
+
+    --rule-w: 1px;
+
+    /* ---------------------------------------------------------------- */
+    /* MOTION                                                            */
+    /* ---------------------------------------------------------------- */
+    --dur-instant: 120ms;
+    --dur-quick: 220ms;
+    --dur-base: 420ms;
+    --dur-slow: 720ms;
+    --dur-invert: 900ms;
+
+    --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-inout-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+    /* ---------------------------------------------------------------- */
+    /* FOCUS — one value, legible on BOTH grounds, so the focus ring     */
+    /* never has to know which side of the inversion it is on.           */
+    /* ---------------------------------------------------------------- */
+    --focus: var(--pi-accent-deep); /* paper 4.53:1 · ink 3.99:1 */
+    --focus-w: 2px;
+    --focus-offset: 3px;
+  }
+
+  /* ==================================================================== */
+  /* TONE MAP                                                             */
+  /* Values annotated with the contrast ratio they were derived to hit.   */
+  /* ==================================================================== */
+
+  [data-tone='light'] {
+    color-scheme: light;
+    --ground: #f7f5f0;
+    --figure: #0b0b0c; /* 18.06:1 on ground — AAA body */
+    --muted: #70706e; /* ink 57% over paper —  4.55:1 — AA body */
+    --rule: #dbd9d5; /*  decorative hairline, no threshold */
+    --accent: #ff4d00; /*  3.05:1 — fills + non-text only  */
+    --accent-text: #cc3e00; /*  4.53:1 — AA body text          */
+    --on-accent: #0b0b0c; /*  5.91:1 on the accent fill      */
+  }
+
+  [data-tone='dark'] {
+    color-scheme: dark;
+    --ground: #0b0b0c;
+    --figure: #f7f5f0; /* 18.06:1 on ground — AAA body */
+    --muted: #7a7977; /* paper 47% over ink —  4.52:1 — AA body */
+    --rule: #313030; /*  decorative hairline, no threshold */
+    --accent: #ff4d00; /*  5.91:1 — fills, non-text AND text */
+    --accent-text: #ff4d00; /*  5.91:1 — AA body text            */
+    --on-accent: #0b0b0c; /*  5.91:1 — identical in both tones */
+  }
+}

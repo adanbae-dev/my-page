@@ -1,0 +1,87 @@
+/* ==========================================================================
+   BASE — element defaults expressed purely in semantic role tokens.
+   No raw colour may appear below this line.
+   ========================================================================== */
+
+@layer base {
+  body {
+    background-color: var(--ground);
+    color: var(--figure);
+    font-family: var(--font-body);
+    font-size: var(--t-body);
+    line-height: var(--lh-body);
+    font-weight: var(--wt-regular);
+    font-variation-settings: 'wdth' var(--wd-normal);
+    /* Numerals line up in tables and metadata without a second family. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tone changes are hard cuts by design: the inversion IS the edit point.
+     The transition below only engages when a tone is changed at runtime
+     (Phase 1 scroll choreography), never on initial paint. */
+  [data-tone] {
+    background-color: var(--ground);
+    color: var(--figure);
+  }
+
+  [data-tone][data-tone-animated='true'] {
+    transition:
+      background-color var(--dur-invert) var(--ease-inout-quart),
+      color var(--dur-invert) var(--ease-inout-quart);
+  }
+
+  a {
+    color: inherit;
+    text-decoration-color: var(--accent-text);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    transition: text-decoration-color var(--dur-quick) var(--ease-standard);
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* One focus treatment, both grounds. See --focus in tokens.css. */
+  :focus-visible {
+    outline: var(--focus-w) solid var(--focus);
+    outline-offset: var(--focus-offset);
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  hr {
+    border: 0;
+    border-block-start: var(--rule-w) solid var(--rule);
+    margin: 0;
+  }
+
+  /* ---------------------------------------------------------------------
+     REDUCED MOTION
+     Durations collapse, but STATE still changes. A visitor who asks for
+     less motion still gets the full Calm -> Dense -> Calm structure — they
+     just get it as cuts instead of transitions. Never hide content here.
+     --------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-instant: 1ms;
+      --dur-quick: 1ms;
+      --dur-base: 1ms;
+      --dur-slow: 1ms;
+      --dur-invert: 1ms;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

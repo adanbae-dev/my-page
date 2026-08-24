@@ -1,0 +1,47 @@
+@layer components {
+  .section {
+    /* The ground is repainted per section — this is the inversion edit point. */
+    padding-block: var(--section-y);
+  }
+
+  .section[data-density='dense'] {
+    --section-y: clamp(3rem, 1.5rem + 7vw, 8rem);
+    --stack-gap: var(--space-s);
+  }
+
+  .section[data-density='calm'] {
+    --stack-gap: var(--space-l);
+  }
+
+  /* Two adjacent sections on the same ground are one continuous field, not
+     an inversion. Collapsing the boundary stops the eye reading a beat where
+     none lands — only a real tone change earns the full gap.
+     This lives in the same cascade layer as the padding it overrides;
+     in @layer base it would silently lose to the rule above. */
+  .section[data-tone='light'] + .section[data-tone='light'],
+  .section[data-tone='dark'] + .section[data-tone='dark'] {
+    padding-block-start: 0;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-block-end: var(--space-xl);
+  }
+
+  .headRow {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-m);
+  }
+
+  .index {
+    color: var(--muted);
+  }
+
+  .title {
+    color: var(--figure);
+  }
+}

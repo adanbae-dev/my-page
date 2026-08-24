@@ -1,0 +1,155 @@
+/* ==========================================================================
+   UTILITIES — the type scale and layout primitives, made usable.
+   These are the only global class names in the product.
+   ========================================================================== */
+
+@layer layout {
+  .wrap {
+    inline-size: 100%;
+    max-inline-size: var(--max-w);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .stack > * + * {
+    margin-block-start: var(--stack-gap, var(--space-m));
+  }
+
+  .measure {
+    max-inline-size: var(--measure);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+    gap: var(--gutter);
+  }
+}
+
+@layer utilities {
+  /* --- Type scale ---------------------------------------------------- */
+
+  /* Expanded width + black weight. Reserved for one statement per section. */
+  .display {
+    font-size: var(--t-display);
+    line-height: var(--lh-display);
+    letter-spacing: var(--tr-display);
+    font-weight: var(--wt-black);
+    font-variation-settings: 'wdth' var(--wd-expanded);
+    text-transform: uppercase;
+  }
+
+  .h1 {
+    font-size: var(--t-h1);
+    line-height: var(--lh-tight);
+    letter-spacing: var(--tr-display);
+    font-weight: var(--wt-black);
+    font-variation-settings: 'wdth' var(--wd-expanded);
+    text-transform: uppercase;
+  }
+
+  .h2 {
+    font-size: var(--t-h2);
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tr-tight);
+    font-weight: var(--wt-bold);
+  }
+
+  .h3 {
+    font-size: var(--t-h3);
+    line-height: var(--lh-snug);
+    letter-spacing: var(--tr-tight);
+    font-weight: var(--wt-bold);
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+    line-height: 1.35;
+    letter-spacing: var(--tr-tight);
+    font-weight: var(--wt-regular);
+    text-wrap: pretty;
+  }
+
+  .small {
+    font-size: var(--t-small);
+    line-height: 1.45;
+  }
+
+  /* Metadata voice: section numbers, axis names, coordinates. */
+  .label {
+    font-size: var(--t-label);
+    line-height: 1.2;
+    letter-spacing: var(--tr-label);
+    font-weight: var(--wt-medium);
+    text-transform: uppercase;
+  }
+
+  /* --- Colour roles --------------------------------------------------- */
+
+  .muted {
+    color: var(--muted);
+  }
+
+  /* Body-size accent text. Uses the tone-corrected value, never the raw fill. */
+  .accentText {
+    color: var(--accent-text);
+  }
+
+  /* The accent as a solid mark. On the light ground the raw accent clears
+     3:1 for non-text use only — which is precisely why it appears as a
+     BLOCK here and as TEXT on the dark ground. The contrast constraint is
+     the art direction, not a workaround for it. */
+  .accentBlock {
+    display: inline-block;
+    /* An inline-block does not break across lines, but its CONTENT does —
+       which fragments the mark into two stacked slabs. The mark is a single
+       object or it is nothing. Type sizes are capped so this never overflows. */
+    white-space: nowrap;
+    background-color: var(--accent);
+    color: var(--on-accent);
+    padding-inline: 0.28em;
+    padding-block: 0.04em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  /* --- Rules ---------------------------------------------------------- */
+
+  .rule {
+    border: 0;
+    border-block-start: var(--rule-w) solid var(--rule);
+    inline-size: 100%;
+  }
+
+  .ruleStrong {
+    border: 0;
+    border-block-start: var(--rule-w) solid var(--figure);
+    inline-size: 100%;
+  }
+
+  /* --- A11y ----------------------------------------------------------- */
+
+  .visuallyHidden:not(:focus):not(:active) {
+    clip-path: inset(50%);
+    block-size: 1px;
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  .skipLink {
+    position: absolute;
+    inset-block-start: var(--space-s);
+    inset-inline-start: var(--space-s);
+    z-index: 100;
+    background-color: var(--figure);
+    color: var(--ground);
+    padding: var(--space-2xs) var(--space-s);
+    transform: translateY(calc(-100% - var(--space-l)));
+  }
+
+  .skipLink:focus-visible {
+    transform: translateY(0);
+  }
+}
