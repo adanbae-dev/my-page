@@ -15,7 +15,7 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, basename } from 'node:path'
+import { dirname, join, basename, sep } from 'node:path'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const budget = JSON.parse(readFileSync(join(ROOT, 'perf.budget.json'), 'utf8'))
@@ -59,6 +59,7 @@ function measure(route) {
   const html = readFileSync(file)
   const used = { html: gz(html), css: 0, js: 0, font: 0 }
   const seen = new Set()
+  const refs = []
 
   for (const m of html
     .toString()
@@ -66,6 +67,7 @@ function measure(route) {
     const url = m[0]
     if (seen.has(url)) continue
     seen.add(url)
+    refs.push(url)
     const asset = join(ROOT, '.next', url.replace('/_next', ''))
     if (!existsSync(asset)) continue
     const cat = CATEGORY['.' + url.split('.').pop()]
@@ -76,7 +78,40 @@ function measure(route) {
   }
 
   used.total = used.html + used.css + used.js + used.font
-  return { route, used }
+  return { route, used, refs }
+}
+
+/**
+ * Deferred weight.
+ *
+ * A dynamic import does not appear in the initial HTML, so a route can pass
+ * its first-load budget while pulling half a megabyte the moment a visitor
+ * clicks. "Lazy" is not "free" — it is weight moved, not weight removed.
+ *
+ * Everything under .next/static/chunks that no prerendered route references
+ * on first load is counted here and held to its own limit.
+ */
+function measureDeferred(referenced) {
+  const chunkDir = join(ROOT, '.next', 'static', 'chunks')
+  if (!existsSync(chunkDir)) return { bytes: 0, files: [] }
+
+  const walk = (dir) =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+      e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)],
+    )
+
+  const files = []
+  let bytes = 0
+  for (const abs of walk(chunkDir)) {
+    if (!abs.endsWith('.js')) continue
+    const url = '/_next' + abs.slice(join(ROOT, '.next').length).split(sep).join('/')
+    if (referenced.has(url)) continue
+    const size = gz(readFileSync(abs))
+    bytes += size
+    files.push({ name: basename(abs), size })
+  }
+  files.sort((a, b) => b.size - a.size)
+  return { bytes, files }
 }
 
 const KEYS = ['html', 'css', 'js', 'font', 'total']
@@ -127,6 +162,86 @@ if (ok.length) {
     const pct = ((worst.used[k] / budget.budgets[k]) * 100).toFixed(0)
     line(`  ${k.padEnd(6)} tightest: ${worst.route.padEnd(34)} ${kb(worst.used[k])}  ${pct.padStart(3)}% of budget`)
   }
+}
+
+/* --- Shared vs route JS ---------------------------------------------- */
+
+/*
+ * A single `js` number conflates two things that behave completely
+ * differently: the framework baseline, which we do not write and can only
+ * accept or upgrade away from, and our own client code, which we choose
+ * every time. Reported together, the framework hides our growth — 96% of
+ * budget looks alarming when 92 points of it are Next and React.
+ *
+ * `shared` is the set of chunks EVERY route loads; `route` is what a page
+ * adds on top of it. Splitting them makes the budget bind harder on the
+ * half we control, not softer.
+ */
+const chunkSets = ok.map((r) => new Set((r.refs ?? []).filter((u) => u.endsWith('.js'))))
+const sharedUrls = chunkSets.length
+  ? [...chunkSets[0]].filter((u) => chunkSets.every((s) => s.has(u)))
+  : []
+const sizeOf = (url) => {
+  const abs = join(ROOT, '.next', url.replace('/_next', ''))
+  return existsSync(abs) ? gz(readFileSync(abs)) : 0
+}
+const sharedBytes = sharedUrls.reduce((n, u) => n + sizeOf(u), 0)
+const sharedSet = new Set(sharedUrls)
+
+const routeExtras = ok.map((r) => ({
+  route: r.route,
+  bytes: (r.refs ?? [])
+    .filter((u) => u.endsWith('.js') && !sharedSet.has(u))
+    .reduce((n, u) => n + sizeOf(u), 0),
+}))
+const worstRoute = routeExtras.reduce((a, b) => (b.bytes > a.bytes ? b : a))
+
+line('')
+line('  JS SPLIT')
+const sharedLimit = budget.budgets['js.shared']
+const routeLimit = budget.budgets['js.route']
+const sharedOver = sharedLimit !== undefined && sharedBytes > sharedLimit
+const routeOver = routeLimit !== undefined && worstRoute.bytes > routeLimit
+if (sharedLimit !== undefined) {
+  line(
+    `  ${sharedOver ? '✗' : '✓'} shared  ${kb(sharedBytes)} / ${kb(sharedLimit)}   framework + shared app code, every route`,
+  )
+  if (sharedOver) failures++
+} else {
+  line(`    shared  ${kb(sharedBytes)}  (no limit set)`)
+}
+if (routeLimit !== undefined) {
+  line(
+    `  ${routeOver ? '✗' : '✓'} route   ${kb(worstRoute.bytes)} / ${kb(routeLimit)}   worst single route (${worstRoute.route})`,
+  )
+  if (routeOver) failures++
+} else {
+  line(`    route   ${kb(worstRoute.bytes)}  worst: ${worstRoute.route}  (no limit set)`)
+}
+
+/* --- Deferred ------------------------------------------------------- */
+
+const referenced = new Set(ok.flatMap((r) => r.refs ?? []))
+const deferred = measureDeferred(referenced)
+const deferredLimit = budget.budgets.deferred
+const deferredOver = deferredLimit !== undefined && deferred.bytes > deferredLimit
+
+line('')
+line('  DEFERRED — chunks no route loads on first paint')
+if (deferred.files.length === 0) {
+  line('    (none)')
+} else {
+  for (const f of deferred.files.slice(0, 6)) line(`    ${kb(f.size)}  ${f.name}`)
+  if (deferred.files.length > 6) {
+    line(`    …and ${deferred.files.length - 6} more`)
+  }
+}
+if (deferredLimit !== undefined) {
+  const pct = ((deferred.bytes / deferredLimit) * 100).toFixed(0)
+  line(
+    `  ${deferredOver ? '✗' : '✓'} deferred ${kb(deferred.bytes)} / ${kb(deferredLimit)}   ${pct.padStart(3)}% of budget`,
+  )
+  if (deferredOver) failures++
 }
 
 line('')

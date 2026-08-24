@@ -20,18 +20,21 @@
     "check:content": "node scripts/check-content.mjs"
   },
   "dependencies": {
+    "@react-three/fiber": "9.7.0",
     "gray-matter": "4.0.3",
     "next": "16.3.2",
     "next-mdx-remote": "6.0.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "rehype-slug": "6.0.0",
-    "remark-gfm": "4.0.1"
+    "remark-gfm": "4.0.1",
+    "three": "0.185.1"
   },
   "devDependencies": {
     "@types/node": "22.19.2",
     "@types/react": "19.2.8",
     "@types/react-dom": "19.2.5",
+    "@types/three": "0.185.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.2",
     "typescript": "5.9.3"

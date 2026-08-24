@@ -1,17 +1,29 @@
 {
   "$comment": [
-    "First-load budget measured on the production build as gzip transfer size.",
-    "Set in Phase 0 while the page was nearly empty, so every later phase has",
-    "to argue for the weight it adds. Routes are DISCOVERED from the build",
-    "output, not listed here: a route that must be added by hand is a route",
-    "that will eventually be forgotten, and forgotten routes get heavy."
+    "Gzip transfer size on the production build. Routes are DISCOVERED from the",
+    "build output, not listed here: a route that must be added by hand is a",
+    "route that will eventually be forgotten, and forgotten routes get heavy.",
+    "",
+    "js.shared vs js.route exists because one `js` number conflates the",
+    "framework baseline — which we do not write — with our own client code,",
+    "which we choose every time. Reported together the framework hides our",
+    "growth. Split, the budget binds hardest on the half we control.",
+    "",
+    "js.shared is effectively a tripwire for Next/React upgrades and for code",
+    "creeping into every route. js.route is the real allowance for features.",
+    "deferred bounds everything no route loads on first paint: a dynamic import",
+    "moves weight, it does not remove it, and without a limit 'lazy-loaded'",
+    "becomes a place to hide an unbounded bundle."
   ],
   "unit": "gzip-bytes",
   "budgets": {
     "html": 24000,
     "css": 8000,
     "js": 185000,
+    "js.shared": 182272,
+    "js.route": 6144,
     "font": 100000,
+    "deferred": 245760,
     "total": 300000
   }
 }

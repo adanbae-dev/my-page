@@ -184,6 +184,31 @@ for (const tone of ['light', 'dark']) {
   }
 }
 
+/* --- The WebGL fallback palette ------------------------------------- */
+
+// The scene reads live custom properties; these literals are only its
+// pre-mount fallback. Assert they are still the same four colours.
+{
+  const src = readFileSync(TOKENS_DATA, 'utf8')
+  const block = src.slice(src.indexOf('SCENE_FALLBACK'))
+  const lightTone = tones['light']
+  line('')
+  line('  SCENE_FALLBACK (lib/tokens.data.ts -> styles/tokens.css)')
+  for (const role of ['ground', 'figure', 'accent', 'rule']) {
+    const m = new RegExp(`${role}:\\s*'(#[0-9a-fA-F]{3,8})'`).exec(block)
+    const css = resolve(lightTone[role]).toLowerCase()
+    if (!m) {
+      line(`  \u2717 ${role.padEnd(7)} missing from SCENE_FALLBACK`)
+      failed++
+      continue
+    }
+    const ts = m[1].toLowerCase()
+    const ok = ts === css
+    if (!ok) failed++
+    line(`  ${ok ? '\u2713' : '\u2717'} ${role.padEnd(7)} ${ts} ${ok ? '==' : '!='} --${role} ${css}`)
+  }
+}
+
 line('')
 line('  ' + '-'.repeat(68))
 if (failed > 0) {

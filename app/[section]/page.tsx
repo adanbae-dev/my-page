@@ -5,11 +5,23 @@ import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
+import { FieldMount } from '@/components/field/FieldMount'
 import { Section } from '@/components/Section'
 import { archive, entriesFor } from '@/lib/content/load'
+import { toField } from '@/lib/field'
 import { cx } from '@/lib/cx'
 import { SECTIONS, getSection, neighbours } from '@/lib/sections'
 import styles from './page.module.css'
+
+
+/*
+ * FieldMount is imported statically even though only TRACE renders it.
+ *
+ * next/dynamic was tried and MEASURED WORSE: the loader machinery it adds to
+ * the route bundle (+0.9 KB) costs more than the 1.7 KB component it defers.
+ * Below a certain size, deferring a component is a net loss — the heavy
+ * thing here is Three.js, and that is deferred inside FieldMount itself.
+ */
 
 type Params = { section: string }
 
@@ -108,15 +120,18 @@ export default async function SectionPage({
             </p>
           </div>
 
-          <EntryList
-            entries={entries}
-            showOrigin={isArchive}
-            emptyMessage={
-              isArchive
-                ? '아직 기록이 없습니다.'
-                : `${def.label} 구간은 아직 비어 있습니다.`
-            }
-          />
+          <div>
+            {isArchive && <FieldMount data={toField(entries)} />}
+            <EntryList
+              entries={entries}
+              showOrigin={isArchive}
+              emptyMessage={
+                isArchive
+                  ? '아직 기록이 없습니다.'
+                  : `${def.label} 구간은 아직 비어 있습니다.`
+              }
+            />
+          </div>
         </div>
       </Section>
 

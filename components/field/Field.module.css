@@ -1,0 +1,128 @@
+/* Unlayered on purpose — see any *.module.css header. */
+
+.wrap {
+  margin-block-end: var(--space-l);
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s);
+  padding-block: var(--space-2xs);
+  border-block-end: var(--rule-w) solid var(--rule);
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-block-size: 2.75rem;
+  padding-inline: 0.75em;
+  border: var(--rule-w) solid var(--figure);
+  background: transparent;
+  color: var(--figure);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-quick) var(--ease-standard),
+    color var(--dur-quick) var(--ease-standard);
+}
+
+.toggle:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.toggle[aria-pressed='true'] {
+  background-color: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.toggle:disabled {
+  border-color: var(--rule);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Live instrumentation. A showcase that cannot show its own cost is a demo,
+   not an engineering artefact. */
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Height comes from the viewport; width simply fills the column.
+   `aspect-ratio` with a `min-block-size` was tried and is a trap: when the
+   minimum height wins, the ratio drives the WIDTH up to satisfy it — a 20rem
+   minimum became a 569px box inside a 390px screen and pushed 200px of
+   horizontal overflow onto the page. */
+.stage {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: clamp(17rem, 52svh, 34rem);
+  border: var(--rule-w) solid var(--rule);
+  background-color: var(--ground);
+  overflow: hidden;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.hud {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  padding: var(--space-s);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-s);
+  background: linear-gradient(
+    to top,
+    var(--ground) 30%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+.hudTitle {
+  font-size: var(--t-lead);
+  line-height: 1.2;
+  letter-spacing: var(--tr-tight);
+  font-weight: var(--wt-bold);
+}
+
+.hudMeta {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis {
+  position: absolute;
+  inset-block-start: var(--space-s);
+  inset-inline-start: var(--space-s);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.state {
+  padding-block: var(--space-m);
+  color: var(--muted);
+}
+
+.note {
+  padding-block-start: var(--space-2xs);
+  color: var(--muted);
+}

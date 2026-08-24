@@ -69,3 +69,19 @@ export const GROUND_HEX: Readonly<Record<'light' | 'dark', string>> = {
   light: '#f7f5f0',
   dark: '#0b0b0c',
 } as const
+
+/**
+ * Fallback palette for the WebGL scene.
+ *
+ * The scene reads its colours from the live CSS custom properties, which is
+ * what keeps it from drifting from the rest of the product. These literals
+ * are only what it falls back to before the host element exists — and like
+ * GROUND_HEX they are asserted against styles/tokens.css by
+ * `pnpm check:contrast`, so a fallback cannot quietly become a fifth colour.
+ */
+export const SCENE_FALLBACK: Readonly<Record<string, string>> = {
+  ground: '#f7f5f0',
+  figure: '#0b0b0c',
+  accent: '#ff4d00',
+  rule: '#dbd9d5',
+} as const
