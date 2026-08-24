@@ -36,7 +36,7 @@ export function Section({
       <div className="wrap">
         {hasHead && (
           <div className={styles.head}>
-            <hr className="rule" />
+            <hr className="rule draw" />
             <div className={styles.headRow}>
               <p className={`label ${styles.title}`}>{title}</p>
               {index && <p className={`label ${styles.index}`}>{index}</p>}

@@ -69,3 +69,23 @@
   border-block-start: var(--rule-w) solid var(--rule);
   color: var(--muted);
 }
+
+/* A hairline draws under the row being considered. The row already changes
+   colour; this says which row the pointer has actually settled on, which
+   colour alone does not on a list this dense. */
+.row::after {
+  content: '';
+  grid-column: 1 / -1;
+  block-size: var(--rule-w);
+  background-color: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-out-expo);
+  margin-block-start: var(--space-2xs);
+  margin-block-end: calc(var(--space-2xs) * -1 - var(--rule-w));
+}
+
+.row:hover::after,
+.row:focus-visible::after {
+  transform: scaleX(1);
+}

@@ -34,13 +34,13 @@ export default function GoldenPath() {
           <h1 id="hero-title" className={cx('display', styles.heroTitle)} lang="en">
             <DisplayLines lines={['An interface', 'for a life']} />
             <br />
-            <span className="accentBlock">in progress</span>
+            <span className="accentBlock markWipe">in progress</span>
           </h1>
 
           <p className="lead measure">{site.statement}</p>
 
           <div className={styles.heroFoot}>
-            <div className={cx('label', styles.axes)}>
+            <div className={cx('label', 'focusGroup', styles.axes)}>
               {SECTIONS.map((s) => (
                 <a key={s.id} href={`#${s.id}`}>
                   {s.index} {s.label}
@@ -67,7 +67,7 @@ export default function GoldenPath() {
               {/* Named so the browser can carry this headline into the depth
                   route instead of cutting to an unrelated page. */}
               <ViewTransition name={`chapter-${s.id}`}>
-                <h2 className="h1" lang="en">
+                <h2 className="h1 arrive" lang="en">
                   <DisplayLines lines={s.titleLines} />
                 </h2>
               </ViewTransition>

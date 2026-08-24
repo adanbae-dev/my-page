@@ -99,7 +99,7 @@ export default async function SectionPage({
           {/* Same name as the heading on the golden path, so the browser
               carries it across the navigation instead of cutting. */}
           <ViewTransition name={`chapter-${def.id}`}>
-            <h1 id="chapter-title" className={cx('h1', styles.title)} lang="en">
+            <h1 id="chapter-title" className={cx('h1', 'arrive', styles.title)} lang="en">
               <DisplayLines lines={def.titleLines} />
             </h1>
           </ViewTransition>

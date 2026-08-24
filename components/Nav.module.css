@@ -109,3 +109,33 @@
 .itemName {
   display: inline;
 }
+
+/* Reading progress — a hairline that fills across the bar's own bottom edge.
+   `scroll(root block)` ties it to the document, so it is exact by
+   construction rather than by a listener trying to keep up. */
+.progress {
+  position: absolute;
+  inset-block-end: calc(var(--rule-w) * -1);
+  inset-inline-start: 0;
+  block-size: 2px;
+  inline-size: 100%;
+  background-color: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: scroll()) {
+  .progress {
+    animation: readingProgress linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes readingProgress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}

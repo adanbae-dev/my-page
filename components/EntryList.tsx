@@ -52,7 +52,7 @@ export function EntryList({
           <Link
             key={`${entry.chapter}/${entry.slug}`}
             href={`/${entry.chapter}/${entry.slug}`}
-            className={styles.row}
+            className={cx('settle', styles.row)}
           >
             <span className={cx('label', styles.meta)}>
               <time dateTime={entry.date}>{formatDate(entry.date)}</time>

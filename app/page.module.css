@@ -30,11 +30,14 @@
   border-block-start: var(--rule-w) solid var(--rule);
 }
 
+/* Colour is deliberately NOT set here. Modules are unlayered and would beat
+   the utilities layer, so setting it would make .focusGroup's dim a no-op —
+   which is exactly what happened the first time. The axes read as figure
+   until the pointer or focus picks one out. */
 .axes {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-m);
-  color: var(--muted);
 }
 
 /* --- Chapter ---------------------------------------------------------- */

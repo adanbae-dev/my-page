@@ -1,0 +1,107 @@
+/* ==========================================================================
+   INTERACTION — scroll- and pointer-driven, at zero JavaScript cost.
+   --------------------------------------------------------------------------
+   GSAP + ScrollTrigger is roughly 50 KB gzipped. The shared bundle has 3 KB
+   of headroom, so a JS scroll library was never available here — and that
+   turned out to be the right constraint rather than a limitation. CSS
+   scroll-driven animations run on the compositor, so they cannot jank the
+   main thread, and they work with JavaScript disabled.
+
+   Two gates wrap everything below, and the order matters:
+
+     @supports  — a browser without scroll timelines gets the finished
+                  layout, never a permanently hidden one.
+     @media     — a visitor who asked for less motion gets the same,
+                  because the from-state of a reveal is invisible content.
+
+   Nothing in here may be the only way to see something.
+   ========================================================================== */
+
+@layer utilities {
+  /* --- Pointer: attention ------------------------------------------------ */
+
+  /* Looking at one axis means not looking at the others. Cheap, immediate,
+     and it says something true about reading a list of choices. */
+  .focusGroup:hover > *:not(:hover),
+  .focusGroup:focus-within > *:not(:focus-visible) {
+    color: var(--muted);
+    transition: color var(--dur-quick) var(--ease-standard);
+  }
+
+  /* --- First paint ------------------------------------------------------- */
+
+  /* The mark wipes in once, on arrival. @starting-style means no JS and no
+     animation library — and the text underneath is painted immediately, so
+     this never delays the largest contentful paint. */
+  .markWipe {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path var(--dur-invert) var(--ease-inout-quart);
+  }
+
+  @starting-style {
+    .markWipe {
+      clip-path: inset(0 100% 0 0);
+    }
+  }
+
+  /* --- Scroll-driven ----------------------------------------------------- */
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* Type is set, not floated in: the line is revealed from its own
+         baseline upward, the way a headline lands on a page. */
+      .arrive {
+        animation: arrive linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 62%;
+      }
+
+      @keyframes arrive {
+        from {
+          clip-path: inset(0 0 100% 0);
+          transform: translateY(0.14em);
+        }
+        to {
+          clip-path: inset(0 0 0 0);
+          transform: none;
+        }
+      }
+
+      /* A rule drawing itself is the section being written. */
+      .draw {
+        animation: draw linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+        transform-origin: left center;
+      }
+
+      @keyframes draw {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+
+      /* List rows settle as they arrive. Short range and no opacity fade —
+         a row you can half-see is worse than one that is simply there. */
+      .settle {
+        animation: settle linear both;
+        animation-timeline: view();
+        animation-range: entry 4% entry 34%;
+      }
+
+      @keyframes settle {
+        from {
+          opacity: 0.35;
+          transform: translateY(0.35rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+}

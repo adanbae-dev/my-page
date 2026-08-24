@@ -96,6 +96,10 @@ export function Nav({ initialTone }: NavProps) {
 
   const currentId = onGoldenPath ? active : pathname.replace(/^\//, '')
 
+  // An entry page is the only place with enough text for progress to mean
+  // anything. `/think` is a list; `/think/slug` is something you read.
+  const isReading = pathname.split('/').filter(Boolean).length === 2
+
   return (
     <nav
       ref={navRef}
@@ -103,6 +107,10 @@ export function Nav({ initialTone }: NavProps) {
       data-tone={tone}
       aria-label="섹션 색인"
     >
+      {/* Reading progress. Driven by the document scroll timeline, so it
+          costs no JavaScript, cannot fall behind the scroll, and simply
+          does not appear where the browser has no scroll timelines. */}
+      {isReading && <div className={styles.progress} aria-hidden="true" />}
       <div className={cx('wrap', styles.inner)}>
         <Link href="/" className={cx('label', styles.brand)}>
           {site.name} <span className={styles.brandSuffix}>· {site.title}</span>

@@ -13,6 +13,7 @@ import '@/styles/reset.css'
 import '@/styles/tokens.css'
 import '@/styles/base.css'
 import '@/styles/utilities.css'
+import '@/styles/interaction.css'
 
 /**
  * One grotesk family for the whole product. The width axis carries the

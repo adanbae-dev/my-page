@@ -15,11 +15,12 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "check": "pnpm run typecheck && pnpm run lint && pnpm run check:contrast && pnpm run check:content",
     "check:budget": "node scripts/check-budget.mjs",
-    "verify": "pnpm run check && pnpm run build && pnpm run check:layers && pnpm run check:budget",
+    "verify": "pnpm run check && pnpm run build && pnpm run check:layers && pnpm run check:motion && pnpm run check:budget",
     "check:layers": "node scripts/check-layers.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:release": "node scripts/check-release.mjs",
-    "release": "pnpm run verify && pnpm run check:release"
+    "release": "pnpm run verify && pnpm run check:release",
+    "check:motion": "node scripts/check-motion.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.7.0",
