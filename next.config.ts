@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next'
 
+import { contentSecurityPolicy } from './lib/csp.mjs'
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -10,29 +12,14 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: false },
 
   /**
-   * Response headers.
-   *
-   * The CSP is deliberately strict about where code may come from and
-   * refuses to be framed. `'unsafe-inline'` on style-src is required: React
-   * emits inline styles for the few dynamic values this product sets (the
-   * motion sweep duration), and nonce-ing them would mean giving up static
-   * prerendering for every route. Scripts get no such exemption beyond what
-   * Next's own inline bootstrap needs.
+   * Response headers. The policy itself lives in lib/csp.mjs so that the
+   * release gate can assert, mechanically, that the production build never
+   * ships 'unsafe-eval'.
    */
   async headers() {
-    const csp = [
-      "default-src 'self'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "frame-ancestors 'none'",
-      "object-src 'none'",
-      "img-src 'self' data: blob:",
-      "style-src 'self' 'unsafe-inline'",
-      "font-src 'self' data:",
-      "script-src 'self' 'unsafe-inline'",
-      "connect-src 'self'",
-      'upgrade-insecure-requests',
-    ].join('; ')
+    const csp = contentSecurityPolicy({
+      dev: process.env.NODE_ENV !== 'production',
+    })
 
     return [
       {

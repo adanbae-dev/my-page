@@ -16,6 +16,8 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
+import { contentSecurityPolicy } from '../lib/csp.mjs'
+
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const APP = join(ROOT, '.next', 'server', 'app')
 
@@ -49,7 +51,35 @@ if (!origin) {
   blockers.push(`NEXT_PUBLIC_SITE_URL is "${origin}" — needs a public https origin`)
 }
 
-/* 2. The files a published site is expected to have --------------------- */
+/* 2. The production CSP -------------------------------------------------- */
+
+// `'unsafe-eval'` is what React's development build needs and what nothing in
+// production needs. lib/csp.mjs adds it conditionally; this asserts the
+// condition actually holds, because a comment saying "dev only" is not a
+// mechanism. Both sides read the same function, so they cannot disagree.
+{
+  const prod = contentSecurityPolicy({ dev: false })
+  const dev = contentSecurityPolicy({ dev: true })
+
+  if (prod.includes('unsafe-eval')) {
+    blockers.push("production CSP contains 'unsafe-eval'")
+  }
+  if (!dev.includes('unsafe-eval')) {
+    warnings.push(
+      "development CSP has no 'unsafe-eval' — React's dev build will log a console error on every load",
+    )
+  }
+  for (const required of [
+    "frame-ancestors 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    'upgrade-insecure-requests',
+  ]) {
+    if (!prod.includes(required)) blockers.push(`production CSP is missing: ${required}`)
+  }
+}
+
+/* 3. The files a published site is expected to have --------------------- */
 
 const REQUIRED = [
   ['sitemap.xml', 'sitemap.xml.body'],
@@ -68,7 +98,7 @@ const hasImage = (name) =>
 if (!hasImage('opengraph-image')) warnings.push('no opengraph-image in the build')
 if (!hasImage('icon')) warnings.push('no icon in the build')
 
-/* 3. Every page a crawler will see -------------------------------------- */
+/* 4. Every page a crawler will see -------------------------------------- */
 
 function htmlFiles(dir = APP, prefix = '') {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
@@ -107,7 +137,7 @@ for (const { route, file } of pages) {
   }
 }
 
-/* 4. Content the author still has to write ------------------------------ */
+/* 5. Content the author still has to write ------------------------------ */
 
 const placeholders = []
 const contentRoot = join(ROOT, 'content')
