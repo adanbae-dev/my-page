@@ -14,6 +14,7 @@ import styles from './page.module.css'
 
 export const metadata = {
   title: 'Art Direction',
+  alternates: { canonical: '/art-direction' },
   description:
     'Phase 0 — Inverted Duotone: the ground, the type, the accent law and the motion vocabulary for PERSONAL INTERFACE.',
 }

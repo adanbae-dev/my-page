@@ -17,7 +17,9 @@
     "check:budget": "node scripts/check-budget.mjs",
     "verify": "pnpm run check && pnpm run build && pnpm run check:layers && pnpm run check:budget",
     "check:layers": "node scripts/check-layers.mjs",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "release": "pnpm run verify && pnpm run check:release"
   },
   "dependencies": {
     "@react-three/fiber": "9.7.0",

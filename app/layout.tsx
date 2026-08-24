@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from 'next'
 import { Archivo } from 'next/font/google'
 import type { ReactNode } from 'react'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
-import { site } from '@/lib/site.config'
+import { SITE_URL, site, url } from '@/lib/site.config'
 import { GROUND_HEX } from '@/lib/tokens.data'
 import { boundingTone, type ToneStep } from '@/lib/tone'
 
@@ -40,6 +41,10 @@ const ROOT_SCORE: readonly ToneStep[] = [
 const ground = boundingTone(ROOT_SCORE)
 
 export const metadata: Metadata = {
+  // Every relative URL in every page's metadata resolves against this.
+  // Without it Next warns and emits relative OpenGraph URLs, which most
+  // crawlers refuse to follow.
+  metadataBase: new URL(SITE_URL),
   title: {
     default: `${site.title} — ${site.name}`,
     // The person, not the product: an entry titled the same as the site
@@ -48,6 +53,20 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.title,
+  alternates: {
+    canonical: '/',
+    types: { 'application/atom+xml': [{ url: '/feed.xml', title: `${site.title} — 전체 기록` }] },
+  },
+  openGraph: {
+    type: 'website',
+    locale: site.locale,
+    siteName: site.title,
+    title: `${site.title} — ${site.name}`,
+    description: site.description,
+    url: '/',
+  },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
 }
 
 export const viewport: Viewport = {
@@ -59,6 +78,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" data-tone={ground} className={archivo.variable}>
       <body>
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: `${site.title} — ${site.name}`,
+            description: site.description,
+            url: url('/'),
+            inLanguage: site.lang,
+            author: {
+              '@type': 'Person',
+              name: site.name,
+              url: url('/'),
+            },
+          }}
+        />
         <a className="skipLink" href="#main">
           본문으로 건너뛰기
         </a>

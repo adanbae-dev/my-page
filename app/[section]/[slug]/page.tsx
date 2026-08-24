@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Prose } from '@/components/Prose'
 import { Section } from '@/components/Section'
 import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
@@ -9,6 +10,7 @@ import { LOG_KIND_LABEL, type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
 import { getSection, isSectionId } from '@/lib/sections'
+import { site, url } from '@/lib/site.config'
 import styles from './page.module.css'
 
 type Params = { section: string; slug: string }
@@ -28,7 +30,22 @@ export async function generateMetadata({
   if (!isSectionId(section)) return {}
   const entry = getEntry(section, slug)
   if (!entry) return {}
-  return { title: entry.title, description: entry.summary }
+  return {
+    title: entry.title,
+    description: entry.summary,
+    alternates: { canonical: `/${section}/${slug}` },
+    openGraph: {
+      type: 'article',
+      url: `/${section}/${slug}`,
+      title: entry.title,
+      description: entry.summary,
+      publishedTime: entry.date,
+      ...(entry.chapter === 'think' && entry.updated
+        ? { modifiedTime: entry.updated }
+        : {}),
+      tags: [...entry.tags],
+    },
+  }
 }
 
 /** The metadata line under the title — different per chapter, on purpose. */
@@ -66,6 +83,23 @@ export default async function EntryPage({
 
   return (
     <>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: entry.title,
+          description: entry.summary,
+          datePublished: entry.date,
+          dateModified:
+            entry.chapter === 'think' && entry.updated ? entry.updated : entry.date,
+          inLanguage: site.lang,
+          keywords: entry.tags.join(', '),
+          articleSection: chapter.label,
+          mainEntityOfPage: url(`/${entry.chapter}/${entry.slug}`),
+          author: { '@type': 'Person', name: site.name, url: url('/') },
+          publisher: { '@type': 'Person', name: site.name, url: url('/') },
+        }}
+      />
       {/* Calm — arrival */}
       <Section tone="light" density="calm">
         <div className={styles.head}>

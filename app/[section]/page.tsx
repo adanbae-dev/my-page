@@ -40,9 +40,17 @@ export async function generateMetadata({
   const { section } = await params
   const def = getSection(section)
   if (!def) return {}
+  const description = `${def.question} — ${def.blurb}`
   return {
     title: def.label,
-    description: `${def.question} — ${def.blurb}`,
+    description,
+    alternates: { canonical: `/${def.id}` },
+    openGraph: {
+      type: 'website',
+      url: `/${def.id}`,
+      title: `${def.label} — ${def.question}`,
+      description,
+    },
   }
 }
 
