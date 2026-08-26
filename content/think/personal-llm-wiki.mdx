@@ -1,0 +1,138 @@
+---
+title: LLM이 1차 출처로 읽는 개인 위키
+date: 2026-06-25
+updated: 2026-06-25
+summary: 위키를 사람이 읽기 좋게가 아니라 LLM이 읽기 좋게 만들면 무엇이 달라지는가. 제로부터 재현 가능하게 적은 절차.
+tags: [obsidian, knowledge-management, llm]
+---
+
+Obsidian을 **"나에 대한 개인 지식 그래프"** + **Claude(LLM)가 1차 출처로 읽는 위키**로 세팅하는 전체 절차. 이 vault를 제로부터 다시 만든다면 이 문서 하나로 재현 가능하도록 정리했다.
+
+> 핵심 철학: **위키는 사람이 읽기 좋게가 아니라, LLM에 주입하기 좋게** 설계한다 — 작은 커널(항상 로드) + 타입별 원자 노트 + 링크 + frontmatter. (= "지식 OS")
+
+## 0. 준비물
+| 항목                               | 용도                 | 비고                |
+| -------------------------------- | ------------------ | ----------------- |
+| **Obsidian**                     | vault 본체 (로컬 마크다운) | 무료                |
+| **Claude Desktop / Claude Code** | 위키를 읽고 쓰는 LLM      | MCP 연동 설정 참고  |
+| **Node/npx**                     | MCP 서버 실행          | `node -v` 확인      |
+| **git**                          | 로컬 백업              | 원격 push 없음(프라이버시) |
+| iCloud (Apple)                   | 다기기 동기화            | 동기화 설정 참고     |
+
+## 1. vault 생성 & 위치
+- iOS와 공유하려면 **Obsidian iCloud 컨테이너 안**에 만든다:
+  `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/my-wiki`
+- Mac 터미널/Claude Code 편의를 위해 `~/Dev/my-wiki` → 실제 경로로 **심볼릭 링크**.
+- 자세한 동기화·충돌 주의: → 동기화 설정
+
+## 2. 폴더 구조 (타입별)
+폴더는 **노트 타입**으로 나눈다. 생활 영역(일/학업/독서)은 폴더가 아니라 MOC+태그로 가로지른다(→ 5번).
+
+| 폴더 | 역할 | 주 타입 |
+|---|---|---|
+| `00_Core/` | 커널 (항상 로드) | identity / idea / moc |
+| `10_Identity/` | 정체성 | identity |
+| `15_Work/` | 내가 하는 일·프로젝트 | project |
+| `20_History/` | 배경·역사 | event |
+| `30_People/` | 사람들 | person |
+| `40_Environment/` | 환경(조직·장소) | org / place |
+| `50_Philosophy/` | 생각·철학 | idea |
+| `60_Assets/` | 자산 | asset |
+| `70_Knowledge/` | 지식·정보 | reference |
+| `80_Inbox/` | 미분류 메모 | memo |
+| `_templates/` | 타입별 노트 템플릿 | — |
+
+> 예외: '일'만 폴더(`15_Work`)+타입(`project`)을 따로 둔다. 진행 중 프로젝트를 담을 타입이 필요하기 때문.
+
+## 3. 타입 시스템 & frontmatter 규약
+**모든 노트는 frontmatter 필수**: `type / aliases / tags / created / updated / status` + 타입별 필드. 노트를 고치면 `updated`를 갱신한다. 본문은 한국어, 키·태그·폴더명은 영문.
+
+`status` 값: `seed`(씨앗) → `growing`(자라는 중) → `evergreen`(안정). MOC는 보통 `evergreen`.
+
+타입별 추가 필드 (템플릿은 `_templates/`):
+| type | 폴더 | 타입별 필드 |
+|---|---|---|
+| `identity` | 00/10 | — (`tags: [core]`은 커널만) |
+| `project` | 15_Work | `state`(active/paused/done) · `role` · `org` · `period` / `tags: [area/work]` |
+| `event` | 20_History | `date` · `period` |
+| `person` | 30_People | `relationship` · `org` · `met` · `importance` |
+| `idea` | 50_Philosophy | `confidence`(high/medium/low) |
+| `asset` | 60_Assets | `category` · `value` · `location` / `tags: [private]` 기본 |
+| `reference` | 70_Knowledge | `source` · `author` · `url` · (책이면)`read`·`rating` |
+| `memo` | 80_Inbox | — / `tags: [inbox]` |
+| `moc` | 각 도메인 | — / `tags: [moc]`, `status: evergreen` |
+
+## 4. 커널 만들기 (`00_Core/`) — 항상 LLM에 주입
+커널은 **짧고 고밀도**로. 세부는 전부 링크로 넘긴다 (context engineering).
+
+| 노트 | 역할 |
+|---|---|
+| `Index.md` (moc) | 최상위 지도. 모든 도메인 MOC + 시스템 문서 입구 |
+| `Me.md` (identity) | "아무 LLM에나 붙여넣는 1페이지" — 나는 누구인가 |
+| `Now.md` (identity) | 지금 집중·진행 중 (Derek Sivers `/now` 스타일, 자주 갱신) |
+| `Principles.md` (idea) | 핵심 원칙. 각 원칙은 Philosophy MOC로 펼침 |
+
+→ Claude는 답하기 전에 **이 4개를 먼저 읽고**, 질문 관련 도메인 노트만 추가로 읽는다 (전부 읽지 않음).
+
+## 5. MOC + 영역(area) 태그 시스템
+- **도메인 MOC**: 폴더(타입)별 허브. `Identity / Work / History / People / Environment / Philosophy / Assets / Knowledge / Inbox MOC`.
+- **영역(area)**: `일/학업/독서`처럼 폴더를 가로지르는 테마. **폴더가 아니라 MOC+태그**로 묶는다:
+  - `#area/work` → Work MOC
+  - `#area/study` → Study MOC
+  - `#area/reading` → Reading MOC
+- MOC는 Dataview 쿼리로 하위 노트를 자동 수집(예: Inbox MOC가 `type=memo`를 모음).
+
+## 6. 플러그인
+| 플러그인 | 왜 | 필수도 |
+|---|---|---|
+| **Templates**(코어) 또는 **Templater** | `{{title}}`·`{{date}}` 치환, 타입별 새 노트 | 권장 |
+| **Dataview** | Index/MOC의 자동 목록·최근 갱신 표 | 권장(쿼리 쓰면 필수) |
+| **Local REST API** | Claude MCP 연동의 토대 | LLM 연동 시 필수 → MCP 연동 설정 |
+
+## 7. 작성·유지 워크플로우
+1. **원자성**: 노트 1개 = 개념/엔티티 1개. 길어지면 쪼갠다. (단 이 가이드 같은 runbook은 예외 — 하나의 절차서)
+2. **연결**: 새 노트는 관련 기존 노트로 `위키링크`를 걸고, 해당 도메인 MOC에도 연결.
+3. **빠른 캡처 → 승격**: 즉석 메모는 `80_Inbox/`(memo)에 → 정리되면 도메인 폴더로 옮겨 정식 타입 노트로 승격.
+4. **갱신**: 노트 수정 시 frontmatter `updated` 날짜 갱신. `Now`는 특히 자주.
+
+## 8. CLAUDE.md — LLM이 위키를 읽는 규칙
+vault 루트의 `CLAUDE.md`가 Claude Code의 행동을 규정한다. 핵심:
+- "나/내 위키/내 정보"를 물으면 **이 위키를 1차 출처**로.
+- 답 전에 **커널 4개 먼저 읽기** → 질문 관련 도메인만 추가 (context engineering).
+- 폴더 지도·타입·frontmatter·영역 규칙 명시.
+- **프라이버시**: `#private` 노트는 외부 공유 산출물에서 제외 (→ 12번).
+
+## 9. Claude 연동 (MCP)
+- **토대**: Local REST API 플러그인 → **서버**: `obsidian-mcp-server`(cyanheads) STDIO로 Desktop·Code 양쪽 연결.
+- 명령·JSON·주의사항 전체: → **MCP 연동 설정**
+- 핵심 주의: Obsidian이 켜져 있어야 응답하고, **vault 전체(=`#private` 포함)가 노출**된다.
+
+## 10. 동기화 (iCloud)
+- iCloud Drive로 Mac↔iPhone/iPad 동기화. 동시 편집 충돌 주의.
+- 전체: → **동기화 설정**
+
+## 11. 백업 & git
+- **로컬 git 백업**: 워킹트리는 vault, git 디렉터리는 iCloud 밖(`--separate-git-dir`). **원격 push 없음** → `#private`가 외부로 안 나감.
+- iCloud는 백업이 아니라 동기화(삭제도 전파) → 복구는 git 스냅샷으로.
+- 자세히: → 동기화 설정
+
+## 12. 프라이버시 (중요)
+- `tags`에 `private`가 있는 노트(자산 상세 등)는 **민감 정보**.
+- 외부 공유 산출물(공개 자기소개, 외부 전송 텍스트)에는 **`#private` 내용을 포함하지 않는다.**
+- 강한 격리가 필요하면: iOS 고급 데이터 보호(ADP) 또는 민감 vault 분리.
+
+## 13. 처음부터 끝까지 체크리스트
+- [ ] Obsidian 설치 + iCloud 경로에 vault 생성 (1)
+- [ ] 타입별 폴더 + `_templates/` 생성 (2,3)
+- [ ] 커널 4종 작성: Index / Me / Now / Principles (4)
+- [ ] 도메인 MOC + 영역 태그(`#area/*`) 세팅 (5)
+- [ ] Templates/Templater + Dataview 설치 (6)
+- [ ] `CLAUDE.md` 작성 (8)
+- [ ] Local REST API + obsidian-mcp-server로 Claude 연동 (9)
+- [ ] iCloud 동기화 + 다기기 추가 (10)
+- [ ] git 로컬 백업(원격 push 금지) (11)
+- [ ] `#private` 규칙 점검 (12)
+
+## 연결
+- Index · 00_Core/Me · Now · Principles
+- MCP 연동 설정 · 동기화 설정
