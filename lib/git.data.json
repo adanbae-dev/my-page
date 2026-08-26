@@ -14,8 +14,48 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-26",
-  "head": "411ca64",
+  "head": "373352e",
   "commits": [
+    {
+      "sha": "373352e",
+      "date": "2026-08-26",
+      "subject": "Identity: GOLDIBUG",
+      "insertions": 43,
+      "deletions": 12,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "392defe",
+      "date": "2026-08-26",
+      "subject": "Fix: the OG image asked for fewer glyphs than it drew",
+      "insertions": 20,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "app"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "bc92f9d",
+      "date": "2026-08-26",
+      "subject": "Record: snapshot at 411ca64",
+      "insertions": 232,
+      "deletions": 0,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "411ca64",
       "date": "2026-08-26",
