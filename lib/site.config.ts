@@ -39,3 +39,20 @@ export const site = {
 
 export const url = (path = '/'): string =>
   `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
+
+/**
+ * The repository this product is built from.
+ *
+ * Public on purpose. `/build` links every commit to its own diff, and a
+ * build record whose claims cannot be checked is not a record — it is a
+ * claim. The one-line cost of that decision is that the owner and name
+ * live here rather than being derived from the git remote: a remote is a
+ * local development detail and can be an SSH URL, which is not a link.
+ */
+export const REPO = {
+  owner: 'adanbae-dev',
+  name: 'my-page',
+  url: 'https://github.com/adanbae-dev/my-page',
+} as const
+
+export const commitUrl = (sha: string): string => `${REPO.url}/commit/${sha}`

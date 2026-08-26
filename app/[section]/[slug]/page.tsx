@@ -6,11 +6,12 @@ import { JsonLd } from '@/components/JsonLd'
 import { Prose } from '@/components/Prose'
 import { Section } from '@/components/Section'
 import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
+import { historyFor } from '@/lib/git/load'
 import { LOG_KIND_LABEL, type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
 import { getSection, isSectionId } from '@/lib/sections'
-import { site, url } from '@/lib/site.config'
+import { commitUrl, site, url } from '@/lib/site.config'
 import styles from './page.module.css'
 
 type Params = { section: string; slug: string }
@@ -80,6 +81,19 @@ export default async function EntryPage({
   if (!entry || !chapter) notFound()
 
   const { newer, older } = entryNeighbours(section, slug)
+
+  /*
+   * Provenance, from the repository.
+   *
+   * Deliberately NOT merged into the `updated` frontmatter field, and the
+   * temptation to do so is exactly why this comment exists. They are
+   * different facts: `updated` is the author saying "I revised this",
+   * while a commit is any change at all — a rename, a lint fix, a typo.
+   * Collapsing them would derive an authored claim from a mechanical one
+   * and produce the same drift the content model exists to prevent.
+   */
+  const history = historyFor(section, slug)
+  const born = history[history.length - 1]
 
   return (
     <>
@@ -168,6 +182,39 @@ export default async function EntryPage({
                 {t}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* What the repository knows about this file. Nothing here is
+            authored; it is all derived, the way the reading estimate is. */}
+        {born && (
+          <div className={styles.provenance}>
+            <p className={cx('label', styles.provenanceHead)}>기록</p>
+
+            <p className="small">
+              {formatDate(born.date)}에 처음 커밋됐고,{' '}
+              {history.length === 1
+                ? '이후 손대지 않았습니다.'
+                : `이후 ${history.length - 1}번 더 손댔습니다.`}
+            </p>
+
+            <ul className={styles.commits}>
+              {history.map((c) => (
+                <li key={c.sha}>
+                  <a href={commitUrl(c.sha)} className={styles.sha} rel="noreferrer">
+                    {c.sha}
+                  </a>
+                  <time className="label muted" dateTime={c.date}>
+                    {formatDate(c.date)}
+                  </time>
+                  <span className="small">{c.subject}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="label">
+              <Link href="/build">전체 빌드 기록 →</Link>
+            </p>
           </div>
         )}
       </Section>

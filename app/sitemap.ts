@@ -29,6 +29,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),
+    // /build has no lastModified on purpose: it changes on every commit,
+    // and telling a crawler that daily would be noise, not information.
+    { url: url('/build'), changeFrequency: 'weekly' as const, priority: 0.4 },
     { url: url('/art-direction'), changeFrequency: 'yearly' as const, priority: 0.3 },
   ]
 }

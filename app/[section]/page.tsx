@@ -126,6 +126,15 @@ export default async function SectionPage({
             <p className={cx('label', styles.count)}>
               {entries.length} {isArchive ? 'RECORDS' : 'ENTRIES'}
             </p>
+
+            {/* The machine-written half of the same promise. It lives on its
+                own route rather than in the chapter list because it is not an
+                entry — nobody wrote it. */}
+            {isArchive && (
+              <p className="label">
+                <Link href="/build">아무도 쓰지 않은 기록 — BUILD →</Link>
+              </p>
+            )}
           </div>
 
           <div>

@@ -1,7 +1,11 @@
 node_modules/
 .next/
 out/
-build/
+# Anchored to the repo root on purpose. Unanchored, `build/` matches a
+# directory called build ANYWHERE — which silently swallowed the
+# app/build route: it built locally and would have 404'd in production,
+# because the source was never committed.
+/build/
 .DS_Store
 *.pem
 .env*

@@ -1,0 +1,260 @@
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so a component's own
+   styles can never be overridden by the global reset or utilities,
+   whatever order the bundler happens to emit the files in. */
+.head {
+  min-block-size: 62svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.crumb {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+  margin-block-end: var(--space-l);
+}
+
+.title {
+  margin-block-end: var(--space-m);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 60rem) {
+  .body {
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+}
+
+/* --- The readout ------------------------------------------------------- */
+
+.readout {
+  display: grid;
+  gap: var(--space-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: var(--space-2xs);
+}
+
+.readout dt {
+  color: var(--muted);
+}
+
+.readout dd {
+  text-align: end;
+}
+
+.note code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.92em;
+}
+
+/* --- Eras -------------------------------------------------------------- */
+
+.eras {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+.eraHead {
+  margin-block-end: var(--space-m);
+}
+
+.eraRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s);
+  margin-block-start: var(--space-2xs);
+}
+
+.eraLabel {
+  color: var(--accent-text);
+}
+
+.eraStat {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.eraTitle {
+  margin-block-start: var(--space-2xs);
+}
+
+/* --- Commit rows ------------------------------------------------------- */
+
+.rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xs);
+  padding-block: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+@media (min-width: 48rem) {
+  .row {
+    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) minmax(0, 11rem);
+    gap: var(--space-m);
+    align-items: start;
+  }
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-xs);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The sha is the link, because the sha is the thing being cited. */
+.sha {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--accent-text);
+}
+
+.rowBody {
+  min-inline-size: 0;
+}
+
+.subject {
+  text-wrap: pretty;
+}
+
+.areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs, 0.25rem);
+  margin-block-start: var(--space-2xs);
+}
+
+.chip {
+  border: var(--rule-w) solid var(--rule);
+  padding-inline: 0.4em;
+  padding-block: 0.1em;
+  color: var(--muted);
+}
+
+/* Generated content is labelled as such wherever it appears, so a reader
+   never has to wonder whether a number includes a lockfile. */
+.chip[data-area='generated'] {
+  border-style: dashed;
+}
+
+.touched {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-xs);
+  margin-block-start: var(--space-xs);
+}
+
+.rowStat {
+  display: grid;
+  gap: var(--space-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 48rem) {
+  .rowStat {
+    justify-items: end;
+  }
+}
+
+.churn {
+  white-space: nowrap;
+}
+
+.add {
+  color: var(--accent-text);
+}
+
+.del {
+  color: var(--muted);
+}
+
+.files {
+  font-size: var(--t-label);
+}
+
+/* --- The bar ----------------------------------------------------------- */
+
+/* A track, so a small commit still reads as small against a fixed span
+   rather than as an ambiguous stub. */
+.track {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 11rem;
+  block-size: 0.32rem;
+  background-color: var(--rule);
+}
+
+.bar {
+  display: block;
+  block-size: 100%;
+  /* Deletions. The insertions sit on top as their own share. */
+  background-color: var(--muted);
+  /* Width comes from the server as an inline custom width: the value is
+     data, and data does not belong in a stylesheet. */
+  min-inline-size: 1px;
+}
+
+.barAdd {
+  display: block;
+  block-size: 100%;
+  background-color: var(--accent);
+}
+
+/* --- Departure --------------------------------------------------------- */
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-m);
+}
+
+.step {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.stepNext {
+  text-align: end;
+}
+
+/* A stated cap. Silent truncation would read as "this is everything". */
+.capped {
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+  max-inline-size: var(--measure);
+}
+
+.omitted {
+  padding-block-start: var(--space-2xs);
+  border-block-start: var(--rule-w) dashed var(--rule);
+}

@@ -13,6 +13,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -155,6 +156,117 @@ if (existsSync(contentRoot)) {
   }
 }
 for (const p of placeholders) warnings.push(`${p} is still a placeholder entry`)
+
+/* 6. The build record ---------------------------------------------------- */
+
+/**
+ * Two questions about lib/git.data.json, and they are not the same question.
+ *
+ * IS IT SAFE?   The parser does not collect authors, so an email address in
+ *               the snapshot means the projection regressed and a personal
+ *               address is about to be published as static HTML on every
+ *               route that shows a commit. That is a blocker.
+ *
+ * IS IT CURRENT? The snapshot cannot contain the commit that writes it, so it
+ *               is ALWAYS at least one commit behind. One is structural; more
+ *               than that means `pnpm sync:git` was not run, and /build will
+ *               quietly under-report the work. That is a warning, because a
+ *               slightly stale record is still a true record.
+ */
+{
+  const snapshotFile = join(ROOT, 'lib', 'git.data.json')
+
+  if (!existsSync(snapshotFile)) {
+    warnings.push('no lib/git.data.json — /build falls back to live git only (run `pnpm sync:git`)')
+  } else {
+    const raw = readFileSync(snapshotFile, 'utf8')
+
+    const email = /[\w.+-]+@[\w-]+\.[\w.-]+/.exec(raw)
+    if (email) {
+      blockers.push(`lib/git.data.json contains an email address (${email[0]}) — it would ship in static HTML`)
+    }
+
+    let snap = null
+    try {
+      snap = JSON.parse(raw)
+    } catch {
+      blockers.push('lib/git.data.json is not valid JSON')
+    }
+
+    if (snap && typeof snap.head === 'string') {
+      const git = (args) =>
+        execFileSync('git', args, {
+          cwd: ROOT,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+        }).trim()
+
+      /*
+       * Each question gets its OWN error handling, and that is the point.
+       *
+       * A single try/catch around all of this was written first and was
+       * WRONG: `git cat-file` on a sha that does not exist throws, the broad
+       * catch swallowed it, and a snapshot pointing at a bogus commit was
+       * reported as "no git repository" — the gate stayed silent on exactly
+       * the case it exists to catch. Verified by deliberately corrupting the
+       * head and watching nothing happen.
+       */
+      let shallow = null
+      try {
+        shallow = git(['rev-parse', '--is-shallow-repository']) !== 'false'
+      } catch {
+        // No git binary, or not a repository. Deploying from a tarball is a
+        // legitimate way to ship; it just cannot be audited from here.
+        line('  · no readable git repository — snapshot freshness not checked')
+      }
+
+      if (shallow === true) {
+        // A shallow clone cannot answer any of this. Say so rather than
+        // reporting a distance that is an artefact of the clone depth.
+        line(`  · shallow clone — snapshot freshness not checked (head ${snap.head})`)
+      } else if (shallow === false) {
+        let type = null
+        try {
+          type = git(['cat-file', '-t', snap.head])
+        } catch {
+          type = null
+        }
+
+        if (type !== 'commit') {
+          blockers.push(
+            `lib/git.data.json head ${snap.head} is not a commit in this repository — regenerate with \`pnpm sync:git\``,
+          )
+        } else {
+          // An ancestor check, not just a distance: a snapshot taken on
+          // another branch or before a rebase would otherwise look merely
+          // stale, and /build would cite commits this history does not have.
+          let ancestor = true
+          try {
+            execFileSync('git', ['merge-base', '--is-ancestor', snap.head, 'HEAD'], {
+              cwd: ROOT,
+              stdio: 'ignore',
+            })
+          } catch {
+            ancestor = false
+          }
+
+          if (!ancestor) {
+            blockers.push(
+              `lib/git.data.json head ${snap.head} is not an ancestor of HEAD — regenerate with \`pnpm sync:git\``,
+            )
+          } else {
+            const behind = Number.parseInt(git(['rev-list', '--count', `${snap.head}..HEAD`]), 10)
+            if (Number.isFinite(behind) && behind > 1) {
+              warnings.push(
+                `lib/git.data.json is ${behind} commits behind HEAD — run \`pnpm sync:git\``,
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+}
 
 /* --- Report ------------------------------------------------------------ */
 
