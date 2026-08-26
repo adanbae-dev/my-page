@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import { JsonLd } from '@/components/JsonLd'
 import { Nav } from '@/components/Nav'
-import { SITE_URL, site, url } from '@/lib/site.config'
+import { SITE_URL, person, site, url } from '@/lib/site.config'
 import { GROUND_HEX } from '@/lib/tokens.data'
 import { boundingTone, type ToneStep } from '@/lib/tone'
 
@@ -87,11 +87,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             description: site.description,
             url: url('/'),
             inLanguage: site.lang,
-            author: {
-              '@type': 'Person',
-              name: site.name,
-              url: url('/'),
-            },
+            author: person(),
           }}
         />
         <a className="skipLink" href="#main">

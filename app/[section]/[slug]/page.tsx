@@ -11,7 +11,7 @@ import { LOG_KIND_LABEL, type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
 import { getSection, isSectionId } from '@/lib/sections'
-import { commitUrl, site, url } from '@/lib/site.config'
+import { commitUrl, person, site, url } from '@/lib/site.config'
 import styles from './page.module.css'
 
 type Params = { section: string; slug: string }
@@ -110,8 +110,8 @@ export default async function EntryPage({
           keywords: entry.tags.join(', '),
           articleSection: chapter.label,
           mainEntityOfPage: url(`/${entry.chapter}/${entry.slug}`),
-          author: { '@type': 'Person', name: site.name, url: url('/') },
-          publisher: { '@type': 'Person', name: site.name, url: url('/') },
+          author: person(),
+          publisher: person(),
         }}
       />
       {/* Calm — arrival */}

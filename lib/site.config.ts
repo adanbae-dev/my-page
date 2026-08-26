@@ -7,10 +7,30 @@
  * refuses to pass while the placeholder is still here, so it cannot ship
  * by being forgotten.
  */
-const NAME = '[name]'
+const NAME = 'GOLDIBUG'
 
-/** True while the author's name has not been filled in. */
-export const NAME_IS_PLACEHOLDER = NAME === '[name]'
+/**
+ * The author's legal name — structured data only, never displayed.
+ *
+ * NAME above is the WORDMARK: what a reader sees, invariant across every
+ * locale. This answers a different question — how a machine connects this
+ * site to a résumé. They are separate fields because a pseudonymous
+ * wordmark and a findable identity are both wanted, and collapsing them
+ * loses one or the other.
+ *
+ * Empty is a valid, deliberate state. `alternateName` is omitted from the
+ * structured data entirely rather than published blank, so this site stays
+ * pseudonymous until someone decides otherwise on purpose.
+ */
+const LEGAL_NAME = ''
+
+/* There is deliberately no `NAME_IS_PLACEHOLDER` export here.
+   One existed, was never imported anywhere, and broke the build the moment
+   NAME was filled in: `NAME === '[name]'` is a comparison between two
+   literal types with no overlap, which TypeScript rejects. The check it
+   claimed to provide is real but lives in scripts/check-release.mjs, which
+   greps this file's source — a gate that keeps working precisely because it
+   does not depend on the value being comparable at the type level. */
 
 /**
  * Canonical origin. Set NEXT_PUBLIC_SITE_URL in the deployment environment;
@@ -56,3 +76,18 @@ export const REPO = {
 } as const
 
 export const commitUrl = (sha: string): string => `${REPO.url}/commit/${sha}`
+
+/**
+ * The one Person object, for every piece of structured data on the site.
+ *
+ * Built here rather than at the three call sites it had — the WebSite author
+ * and an entry's author and publisher. Three literals meant `alternateName`
+ * could land on an article byline and be missing from the site itself, which
+ * is exactly the kind of drift this file exists to prevent.
+ */
+export const person = () => ({
+  '@type': 'Person' as const,
+  name: NAME,
+  ...(LEGAL_NAME ? { alternateName: LEGAL_NAME } : {}),
+  url: url('/'),
+})
