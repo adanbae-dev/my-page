@@ -11,7 +11,26 @@ export default async function OpenGraphImage() {
   const line1 = 'An interface'
   const line2 = 'for a life'
   const line3 = 'in progress'
-  const text = `${site.title}${site.name}${line1}${line2}${line3}`
+  /**
+   * Every character this image actually DRAWS, in every case it draws it in.
+   *
+   * The old version listed the title, the name and the three headline lines
+   * — and missed two things. It omitted the section labels entirely, and it
+   * ignored that the layout uppercases the title with `.toUpperCase()` and
+   * the headline with `textTransform`. Google's `text=` subsetting is
+   * case-sensitive, so the glyphs it never asked for came back missing and
+   * Satori quietly substituted its default face for them.
+   *
+   * Measured: H, K, M and V always fell back — visible as a lighter
+   * `THINK MAKE LIVE TRACE`. And with a non-Latin `site.name` the subset
+   * also lost G, which broke `IN PROGRESS`: the loudest element on the card,
+   * degraded by an unrelated change to the author's name.
+   *
+   * Asking for both cases of everything drawn costs nothing — the subset is
+   * a few kilobytes either way — and removes the coupling.
+   */
+  const drawn = `${site.title}${site.name}${line1}${line2}${line3}${site.sections.join('')}`
+  const text = `${drawn}${drawn.toUpperCase()}`
 
   return new ImageResponse(
     (
