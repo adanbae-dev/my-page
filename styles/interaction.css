@@ -542,14 +542,31 @@
         /* `cover`, not `entry`, and this was measured rather than guessed.
            `view()` on the span reports the SPAN'S own progress, and its entry
            phase is only about its own height — 26% of that turned out to be
-           24 pixels of scroll for eleven characters, so one wheel tick
-           skipped the whole reveal. `cover` spans the full crossing, viewport
-           height plus element height, which is roughly 1100px here.
+           24 pixels of scroll for eleven characters, so one wheel tick skipped
+           the whole reveal. `cover` spans the full crossing: viewport height
+           plus element height.
+
+           ENDS AT 50%, because 50% of `cover` is the headline sitting at the
+           middle of the screen — exactly, and independently of either height:
+
+             top(p) = vh − p(vh + h),  centre = top + h/2
+             centre = vh/2  ⟹  p(vh + h) = (vh + h)/2  ⟹  p = 0.5
+
+           Confirmed against the page before relying on it: the headline's
+           centre met the viewport's centre at scrollY 890, and the cover phase
+           ran 284→1496, which puts that moment at 50.0%.
+
+           It used to run to 92%, which meant the last character landed 464px
+           after the headline had passed the middle — the typing finished on
+           the way out. The cost of ending at the middle is that the same
+           characters now share half the scroll: about 22px each rather than
+           40. That is the trade, and it is the direction that was asked for.
 
            Split by CHARACTERS rather than by line index, so a long line gets
-           proportionally more scroll and the typing speed stays constant. */
-        animation-range: cover calc(var(--o, 0) / var(--total, 20) * 92%)
-          cover calc((var(--o, 0) + var(--n, 20)) / var(--total, 20) * 92%);
+           proportionally more scroll and the speed stays constant across
+           lines. */
+        animation-range: cover calc(var(--o, 0) / var(--total, 20) * 50%)
+          cover calc((var(--o, 0) + var(--n, 20)) / var(--total, 20) * 50%);
       }
     }
   }
