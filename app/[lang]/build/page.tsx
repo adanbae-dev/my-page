@@ -80,14 +80,32 @@ const n = (v: number): string => v.toLocaleString('en-US')
  * kept — the weight readout costs 0.20 KB gzip here, which was worth checking
  * because two guesses about where the kilobyte went were both wrong.
  *
- * 64 has no meaning beyond fitting; it is not the sigil's 64 slots wearing a
- * different hat.
+ * LOWERED 64 -> 52. Measured again, because the page changed again: at 56
+ * commits it is 22.7 KB of 23.4, which is 0.7 KB — five rows — of headroom.
+ * 64 was unreachable for the second time.
+ *
+ * 52 PINS the page rather than merely slowing it: the cap is below the current
+ * commit count, so the rendered row count stops moving and the html stops
+ * growing whatever the history does. That is the cap doing its job, and it is
+ * why the html budget was NOT raised instead. The budget is a global contract
+ * covering every route; the cap is a local decision this page discloses in
+ * words ("N rows omitted"). Degrading visibly beats loosening a contract
+ * quietly for sixty-eight routes that are nowhere near it.
+ *
+ * The pin is not perfect and the limit of this approach should be written down
+ * rather than discovered later: era headers and their totals are never
+ * dropped, so the page still grows slowly as new phases are declared. When 52
+ * rows stops being enough to call this a record, the fix is structural — paginate
+ * by era, one phase per route — not another number here.
+ *
+ * Neither 64 nor 52 has meaning beyond fitting; neither is the sigil's 64
+ * slots wearing a different hat.
  *
  * Eras are NEVER dropped — every phase keeps its header and its totals, so
  * the shape of the record stays complete. Only individual rows past the cap
  * are omitted, and the page says how many.
  */
-const ROW_BUDGET = 64
+const ROW_BUDGET = 52
 
 /**
  * Bar length is LOG-scaled, for the same reason lib/field.ts positions by
