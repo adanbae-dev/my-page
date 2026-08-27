@@ -14,8 +14,45 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "9bcbb9f",
+  "head": "68db941",
   "commits": [
+    {
+      "sha": "68db941",
+      "date": "2026-08-27",
+      "subject": "Content: 수리통계학 기호 읽는 법",
+      "insertions": 149,
+      "deletions": 0,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "statistics-notation"
+        }
+      ]
+    },
+    {
+      "sha": "9ae98c5",
+      "date": "2026-08-27",
+      "subject": "Content: 게이트가 통과시킨 버그들",
+      "insertions": 183,
+      "deletions": 1,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "gates-that-passed"
+        }
+      ]
+    },
     {
       "sha": "9bcbb9f",
       "date": "2026-08-27",
