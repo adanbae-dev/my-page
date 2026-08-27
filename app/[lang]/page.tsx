@@ -4,6 +4,7 @@ import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
+import { Sigil } from '@/components/Sigil'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
@@ -55,14 +56,29 @@ export default async function GoldenPath({
           <p className="lead measure balance trail">{d.site.statement}</p>
 
           <div className={styles.heroFoot}>
-            <div className={cx('label', 'focusGroup', 'onLoad', styles.axes)}>
-              {SECTIONS.map((s) => (
-                <a key={s.id} href={`#${s.id}`}>
-                  {s.index} {s.label}
-                </a>
-              ))}
+            {/* Axes and hint are ONE child. `justify-content: space-between`
+                counts children, not meanings, so a third one here would push
+                this pair off the edges — which is exactly what a third child
+                did to the nav rail before it was grouped. */}
+            <div className={styles.heroMeta}>
+              <div className={cx('label', 'focusGroup', 'onLoad', styles.axes)}>
+                {SECTIONS.map((s) => (
+                  <a key={s.id} href={`#${s.id}`}>
+                    {s.index} {s.label}
+                  </a>
+                ))}
+              </div>
+              <p className="label onLoad">{d.home.scrollHint}</p>
             </div>
-            <p className="label onLoad">{d.home.scrollHint}</p>
+
+            {/* A seal at the foot of the first screen. It is computed from the
+                repository, so it is the one element of this page that nobody
+                else could put on theirs. */}
+            <Sigil
+              dial
+              label={d.sigil.label}
+              className={cx('onLoad', styles.heroSeal)}
+            />
           </div>
         </div>
       </section>

@@ -20,14 +20,31 @@
 }
 
 .heroFoot {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-m) var(--space-l);
+  margin-block-start: var(--space-xl);
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.heroMeta {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-m);
-  margin-block-start: var(--space-xl);
-  padding-block-start: var(--space-s);
-  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+/* Small enough to read as a stamp rather than as an illustration. It scales
+   with the viewport because at a fixed size it is a postage stamp on a
+   desktop and half the screen on a phone. */
+.heroSeal {
+  inline-size: clamp(4.5rem, 11vw, 8rem);
+  align-self: end;
+  justify-self: end;
+  color: var(--fg);
 }
 
 /* Colour is deliberately NOT set here. Modules are unlayered and would beat

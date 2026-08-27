@@ -258,3 +258,32 @@
   padding-block-start: var(--space-2xs);
   border-block-start: var(--rule-w) dashed var(--rule);
 }
+
+/* --- Sigil ------------------------------------------------------------- */
+
+/* The mark sits next to the readout it is computed from. Placing it in the
+   hero of this page would make it a graphic; placing it here makes it a
+   reading of the table above. */
+/* STACKED, not side by side. This block lives in the page's narrow sidebar,
+   and putting a 128px mark beside the text left the legend about 175px wide —
+   a measure of four or five words per line, which is unreadable regardless of
+   how well it is written. Measured in the browser, not guessed at. */
+.sigilBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-s);
+  padding-block-start: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.sigilMark {
+  inline-size: clamp(4.5rem, 40%, 7rem);
+  color: var(--fg);
+}
+
+.sigilText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}

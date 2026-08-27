@@ -146,6 +146,15 @@ export const en = {
     ogDescription:
       'The record of how this interface was built. Authored lines and generated lines counted separately, every commit linked to its diff.',
   },
+  sigil: {
+    heading: 'Sigil',
+    label:
+      'A mark computed from this repository\u2019s own record: {count} commits, {used} of {slots} slots filled.',
+    legend:
+      'One slot per commit. Depth is how many lines that commit actually changed by hand, and the marks reaching past the ring are the phases the history declared for itself. The {remaining} empty slots have not been earned yet. When they are, a new ring opens inside and the outer one sets for good — nothing already drawn ever moves again.',
+    caption: '{used} of {slots}',
+  },
+
   notFound: {
     title: 'Not found',
     body: 'There is nothing at this address. The four chapters below are the whole site.',

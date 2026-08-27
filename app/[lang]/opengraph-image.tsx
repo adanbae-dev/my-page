@@ -1,7 +1,9 @@
 import { ImageResponse } from 'next/og'
 
+import { commits } from '@/lib/git/load'
 import { LOCALES } from '@/lib/i18n/config'
 import { OG, OG_CONTENT_TYPE, OG_SIZE, ogFonts } from '@/lib/og'
+import { sigilFrom, sigilSvgMarkup } from '@/lib/sigil'
 import { site } from '@/lib/site.config'
 
 export const size = OG_SIZE
@@ -19,6 +21,19 @@ export function generateStaticParams(): { lang: string }[] {
 export const alt = `${site.title} — ${site.tagline}`
 
 export default async function OpenGraphImage() {
+  /* Data URI rather than a component: Satori rasterises an `<img>`, and it
+     does not run the CSS that resolves `currentColor`. Base64 rather than a
+     percent-encoded URI because the markup contains `#` twice per colour and
+     one unescaped `#` truncates the whole document at the fragment. */
+  const mark = sigilFrom(commits())
+  const seal =
+    mark.count > 0
+      ? `data:image/svg+xml;base64,${Buffer.from(
+          sigilSvgMarkup(mark, { wedge: OG.ink, tick: OG.rule, nub: OG.accent }),
+          'utf8',
+        ).toString('base64')}`
+      : null
+
   const line1 = 'An interface'
   const line2 = 'for a life'
   const line3 = 'in progress'
@@ -58,8 +73,26 @@ export default async function OpenGraphImage() {
           fontFamily: 'Archivo, NotoKR, sans-serif',
         }}
       >
-        <div style={{ display: 'flex', fontSize: 22, letterSpacing: 4 }}>
-          {site.title.toUpperCase()}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+          }}
+        >
+          <div style={{ display: 'flex', fontSize: 22, letterSpacing: 4 }}>
+            {site.title.toUpperCase()}
+          </div>
+          {/* The generated mark, stamped on the card. This is the one element
+              of the image that cannot be copied from anyone else's template:
+              it is folded from this repository's commit record at build time.
+              Only on the card, not on the favicon — sixty-four wedges are
+              legible at 150px and mush at 16, which is why app/icon.tsx keeps
+              its geometric block. */}
+          {seal ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={seal} width={150} height={150} alt="" />
+          ) : null}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.88 }}>

@@ -5,13 +5,15 @@ import { notFound } from 'next/navigation'
 import { DisplayLines } from '@/components/DisplayLines'
 import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
+import { Sigil } from '@/components/Sigil'
 import { cx } from '@/lib/cx'
-import { isLocale } from '@/lib/i18n/config'
+import { isLocale, t } from '@/lib/i18n/config'
 import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
-import { eras, stats } from '@/lib/git/load'
+import { commits, eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
+import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
 import { commitUrl, REPO, site } from '@/lib/site.config'
 import styles from './page.module.css'
 
@@ -162,8 +164,13 @@ export default async function BuildPage({
 }) {
   const { lang } = await params
   if (!isLocale(lang)) notFound()
+  const d = dict(lang)
 
   const s = stats()
+  /* Folded here as well as inside <Sigil>, so the legend can name the numbers
+     it is describing. Two passes over 64 slots is not worth an API that makes
+     every caller thread geometry through its props. */
+  const mark = sigilFrom(commits())
   const groups = eras()
 
   const widthOf = scaler(
@@ -282,6 +289,23 @@ export default async function BuildPage({
               <p className="small muted">
                 이 빌드는 저장소 기록에 접근할 수 없었습니다.
               </p>
+            )}
+
+            {mark.count > 0 && (
+              <div className={styles.sigilBlock}>
+                <Sigil label={d.sigil.label} className={styles.sigilMark} />
+                <div className={styles.sigilText}>
+                  <p className="label">{d.sigil.heading}</p>
+                  <p className="small muted measure">
+                    {t(d.sigil.legend, {
+                      remaining: mark.remaining,
+                      used: mark.used,
+                      slots: SIGIL_SLOTS,
+                      count: mark.count,
+                    })}
+                  </p>
+                </div>
+              </div>
             )}
 
             <p className={cx('small', 'muted', 'measure', styles.note)}>

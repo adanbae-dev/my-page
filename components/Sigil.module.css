@@ -1,0 +1,25 @@
+/* Geometry is in lib/sigil.ts; this file only says what the parts look like.
+
+   Everything is painted with currentColor or the accent, so the mark inverts
+   with its section the same way type does and needs no per-tone override. */
+
+.sigil {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible; /* milestone nubs sit outside the viewBox radius */
+}
+
+.wedge {
+  fill: currentColor;
+}
+
+/* Work not yet done. Present, but clearly not a claim. */
+.tick {
+  fill: currentColor;
+  opacity: 0.22;
+}
+
+.nub {
+  fill: var(--accent);
+}
