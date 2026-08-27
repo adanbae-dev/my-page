@@ -17,6 +17,19 @@ import type React from 'react'
  * a headline out letter by letter.
  */
 export function DisplayLines({ lines }: { lines: readonly string[] }) {
+  /* Characters before each line, and the total. A typed reveal needs these to
+     run at a constant SPEED: with only a per-line duration, a 17-character
+     line and an 8-character line finish in the same time and therefore type
+     at different speeds. With a per-character duration the delay for line i
+     is the sum of the lines before it, which is what `--o` carries. */
+  const total = lines.reduce((n, l) => n + l.length, 0)
+  let before = 0
+  const offsets = lines.map((l) => {
+    const o = before
+    before += l.length
+    return o
+  })
+
   return (
     <>
       {lines.map((line, i) => (
@@ -27,9 +40,13 @@ export function DisplayLines({ lines }: { lines: readonly string[] }) {
             style={
               {
                 '--i': i,
-                // Character count, so a typed reveal can take exactly one
-                // step per character instead of an arbitrary number.
+                // Character count, so a typed reveal takes exactly one step
+                // per character instead of an arbitrary number.
                 '--n': line.length,
+                // Characters before this line, and in the whole headline —
+                // together they make the typing speed constant across lines.
+                '--o': offsets[i],
+                '--total': total,
               } as React.CSSProperties
             }
           >

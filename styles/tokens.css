@@ -34,9 +34,11 @@
       system-ui, sans-serif;
     /* Archivo carries no Hangul. Korean falls through to the platform
        grotesk. See docs/ART-DIRECTION.md -> "Open: Korean typeface". */
-    /* One typed line. Long enough to read as typing rather than as a wipe,
-     short enough that the headline is finished before anyone waits for it. */
-  --dur-type: 620ms;
+    /* Time per CHARACTER, not per line. A per-line duration makes a 17-character
+     line and an 8-character line type at different speeds, which reads as
+     inconsistent rather than as rhythm. 78ms lands around 13 characters a
+     second — slow enough to watch, fast enough not to be waited on. */
+  --dur-char: 78ms;
 
   --font-kr: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo',
       'Malgun Gothic', system-ui, sans-serif;

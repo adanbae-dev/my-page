@@ -469,8 +469,10 @@
        Writing it explicitly would put an `animation-timeline` mention outside
        `@supports (animation-timeline: …)`, which check:motion refuses, and it
        is right to: the exception is invisible from the outside. */
-    animation: typeIn var(--dur-type) steps(var(--n, 20), end) both;
-    animation-delay: calc(var(--i, 0) * var(--dur-type));
+    animation: typeIn steps(var(--n, 20), end) both;
+    /* One character per --dur-char, so every line types at one speed. */
+    animation-duration: calc(var(--n, 20) * var(--dur-char));
+    animation-delay: calc(var(--o, 0) * var(--dur-char));
   }
 
   @keyframes typeIn {
@@ -486,7 +488,7 @@
      finish before wiping in. markWipe already owns the transition; this only
      moves when it starts. */
   .type .markWipe {
-    transition-delay: calc(var(--lines, 2) * var(--dur-type));
+    transition-delay: calc(var(--total, 22) * var(--dur-char));
   }
 
   /* A caret, blinking where the typing stopped. Three blinks and it leaves —
@@ -500,8 +502,8 @@
     margin-inline-start: 0.06em;
     vertical-align: baseline;
     background-color: var(--accent);
-    animation: caret 520ms steps(1, end) calc(var(--lines, 2) * var(--dur-type)) 6
-      both;
+    animation: caret 520ms steps(1, end) calc(var(--total, 22) * var(--dur-char))
+      6 both;
   }
 
   @keyframes caret {
@@ -537,10 +539,17 @@
       .typeScroll .lineIn {
         animation: typeIn steps(var(--n, 20), end) both;
         animation-timeline: view();
-        /* Each line spends its own stretch of the scroll, so the second only
-           starts once the first has finished. */
-        animation-range: entry calc(3% + var(--i, 0) * 23%)
-          entry calc(29% + var(--i, 0) * 23%);
+        /* `cover`, not `entry`, and this was measured rather than guessed.
+           `view()` on the span reports the SPAN'S own progress, and its entry
+           phase is only about its own height — 26% of that turned out to be
+           24 pixels of scroll for eleven characters, so one wheel tick
+           skipped the whole reveal. `cover` spans the full crossing, viewport
+           height plus element height, which is roughly 1100px here.
+
+           Split by CHARACTERS rather than by line index, so a long line gets
+           proportionally more scroll and the typing speed stays constant. */
+        animation-range: cover calc(var(--o, 0) / var(--total, 20) * 92%)
+          cover calc((var(--o, 0) + var(--n, 20)) / var(--total, 20) * 92%);
       }
     }
   }

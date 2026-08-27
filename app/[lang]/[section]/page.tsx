@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
-import type React from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
@@ -146,8 +145,7 @@ export default async function SectionPage({
               id="chapter-title"
               className={cx('h1', 'type', 'balance', styles.title)}
               lang="en"
-              style={{ '--lines': 2 } as React.CSSProperties}
-            >
+              >
               <DisplayLines lines={def.titleLines} />
             </h1>
           </ViewTransition>

@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
-import type React from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
@@ -43,13 +42,10 @@ export default async function GoldenPath({
         <div className={cx('wrap', styles.heroInner)}>
           <p className="label onLoad">{site.title}</p>
 
-          {/* `--lines` tells the accent block and the caret how long the
-              typing takes, so the sequence stays right if a line is added. */}
           <h1
             id="hero-title"
             className={cx('display', 'type', styles.heroTitle)}
             lang="en"
-            style={{ '--lines': 2 } as React.CSSProperties}
           >
             <DisplayLines lines={['An interface', 'for a life']} />
             <br />
