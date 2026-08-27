@@ -2,8 +2,9 @@ import Link from 'next/link'
 
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
+import type { LocalisedEntry } from '@/lib/content/load'
 import type { Entry } from '@/lib/content/schema'
-import { localePath, t, type Locale } from '@/lib/i18n/config'
+import { localePath, LOCALE_META, t, type Locale } from '@/lib/i18n/config'
 import { dict, type Dictionary } from '@/lib/i18n/dictionary'
 import { getSection } from '@/lib/sections'
 import styles from './EntryList.module.css'
@@ -30,7 +31,7 @@ function trailing(entry: Entry, d: Dictionary): string {
 }
 
 type EntryListProps = {
-  entries: readonly Entry[]
+  entries: readonly LocalisedEntry[]
   locale: Locale
   /** Show which chapter each entry came from — used by the archive. */
   showOrigin?: boolean
@@ -68,7 +69,14 @@ export function EntryList({
             </span>
 
             <span>
-              <span className={styles.title} lang="ko">
+              {/* The entry's OWN language, not the page's. An untranslated
+                  entry shows its Korean title on an English page, and a
+                  screen reader has to be told that or it reads Hangul with an
+                  English voice. This is why `locale` travels with the entry. */}
+              <span
+                className={cx('rowMark', styles.title)}
+                lang={LOCALE_META[entry.locale].lang}
+              >
                 {entry.title}
               </span>
               <span className={cx('small', styles.summary)} style={{ display: 'block' }}>

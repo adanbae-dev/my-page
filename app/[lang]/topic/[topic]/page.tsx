@@ -3,11 +3,13 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { EntryList } from '@/components/EntryList'
+import { FieldMount } from '@/components/field/FieldMount'
 import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
 import { TopicFilter } from '@/components/TopicFilter'
 import { allTopicParams, entriesForTopic, topicCounts } from '@/lib/content/load'
 import { cx } from '@/lib/cx'
+import { toField } from '@/lib/field'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { breadcrumbSchema, collectionPageSchema, pageMetadata } from '@/lib/seo'
@@ -126,6 +128,13 @@ export default async function TopicPage({ params }: { params: Promise<Params> })
         <p className={cx('label', 'muted', styles.count)}>
           {t(d.topics.countOf, { n: entries.length })}
         </p>
+
+        {/* The same spatial view TRACE offers, scoped to this topic — and it
+            costs nothing new: it is the deferred Three.js chunk that already
+            exists, behind the same button and the same capability probe. A
+            topic is a slice through the timeline, which is exactly what this
+            scene draws. */}
+        <FieldMount data={toField(entries, d)} labels={d.field} />
 
         <EntryList entries={entries} locale={lang} showOrigin />
       </Section>

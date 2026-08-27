@@ -17,6 +17,29 @@
    Nothing in here may be the only way to see something.
    ========================================================================== */
 
+/* --- Cross-document navigation ------------------------------------------ */
+
+/* Every navigation on this site is a full document load — the locale switcher
+   deliberately so, and the rest because every route is prerendered. This
+   makes the browser cross-fade between them instead of flashing white.
+   
+   About sixty bytes for the single most visible interaction on the site, and
+   it degrades to what happens today in a browser that does not support it.
+   Kept outside @layer: an at-rule with no selector has nothing to cascade
+   against, and burying it in a layer only hides it. */
+@view-transition {
+  navigation: auto;
+}
+
+/* The bar is the one thing that should NOT cross-fade — it is in the same
+   place on both pages, so animating it reads as a flicker rather than a
+   transition. Naming it takes it out of the default root snapshot. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(root) {
+    animation-duration: var(--dur-quick);
+  }
+}
+
 @layer utilities {
   /* --- Pointer: attention ------------------------------------------------ */
 
@@ -103,5 +126,27 @@
         }
       }
     }
+  }
+}
+
+@layer utilities {
+  /* --- Pointer: a row answers ------------------------------------------ */
+
+  /* An accent hairline draws itself under the title of the row you are on.
+     The list is the densest thing in the product and every row looks alike;
+     this is the cheapest way to say "this one" without moving anything —
+     no layout shift, no colour change to re-check against the contrast
+     contract, and it works from the keyboard for free. */
+  .rowMark {
+    background-image: linear-gradient(var(--accent), var(--accent));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 var(--rule-w);
+    transition: background-size var(--dur-quick) var(--ease-standard);
+  }
+
+  a:hover .rowMark,
+  a:focus-visible .rowMark {
+    background-size: 100% var(--rule-w);
   }
 }
