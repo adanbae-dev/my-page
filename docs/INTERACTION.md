@@ -114,7 +114,6 @@ Added after the i18n and topics work, on the same premise: **no JavaScript.**
 | `layIn` | `view()`, clip-path wipe | supports + reduced-motion |
 | `slideIn` | `view()` | supports + reduced-motion |
 | `indexFill` | `view()`, colour only | supports — it is an indicator |
-| `sweep` | `view()`, accent band through display type | supports — indicator |
 | `pin` | `position: sticky` | — |
 | `lift` · `tilt` | `:hover` / `:focus-visible` | — |
 | `accentRise` | `:hover` / `:focus-visible`, `scaleY` from baseline | — |
@@ -124,11 +123,22 @@ Added after the i18n and topics work, on the same premise: **no JavaScript.**
 | `::selection` | — | — |
 | shared elements | `@view-transition` + `view-transition-name` | — |
 
-`pnpm check:motion` classifies all ten scroll-driven ones and asserts each is
-gated for what it actually does. `indexFill` and `sweep` are indicators —
-they move over content that is already painted — so they stay available to a
-visitor who asked for less motion, the same call the reading-progress
-hairline gets.
+`pnpm check:motion` classifies all nine scroll-driven ones and asserts each is
+gated for what it actually does. `indexFill` is an indicator — it moves over
+content that is already painted — so it stays available to a visitor who asked
+for less motion, the same call the reading-progress hairline gets.
+
+### One that shipped broken
+
+`sweep` sent an accent band through the display type with
+`background-clip: text`, and it made the home page headline invisible. That
+property paints an element's OWN background through its glyphs and needs
+`color: transparent` to show — but `DisplayLines` wraps each line in a span,
+and a span inherits the transparent colour while background is not an
+inherited property. Nothing to clip, nothing to see. Removed rather than
+repaired: every display headline here goes through DisplayLines, so the effect
+has no site, and leaving the class in would mean the next child element added
+inside such a headline vanishes with no error.
 
 ### Two that needed a different mechanism
 

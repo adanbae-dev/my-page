@@ -42,7 +42,7 @@ export default async function GoldenPath({
         <div className={cx('wrap', styles.heroInner)}>
           <p className="label onLoad">{site.title}</p>
 
-          <h1 id="hero-title" className={cx('display', 'sweep', styles.heroTitle)} lang="en">
+          <h1 id="hero-title" className={cx('display', styles.heroTitle)} lang="en">
             <DisplayLines lines={['An interface', 'for a life']} />
             <br />
             <span className="accentBlock markWipe">in progress</span>
