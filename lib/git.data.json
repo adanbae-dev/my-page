@@ -14,8 +14,38 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "6c2ddbe",
+  "head": "414853a",
   "commits": [
+    {
+      "sha": "414853a",
+      "date": "2026-08-27",
+      "subject": "Effects: 13 of them, and js.route did not move",
+      "insertions": 443,
+      "deletions": 27,
+      "generated": 0,
+      "files": 13,
+      "areas": [
+        "app",
+        "components",
+        "styles",
+        "docs",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e2fba1b",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 6c2ddbe",
+      "insertions": 79,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "6c2ddbe",
       "date": "2026-08-27",
