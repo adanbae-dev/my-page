@@ -141,11 +141,16 @@ export default async function EntryPage({
             <span>{d.sections[chapter.id].question}</span>
           </p>
 
-          <h1 className={cx('h2', styles.title)} lang="ko">
+          {/* Paired with the same title in the list it was clicked from. */}
+          <h1
+            className={cx('h2', styles.title)}
+            lang={LOCALE_META[entry.locale].lang}
+            style={{ viewTransitionName: `entry-${entry.chapter}-${entry.slug}` }}
+          >
             {entry.title}
           </h1>
 
-          <p className="lead measure">{entry.summary}</p>
+          <p className="lead measure balance trail">{entry.summary}</p>
 
           <p className={cx('label', styles.byline)}>
             {byline(entry, d).map((bit) => (
@@ -168,7 +173,7 @@ export default async function EntryPage({
           exist because the brief promised decisions rather than screenshots. */}
       {isWork(entry) && (
         <Section tone="dark" density="dense" index={chapter.index} title={d.entry.decisions}>
-          <div className={styles.decisions}>
+          <div className={cx("layIn", styles.decisions)}>
             <div className={styles.decision}>
               <p className={cx('label', styles.decisionLabel)}>{d.entry.constraint}</p>
               <p className="small">{entry.constraint}</p>

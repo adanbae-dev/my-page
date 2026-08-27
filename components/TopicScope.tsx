@@ -62,7 +62,7 @@ export function TopicScope({
             defaultChecked
             className={styles.input}
           />
-          <label htmlFor="topic-scope-all" className={styles.option}>
+          <label htmlFor="topic-scope-all" className={cx('lift', styles.option)}>
             {labels.all}
           </label>
 
@@ -75,7 +75,10 @@ export function TopicScope({
                 value={topic}
                 className={styles.input}
               />
-              <label htmlFor={`topic-scope-${topic}`} className={styles.option}>
+              <label
+                htmlFor={`topic-scope-${topic}`}
+                className={cx('lift', styles.option)}
+              >
                 {labels.names[topic]}
                 <span className={styles.count}>{counts[topic]}</span>
               </label>

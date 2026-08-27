@@ -136,7 +136,13 @@ export function Nav({ initialTone, locale, labels }: NavProps) {
           does not appear where the browser has no scroll timelines. */}
       {isReading && <div className={styles.progress} aria-hidden="true" />}
       <div className={cx('wrap', styles.inner)}>
-        <Link href={localePath(locale)} className={cx('label', styles.brand)}>
+        {/* Named so the bar's own mark is a persisted element rather than
+            something that cross-fades with the page behind it. */}
+        <Link
+          href={localePath(locale)}
+          className={cx('label', styles.brand)}
+          style={{ viewTransitionName: 'brand' }}
+        >
           {site.name} <span className={styles.brandSuffix}>· {site.title}</span>
         </Link>
 
@@ -157,7 +163,7 @@ export function Nav({ initialTone, locale, labels }: NavProps) {
                     // On the golden path the bar moves you within the page; from a
                     // depth route it moves you between pages.
                     href={onGoldenPath ? `#${s.id}` : localePath(locale, `/${s.id}`)}
-                    className={cx('label', styles.item)}
+                    className={cx('label', 'accentRise', styles.item)}
                     {...(isCurrent
                       ? { 'aria-current': onGoldenPath ? 'true' : 'page' }
                       : {})}

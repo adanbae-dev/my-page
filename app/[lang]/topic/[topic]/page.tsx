@@ -99,11 +99,11 @@ export default async function TopicPage({ params }: { params: Promise<Params> })
             <span>{d.topics.label}</span>
           </p>
 
-          <h1 id="topic-title" className={cx('h1', 'arrive', styles.title)}>
+          <h1 id="topic-title" className={cx('h1', 'arrive', 'balance', styles.title)}>
             {meta.name}
           </h1>
 
-          <p className="lead measure">{meta.blurb}</p>
+          <p className="lead measure balance trail">{meta.blurb}</p>
         </div>
       </section>
 

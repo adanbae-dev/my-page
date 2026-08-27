@@ -73,9 +73,19 @@ export function EntryList({
                   entry shows its Korean title on an English page, and a
                   screen reader has to be told that or it reads Hangul with an
                   English voice. This is why `locale` travels with the entry. */}
+              {/* The same name on the article's own <h1>, so the browser
+                  MORPHS this title into that one across the navigation
+                  instead of cross-fading two unrelated pages. A name has to
+                  be unique per document, and a slug already is.
+
+                  Inline rather than in the stylesheet because the value is
+                  data: there is no way to write one CSS rule that names N
+                  rows. It costs html bytes on pages that have rows, and
+                  nothing anywhere else. */}
               <span
                 className={cx('rowMark', styles.title)}
                 lang={LOCALE_META[entry.locale].lang}
+                style={{ viewTransitionName: `entry-${entry.chapter}-${entry.slug}` }}
               >
                 {entry.title}
               </span>

@@ -40,7 +40,7 @@ export function TopicFilter({
             <li key={topic}>
               <Link
                 href={localePath(lang, `/topic/${topic}`)}
-                className={cx(styles.chip, isCurrent && styles.chipCurrent)}
+                className={cx('tilt', styles.chip, isCurrent && styles.chipCurrent)}
                 {...(isCurrent ? { 'aria-current': 'page' } : {})}
               >
                 {labels.names[topic]}

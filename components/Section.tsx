@@ -38,8 +38,10 @@ export function Section({
           <div className={styles.head}>
             <hr className="rule draw" />
             <div className={styles.headRow}>
-              <p className={`label ${styles.title}`}>{title}</p>
-              {index && <p className={`label ${styles.index}`}>{index}</p>}
+              <p className={`label slideIn ${styles.title}`}>{title}</p>
+              {index && (
+                <p className={`label indexFill pin ${styles.index}`}>{index}</p>
+              )}
             </div>
           </div>
         )}

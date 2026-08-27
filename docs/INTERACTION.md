@@ -97,3 +97,59 @@ still clears 4.55:1, so the effect cannot push text under AA.
   for a depth route would be better and is not done.
 - The WebGL field still has no keyboard path — the list remains the
   accessible route. Unchanged from Phase 3.
+
+---
+
+## Round two — the effects layer
+
+Added after the i18n and topics work, on the same premise: **no JavaScript.**
+`js.route` was 6.4 KB before and 6.4 KB after. Everything below is CSS.
+
+### What was added
+
+| | Driver | Gated by |
+|---|---|---|
+| `lineIn` | `view()`, offset per line by `--i` | supports + reduced-motion |
+| `trail` | `view()` | supports + reduced-motion |
+| `layIn` | `view()`, clip-path wipe | supports + reduced-motion |
+| `slideIn` | `view()` | supports + reduced-motion |
+| `indexFill` | `view()`, colour only | supports — it is an indicator |
+| `sweep` | `view()`, accent band through display type | supports — indicator |
+| `pin` | `position: sticky` | — |
+| `lift` · `tilt` | `:hover` / `:focus-visible` | — |
+| `accentRise` | `:hover` / `:focus-visible`, `scaleY` from baseline | — |
+| `rowMark` | `:hover` / `:focus-visible`, `background-size` | — |
+| `onLoad` | `@starting-style` | reduced-motion (from-state only) |
+| `balance` | `text-wrap` | — |
+| `::selection` | — | — |
+| shared elements | `@view-transition` + `view-transition-name` | — |
+
+`pnpm check:motion` classifies all ten scroll-driven ones and asserts each is
+gated for what it actually does. `indexFill` and `sweep` are indicators —
+they move over content that is already painted — so they stay available to a
+visitor who asked for less motion, the same call the reading-progress
+hairline gets.
+
+### Two that needed a different mechanism
+
+**`onLoad` cannot use a scroll timeline.** Above-the-fold copy is already in
+view, so `entry` never happens and the element would sit at its from-state
+forever. `@starting-style` runs once on arrival with no scroll involved. The
+settled state is declared outside the motion query so reduced motion gets
+finished content rather than nothing.
+
+**Shared-element transitions need a name per element**, and no single CSS rule
+can name N rows. `view-transition-name: entry-{chapter}-{slug}` is set inline
+on the list title and on the article's own `<h1>`, so the browser morphs one
+into the other across a full document load. It costs html bytes on pages that
+have rows and nothing anywhere else.
+
+### Cost
+
+```
+css     7.24 -> 7.7 KB     86% of budget (raised 8000 -> 9216, recorded there)
+total  288.6 -> 289.2 KB   98% of budget
+route    6.4 -> 6.4 KB     unchanged
+```
+
+Effect instances on one page: 54 on the golden path, 56 on TRACE.

@@ -128,7 +128,7 @@ export default async function SectionPage({
         aria-labelledby="chapter-title"
       >
         <div className="wrap">
-          <p className={cx('label', styles.crumb)}>
+          <p className={cx('label', 'onLoad', styles.crumb)}>
             <Link href={localePath(lang)}>{d.nav.backToGoldenPath}</Link>
             <span>
               {def.index} / {def.label}
@@ -143,7 +143,7 @@ export default async function SectionPage({
             </h1>
           </ViewTransition>
 
-          <p className="lead measure">{d.sections[def.id].blurb}</p>
+          <p className="lead measure balance trail">{d.sections[def.id].blurb}</p>
         </div>
       </section>
 
@@ -160,7 +160,7 @@ export default async function SectionPage({
             <p className="small muted measure">
               {isArchive ? d.chapter.archiveNote : d.sections[def.id].blurb}
             </p>
-            <p className={cx('label', styles.count)}>
+            <p className={cx('label', 'slideIn', styles.count)}>
               {entries.length} {isArchive ? d.chapter.records : d.chapter.entries}
             </p>
 

@@ -20,17 +20,27 @@
     "dynamic segment Turbopack stops hoisting it into the chunk every route",
     "shares. Measured before and after: shared 174.8 -> 169.5, route 1.7 -> 6.4,",
     "total 176.5 -> 175.9. Nothing got heavier \u2014 the accounting moved \u2014 so the",
-    "allowance moved with it rather than being raised."
+    "allowance moved with it rather than being raised.",
+    "",
+    "RAISED css 8000 -> 9216 and total 300000 -> 303104 for the interaction layer.",
+    "Stated rather than absorbed quietly, because that is the only thing this",
+    "file is for. Measured after, not predicted: css 7.24 -> 7.7 KB, total 288.6 -> 289.2 KB",
+    "worst route. The additions are 13 distinct effects and",
+    "cross-document shared-element transitions, all of it CSS \u2014 js.route did not",
+    "move. The binding weights are unchanged and are not these: the font is",
+    "88 KB and the framework bundle 169.5 KB, together 257 KB of the total.",
+    "Reverting is one edit here plus removing styles/interaction.css's last two",
+    "sections; nothing else depends on it."
   ],
   "unit": "gzip-bytes",
   "budgets": {
     "html": 24000,
-    "css": 8000,
+    "css": 9216,
     "js": 185000,
     "js.shared": 177152,
     "js.route": 11264,
     "font": 100000,
     "deferred": 245760,
-    "total": 300000
+    "total": 303104
   }
 }

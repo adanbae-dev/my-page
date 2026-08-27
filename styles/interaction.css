@@ -150,3 +150,316 @@
     background-size: 100% var(--rule-w);
   }
 }
+
+/* ==========================================================================
+   EFFECTS — everything below is scroll- or pointer-driven and costs no JS.
+   --------------------------------------------------------------------------
+   The two gates from the top of this file still apply and are still checked
+   by `pnpm check:motion`: a scroll-driven rule sits inside
+   @supports (animation-timeline: …), and one whose from-state HIDES content
+   sits additionally inside @media (prefers-reduced-motion: no-preference).
+
+   Every one of these reuses a token that already exists. None introduces a
+   colour, a duration or an easing curve of its own — the palette and the
+   timing are the art direction, and an effect that invents its own is a
+   second design system wearing the first one's clothes.
+   ========================================================================== */
+
+@layer utilities {
+  /* --- Pointer: lift ---------------------------------------------------- */
+
+  /* A control rises very slightly toward the pointer. 2px, because the point
+     is to feel answered rather than to see movement — anything larger reads
+     as the layout being unstable. */
+  .lift {
+    transition:
+      transform var(--dur-quick) var(--ease-standard),
+      border-color var(--dur-quick) var(--ease-standard);
+  }
+
+  .lift:hover,
+  .lift:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  /* --- Pointer: the accent grows from the baseline ---------------------- */
+
+  /* Where a hover wants to say "this is the live one" without swapping a
+     colour and re-opening the contrast question, the accent arrives as a
+     block that grows up from the text's own baseline. */
+  .accentRise {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .accentRise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--accent);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform var(--dur-quick) var(--ease-inout-quart);
+  }
+
+  .accentRise:hover::before,
+  .accentRise:focus-visible::before {
+    transform: scaleY(1);
+  }
+
+  /* --- Typography ------------------------------------------------------- */
+
+  /* A headline broken into an orphan is a worse headline. Free, and it only
+     ever changes where the break lands. */
+  .balance {
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    /* --- Indicators: safe without the motion gate --------------------- */
+
+    /* An index number that fills as its own section passes. It indicates
+       progress and hides nothing, so — like the reading-progress hairline —
+       it stays available to a visitor who asked for less motion. Taking a
+       position indicator away from the readers the motion gate exists to
+       protect would be the wrong reading of the rule. */
+    .indexFill {
+      animation: indexFill linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes indexFill {
+      from {
+        color: var(--rule);
+      }
+      to {
+        color: var(--figure);
+      }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      /* --- Reveals: these hide content, so they are gated -------------- */
+
+      /* A dark section arrives as a ground being laid rather than a block
+         appearing: the panel wipes down over the copy already in place. */
+      .layIn {
+        animation: layIn linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 55%;
+      }
+
+      @keyframes layIn {
+        from {
+          clip-path: inset(0 0 100% 0);
+        }
+        to {
+          clip-path: inset(0 0 0 0);
+        }
+      }
+
+      /* Body copy drifts up a few pixels behind the headline that arrives
+         above it, which is what makes the headline read as landing ON
+         something instead of next to it. */
+      .trail {
+        animation: trail linear both;
+        animation-timeline: view();
+        animation-range: entry 6% entry 70%;
+      }
+
+      @keyframes trail {
+        from {
+          opacity: 0.2;
+          transform: translateY(0.6rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* A number or a label that counts itself in from the side. Short
+         range: it should be finished before the eye reaches it. */
+      .slideIn {
+        animation: slideIn linear both;
+        animation-timeline: view();
+        animation-range: entry 2% entry 30%;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-0.5rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+}
+
+/* --- Round two: the parts that need a property, a sweep or a sticky ------ */
+
+/* Anchor links on the golden path glide instead of jumping. Gated, because
+   "less motion" includes not being moved 4000px without asking. */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  /* --- Sticky index ----------------------------------------------------- */
+
+  /* The beat number holds its place while its own section scrolls past, so
+     the rail reads as a position rather than a decoration. `position:
+     sticky` and nothing else — no observer, no listener, exact by
+     construction. */
+  .pin {
+    position: sticky;
+    inset-block-start: calc(var(--nav-h) + var(--space-s));
+  }
+
+  /* --- Depth on hover --------------------------------------------------- */
+
+  /* A chip tips very slightly away from the pointer. Two degrees: enough to
+     read as a surface, not enough to make text blurry on a low-DPI screen. */
+  .tilt {
+    transition: transform var(--dur-quick) var(--ease-standard);
+    transform-style: preserve-3d;
+  }
+
+  .tilt:hover,
+  .tilt:focus-visible {
+    transform: perspective(24rem) rotateX(-6deg) translateY(-1px);
+  }
+}
+
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    /* --- The accent sweeps through the headline ------------------------- */
+
+    /* An accent-coloured band travels across the display type as the hero
+       scrolls, using the type itself as the mask. Nothing is hidden: the
+       band moves over letters that are already painted, so this is an
+       indicator and stays available under reduced motion — the same
+       reasoning the reading-progress hairline gets.
+
+       `background-clip: text` needs a transparent fill to show through,
+       which is why the colour is set here rather than inherited. */
+    .sweep {
+      background-image: linear-gradient(
+        100deg,
+        var(--figure) 0%,
+        var(--figure) 38%,
+        var(--accent) 50%,
+        var(--figure) 62%,
+        var(--figure) 100%
+      );
+      background-size: 320% 100%;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: sweep linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+
+    @keyframes sweep {
+      from {
+        background-position: 120% 0;
+      }
+      to {
+        background-position: -120% 0;
+      }
+    }
+
+    /* A browser with background-clip but no view timeline paints the band
+       parked off to one side, which is simply the figure colour. */
+    @supports not (animation-timeline: view()) {
+      .sweep {
+        background-image: none;
+        color: var(--figure);
+      }
+    }
+  }
+}
+
+/* --- Round three: per-line beats, first paint, and selection ------------- */
+
+@layer utilities {
+  /* Text selection uses the accent. Two declarations for a detail that shows
+     up every time somebody quotes this site. */
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+}
+
+@layer utilities {
+  /* --- First paint ------------------------------------------------------ */
+
+  /* Above-the-fold copy cannot use a scroll timeline: it is already in view,
+     so `entry` never happens and the element would sit at its from-state
+     forever. @starting-style covers exactly that gap — it runs once, on
+     arrival, with no scroll involved.
+
+     The settled state is declared OUTSIDE the motion query so a visitor who
+     asked for less motion gets finished content rather than nothing. Only
+     the from-state is gated. */
+  .onLoad {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .onLoad {
+      transition:
+        opacity var(--dur-invert) var(--ease-standard),
+        transform var(--dur-invert) var(--ease-inout-quart);
+    }
+
+    @starting-style {
+      .onLoad {
+        opacity: 0;
+        transform: translateY(0.75rem);
+      }
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /* --- One beat per line -------------------------------------------- */
+
+      /* A two-line headline that arrives as one block reads as a graphic. The
+         same headline arriving a line at a time reads as being written. `--i`
+         comes from DisplayLines, so the offset is per line rather than per
+         element and no keyframe has to be duplicated. */
+      .lineIn {
+        display: inline-block;
+        animation: lineIn linear both;
+        animation-timeline: view();
+        animation-range: entry calc(4% + var(--i, 0) * 9%)
+          entry calc(46% + var(--i, 0) * 9%);
+      }
+
+      @keyframes lineIn {
+        from {
+          opacity: 0.15;
+          transform: translateY(0.5em) scaleY(0.94);
+          transform-origin: bottom;
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+}

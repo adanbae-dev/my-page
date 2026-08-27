@@ -40,25 +40,25 @@ export default async function GoldenPath({
         aria-labelledby="hero-title"
       >
         <div className={cx('wrap', styles.heroInner)}>
-          <p className="label">{site.title}</p>
+          <p className="label onLoad">{site.title}</p>
 
-          <h1 id="hero-title" className={cx('display', styles.heroTitle)} lang="en">
+          <h1 id="hero-title" className={cx('display', 'sweep', styles.heroTitle)} lang="en">
             <DisplayLines lines={['An interface', 'for a life']} />
             <br />
             <span className="accentBlock markWipe">in progress</span>
           </h1>
 
-          <p className="lead measure">{d.site.statement}</p>
+          <p className="lead measure balance trail">{d.site.statement}</p>
 
           <div className={styles.heroFoot}>
-            <div className={cx('label', 'focusGroup', styles.axes)}>
+            <div className={cx('label', 'focusGroup', 'onLoad', styles.axes)}>
               {SECTIONS.map((s) => (
                 <a key={s.id} href={`#${s.id}`}>
                   {s.index} {s.label}
                 </a>
               ))}
             </div>
-            <p className="label">{d.home.scrollHint}</p>
+            <p className="label onLoad">{d.home.scrollHint}</p>
           </div>
         </div>
       </section>
@@ -78,15 +78,18 @@ export default async function GoldenPath({
               {/* Named so the browser can carry this headline into the depth
                   route instead of cutting to an unrelated page. */}
               <ViewTransition name={`chapter-${s.id}`}>
-                <h2 className="h1 arrive" lang="en">
+                <h2 className="h1 arrive balance" lang="en">
                   <DisplayLines lines={s.titleLines} />
                 </h2>
               </ViewTransition>
             </div>
 
             <div className={styles.chapterAside}>
-              <p className="small muted">{d.sections[s.id].blurb}</p>
-              <Link href={localePath(lang, `/${s.id}`)} className={cx('label', styles.enter)}>
+              <p className="small muted trail">{d.sections[s.id].blurb}</p>
+              <Link
+                href={localePath(lang, `/${s.id}`)}
+                className={cx('label', 'accentRise', styles.enter)}
+              >
                 <span className={styles.enterLabel}>{t(d.home.enter, { label: s.label })}</span>
                 <span className={styles.enterArrow} aria-hidden="true">
                   →
