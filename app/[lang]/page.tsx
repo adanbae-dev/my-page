@@ -104,7 +104,7 @@ export default async function GoldenPath({
         </div>
       </section>
 
-      {SECTIONS.map((s) => (
+      {SECTIONS.map((s, i) => (
         <Section
           key={s.id}
           id={s.id}
@@ -113,7 +113,16 @@ export default async function GoldenPath({
           index={s.index}
           title={s.label}
         >
-          <div className={styles.chapter}>
+          {/* Every other beat mirrors. Four beats out of one template put the
+              title on the left four times, so the eye rode a single channel
+              straight down the page — the beats were distinguishable but the
+              SCROLL was not. Alternating the composition makes it move side to
+              side, which is what a spread does and a feed does not.
+
+              Explicit rather than :nth-of-type: the hero is a sibling section
+              too, so a structural selector would count it and flip the wrong
+              half. */}
+          <div className={cx(styles.chapter, i % 2 === 1 && styles.chapterFlip)}>
             <div>
               <p className={cx('label', styles.chapterQuestion)}>{d.sections[s.id].question}</p>
               {/* Named so the browser can carry this headline into the depth

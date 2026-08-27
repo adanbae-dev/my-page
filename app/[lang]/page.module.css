@@ -258,3 +258,27 @@
   font-family: var(--font-mono, ui-monospace, monospace);
   letter-spacing: 0;
 }
+
+/* The mirrored beat. Only above the breakpoint where there are two columns to
+   swap — stacked on a phone, a "flip" would just reorder two blocks for no
+   reason and put the aside above the title it belongs to. */
+@media (min-width: 60rem) {
+  .chapterFlip {
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+  }
+
+  .chapterFlip > :first-child {
+    order: 2;
+    text-align: right;
+  }
+
+  .chapterFlip > :last-child {
+    order: 1;
+  }
+
+  /* The mark and the way in stay on the outside edge, so the two beats are
+     mirror images rather than one beat with its columns shuffled. */
+  .chapterFlip .chapterAside {
+    align-items: flex-start;
+  }
+}
