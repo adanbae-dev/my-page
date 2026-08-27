@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 
 import { notFound } from 'next/navigation'
 
-import { isLocale, localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
+import { isLocale } from '@/lib/i18n/config'
+import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import Link from 'next/link'
 
+import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
 import { cx } from '@/lib/cx'
 import { site } from '@/lib/site.config'
@@ -19,11 +21,6 @@ import type { Tone } from '@/lib/tone'
 import styles from './page.module.css'
 
 
-/** hreflang for one locale-free path, built from LOCALES so it cannot drift. */
-const languages = (path: string) =>
-  Object.fromEntries(
-    LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
-  )
 
 const DESCRIPTION =
   'Phase 0 — Inverted Duotone: the ground, the type, the accent law and the motion vocabulary for PERSONAL INTERFACE.'
@@ -36,21 +33,12 @@ export async function generateMetadata({
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const path = '/art-direction'
-  return {
+  return pageMetadata({
+    lang,
+    path,
     title: 'Art Direction',
     description: DESCRIPTION,
-    alternates: {
-      canonical: localePath(lang, path),
-      languages: languages(path),
-    },
-    openGraph: {
-      type: 'website',
-      locale: LOCALE_META[lang].og,
-      url: localePath(lang, path),
-      title: 'Art Direction',
-      description: DESCRIPTION,
-    },
-  }
+  })
 }
 
 /* ------------------------------------------------------------------ */
@@ -140,6 +128,13 @@ export default async function ArtDirectionPage({
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema(lang, [
+          { name: site.title, path: '/' },
+          { name: 'Art Direction', path: '/art-direction' },
+        ])}
+      />
+
       {/* ---- 00 · CALM ------------------------------------------------ */}
       <section
         data-tone="light"

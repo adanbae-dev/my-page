@@ -1,15 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
 import { DisplayLines } from '@/components/DisplayLines'
+import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
 import { cx } from '@/lib/cx'
-import { isLocale, localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
+import { isLocale } from '@/lib/i18n/config'
+import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
 import { eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
-import { commitUrl, REPO } from '@/lib/site.config'
+import { commitUrl, REPO, site } from '@/lib/site.config'
 import styles from './page.module.css'
 
 /**
@@ -26,11 +29,6 @@ import styles from './page.module.css'
  */
 
 
-/** hreflang for one locale-free path, built from LOCALES so it cannot drift. */
-const languages = (path: string) =>
-  Object.fromEntries(
-    LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
-  )
 
 export async function generateMetadata({
   params,
@@ -41,21 +39,12 @@ export async function generateMetadata({
   if (!isLocale(lang)) return {}
   const d = dict(lang)
   const path = '/build'
-  return {
+  return pageMetadata({
+    lang,
+    path,
     title: 'BUILD',
     description: d.build.description,
-    alternates: {
-      canonical: localePath(lang, path),
-      languages: languages(path),
-    },
-    openGraph: {
-      type: 'website',
-      locale: LOCALE_META[lang].og,
-      url: localePath(lang, path),
-      title: d.build.ogTitle,
-      description: d.build.ogDescription,
-    },
-  }
+  })
 }
 
 const n = (v: number): string => v.toLocaleString('en-US')
@@ -166,7 +155,14 @@ function CommitRow({
   )
 }
 
-export default function BuildPage() {
+export default async function BuildPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}) {
+  const { lang } = await params
+  if (!isLocale(lang)) notFound()
+
   const s = stats()
   const groups = eras()
 
@@ -200,6 +196,13 @@ export default function BuildPage() {
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema(lang, [
+          { name: site.title, path: '/' },
+          { name: 'BUILD', path: '/build' },
+        ])}
+      />
+
       {/* Calm — arrival */}
       <section
         data-tone="light"

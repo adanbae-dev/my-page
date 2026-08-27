@@ -98,6 +98,9 @@ if (!origin) {
 const REQUIRED = [
   ['sitemap.xml', 'sitemap.xml.body'],
   ['robots.txt', 'robots.txt.body'],
+  // Derived from the content, so it is only ever missing because the route
+  // stopped being prerendered — which is silent otherwise.
+  ['llms.txt', 'llms.txt.body'],
 ]
 for (const names of REQUIRED) {
   const found = names.some((n) => existsSync(join(APP, n)))
@@ -115,10 +118,18 @@ for (const tag of LOCALE_TAGS) {
   if (!found) blockers.push(`missing from the build: /${tag}/feed.xml`)
 }
 
-const hasImage = (name) =>
-  readdirSync(APP, { withFileTypes: true }).some(
-    (e) => e.name.startsWith(name) || (e.isDirectory() && e.name === name),
-  )
+/* Metadata images sit wherever their file convention sits, and
+   opengraph-image moved under the locale segment when the tree did — a
+   card image belongs to a language. Searched rather than assumed: this
+   check reported "no opengraph-image" while every page had one. */
+const hasImage = (name, dir = APP, depth = 0) => {
+  if (depth > 3) return false
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.name.startsWith(name)) return true
+    if (e.isDirectory() && hasImage(name, join(dir, e.name), depth + 1)) return true
+  }
+  return false
+}
 if (!hasImage('opengraph-image')) warnings.push('no opengraph-image in the build')
 if (!hasImage('icon')) warnings.push('no icon in the build')
 

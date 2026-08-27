@@ -10,17 +10,11 @@ import { historyFor } from '@/lib/git/load'
 import { type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
-import {
-  isLocale,
-  localePath,
-  LOCALES,
-  LOCALE_META,
-  t,
-  type Locale,
-} from '@/lib/i18n/config'
+import { isLocale, localePath, LOCALE_META, t, type Locale } from '@/lib/i18n/config'
 import { dict, type Dictionary } from '@/lib/i18n/dictionary'
+import { breadcrumbSchema, countWords, pageMetadata } from '@/lib/seo'
 import { getSection, isSectionId } from '@/lib/sections'
-import { commitUrl, person, url } from '@/lib/site.config'
+import { commitUrl, person, site, url } from '@/lib/site.config'
 import styles from './page.module.css'
 
 type Params = { lang: string; section: string; slug: string }
@@ -41,28 +35,19 @@ export async function generateMetadata({
   const entry = getEntry(section, slug, lang)
   if (!entry) return {}
   const path = `/${section}/${slug}`
-  return {
+  return pageMetadata({
+    lang,
+    path,
     title: entry.title,
     description: entry.summary,
-    alternates: {
-      canonical: localePath(lang, path),
-      languages: Object.fromEntries(
-        LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
-      ),
-    },
-    openGraph: {
-      type: 'article',
-      locale: LOCALE_META[lang].og,
-      url: localePath(lang, path),
-      title: entry.title,
-      description: entry.summary,
+    article: {
       publishedTime: entry.date,
       ...(entry.chapter === 'think' && entry.updated
         ? { modifiedTime: entry.updated }
         : {}),
-      tags: [...entry.tags],
+      tags: entry.tags,
     },
-  }
+  })
 }
 
 /** The metadata line under the title — different per chapter, on purpose. */
@@ -128,12 +113,24 @@ export default async function EntryPage({
             entry.chapter === 'think' && entry.updated ? entry.updated : entry.date,
           inLanguage: LOCALE_META[entry.locale].lang,
           keywords: entry.tags.join(', '),
+          // Counted the way the reading estimate is: Hangul per character,
+          // because a whitespace split under-reports Korean threefold.
+          wordCount: countWords(entry.body),
+          timeRequired: `PT${entry.readingMinutes}M`,
           articleSection: chapter.label,
           mainEntityOfPage: url(localePath(locale, `/${entry.chapter}/${entry.slug}`)),
           author: person(),
           publisher: person(),
         }}
       />
+      <JsonLd
+        data={breadcrumbSchema(locale, [
+          { name: site.title, path: '/' },
+          { name: chapter.label, path: `/${chapter.id}` },
+          { name: entry.title, path: `/${entry.chapter}/${entry.slug}` },
+        ])}
+      />
+
       {/* Calm — arrival */}
       <Section tone="light" density="calm">
         <div className={styles.head}>

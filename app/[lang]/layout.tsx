@@ -12,7 +12,8 @@ import {
   type Locale,
 } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
-import { SITE_URL, person, site, url } from '@/lib/site.config'
+import { alternateLanguages, websiteSchema } from '@/lib/seo'
+import { SITE_URL, site } from '@/lib/site.config'
 import { GROUND_HEX } from '@/lib/tokens.data'
 import { boundingTone, type ToneStep } from '@/lib/tone'
 
@@ -61,18 +62,6 @@ export const dynamicParams = false
 export function generateStaticParams(): Params[] {
   return LOCALES.map((lang) => ({ lang }))
 }
-
-/**
- * `languages` is the hreflang set, emitted on every page.
- *
- * Built from LOCALES rather than written out, so adding a third locale
- * cannot leave the alternates behind — the classic way an i18n site ends up
- * telling crawlers it has fewer languages than it has.
- */
-const alternateLanguages = (path: string) =>
-  Object.fromEntries(
-    LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
-  )
 
 export async function generateMetadata({
   params,
@@ -139,15 +128,7 @@ export default async function RootLayout({
     <html lang={LOCALE_META[locale].lang} data-tone={ground} className={archivo.variable}>
       <body>
         <JsonLd
-          data={{
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            name: `${site.title} — ${site.name}`,
-            description: d.site.description,
-            url: url(localePath(locale)),
-            inLanguage: LOCALE_META[locale].lang,
-            author: person(),
-          }}
+          data={websiteSchema(locale, d.site.description)}
         />
         <a className="skipLink" href="#main">
           {d.a11y.skipToContent}

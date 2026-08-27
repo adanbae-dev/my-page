@@ -6,18 +6,15 @@ import { ViewTransition } from 'react'
 import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
 import { FieldMount } from '@/components/field/FieldMount'
+import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
 import { archive, entriesFor } from '@/lib/content/load'
 import { toField } from '@/lib/field'
 import { cx } from '@/lib/cx'
-import {
-  isLocale,
-  localePath,
-  LOCALES,
-  LOCALE_META,
-  t,
-} from '@/lib/i18n/config'
+import { isLocale, localePath, LOCALES, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
+import { site } from '@/lib/site.config'
+import { breadcrumbSchema, collectionPageSchema, pageMetadata } from '@/lib/seo'
 import { SECTIONS, getSection, neighbours } from '@/lib/sections'
 import styles from './page.module.css'
 
@@ -52,23 +49,12 @@ export async function generateMetadata({
   const { question, blurb } = d.sections[def.id]
   const description = `${question} — ${blurb}`
   const path = `/${def.id}`
-  return {
+  return pageMetadata({
+    lang,
+    path,
     title: def.label,
     description,
-    alternates: {
-      canonical: localePath(lang, path),
-      languages: Object.fromEntries(
-        LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
-      ),
-    },
-    openGraph: {
-      type: 'website',
-      locale: LOCALE_META[lang].og,
-      url: localePath(lang, path),
-      title: `${def.label} — ${question}`,
-      description,
-    },
-  }
+  })
 }
 
 /**
@@ -99,6 +85,30 @@ export default async function SectionPage({
 
   return (
     <>
+      {/* A chapter is a list, so it says so in a form a machine can read:
+          CollectionPage with every entry named in hasPart. Without it a
+          crawler has to infer from prose that this page indexes work. */}
+      <JsonLd
+        data={collectionPageSchema({
+          lang,
+          section: def.id,
+          name: `${def.label} — ${d.sections[def.id].question}`,
+          description: isArchive ? d.chapter.archiveNote : d.sections[def.id].blurb,
+          parts: entries.map((e) => ({
+            title: e.title,
+            chapter: e.chapter,
+            slug: e.slug,
+            date: e.date,
+          })),
+        })}
+      />
+      <JsonLd
+        data={breadcrumbSchema(lang, [
+          { name: site.title, path: '/' },
+          { name: def.label, path: `/${def.id}` },
+        ])}
+      />
+
       {/* Calm — arrival */}
       <section
         data-tone="light"

@@ -14,8 +14,47 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "7c554fa",
+  "head": "b949b78",
   "commits": [
+    {
+      "sha": "b949b78",
+      "date": "2026-08-27",
+      "subject": "Fix: the language control was resizing the nav and changing typeface",
+      "insertions": 25,
+      "deletions": 31,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "components"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "5a841b1",
+      "date": "2026-08-27",
+      "subject": "Fix: the language control moved the chapter rail into the middle of the bar",
+      "insertions": 117,
+      "deletions": 48,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "components"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "3316578",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 7c554fa",
+      "insertions": 32,
+      "deletions": 2,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "7c554fa",
       "date": "2026-08-27",

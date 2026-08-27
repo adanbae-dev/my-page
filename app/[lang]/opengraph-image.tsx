@@ -1,10 +1,21 @@
 import { ImageResponse } from 'next/og'
 
+import { LOCALES } from '@/lib/i18n/config'
 import { OG, OG_CONTENT_TYPE, OG_SIZE, ogFonts } from '@/lib/og'
 import { site } from '@/lib/site.config'
 
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE
+
+/**
+ * Without this the image route sits under a dynamic segment with nothing
+ * saying which locales exist, and the build marks it `ƒ` — a function invoked
+ * on every social crawler fetch. Measured: it was `○ /opengraph-image` before
+ * the tree moved and `ƒ /[lang]/opengraph-image` after, until this was added.
+ */
+export function generateStaticParams(): { lang: string }[] {
+  return LOCALES.map((lang) => ({ lang }))
+}
 export const alt = `${site.title} — ${site.tagline}`
 
 export default async function OpenGraphImage() {
