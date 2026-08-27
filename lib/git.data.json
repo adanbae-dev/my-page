@@ -14,8 +14,23 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "09f80a0",
+  "head": "41d3b58",
   "commits": [
+    {
+      "sha": "41d3b58",
+      "date": "2026-08-28",
+      "subject": "SEO: 페이지별 메타데이터를 실측해서 고치고, 회귀 게이트를 붙였다",
+      "insertions": 281,
+      "deletions": 17,
+      "generated": 0,
+      "files": 10,
+      "areas": [
+        "app",
+        "lib",
+        "scripts"
+      ],
+      "entries": []
+    },
     {
       "sha": "09f80a0",
       "date": "2026-08-28",

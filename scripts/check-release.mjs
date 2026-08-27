@@ -356,6 +356,59 @@ for (const p of placeholders) warnings.push(`${p} is still a placeholder entry`)
             }
           }
         }
+
+/* --- The published weight ------------------------------------------- */
+
+/*
+ * The site states its own gzip size on every page it can. That number is a
+ * measurement, and a measurement that has drifted from the thing it measures
+ * is worse than no number at all — it carries the authority of having been
+ * measured while being wrong, and nobody reading the page can tell.
+ *
+ * Warning rather than blocker, and deliberately: a stale figure is a wrong
+ * sentence on a page, not a broken deploy, and a gate that blocks a release
+ * over a reporting script is a gate that gets bypassed. The routes check is
+ * the one that matters — a snapshot missing routes the build now has means new
+ * pages are publishing nothing at all.
+ */
+{
+  const snapFile = join(ROOT, 'lib', 'perf.data.json')
+  if (!existsSync(snapFile)) {
+    warnings.push('lib/perf.data.json is missing — run `pnpm sync:perf`')
+  } else {
+    try {
+      const snap = JSON.parse(readFileSync(snapFile, 'utf8'))
+      const known = Object.keys(snap.routes ?? {})
+      if (known.length === 0) {
+        blockers.push('lib/perf.data.json has no routes — regenerate with `pnpm sync:perf`')
+      } else {
+        const built = pages.map((p) => p.route)
+        const missing = built.filter(
+          (r) => r !== '/_not-found' && r !== '/_global-error' && !known.includes(r),
+        )
+        if (missing.length > 0) {
+          warnings.push(
+            `lib/perf.data.json has no weight for ${missing.length} route(s) in this build ` +
+              `(${missing.slice(0, 3).join(', ')}${missing.length > 3 ? ', …' : ''}) — run \`pnpm sync:perf\``,
+          )
+        }
+        let headSha = ''
+        try {
+          headSha = git(['rev-parse', '--short=7', 'HEAD']).trim()
+        } catch {
+          headSha = ''
+        }
+        if (snap.head && headSha && snap.head !== headSha) {
+          warnings.push(
+            `lib/perf.data.json measures ${snap.head}, HEAD is ${headSha} — run \`pnpm sync:perf\``,
+          )
+        }
+      }
+    } catch (err) {
+      blockers.push(`lib/perf.data.json is unreadable — ${err.message}`)
+    }
+  }
+}
       }
     }
   }

@@ -12,113 +12,33 @@
  * Run after `pnpm build`.
  */
 
-import { readFileSync, existsSync, readdirSync } from 'node:fs'
-import { gzipSync } from 'node:zlib'
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { dirname, join, basename, sep } from 'node:path'
+import { dirname, join } from 'node:path'
+
+import { CATEGORY_KEYS, measureBuild } from '../lib/perf/measure.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const budget = JSON.parse(readFileSync(join(ROOT, 'perf.budget.json'), 'utf8'))
-const APP = join(ROOT, '.next', 'server', 'app')
 
-const gz = (buf) => gzipSync(buf, { level: 9 }).length
-const CATEGORY = { '.js': 'js', '.css': 'css', '.woff2': 'font' }
 const kb = (n) => (n / 1024).toFixed(1).padStart(7) + ' KB'
 const line = (s) => process.stdout.write(s + '\n')
 
-/**
- * Every prerendered route is discovered from the build output rather than
- * listed in config. A route that has to be added to a list by hand is a
- * route that will eventually be forgotten — and forgotten routes are
- * exactly the ones that get heavy.
- */
-function discoverRoutes(dir = APP, prefix = '') {
-  const out = []
-  for (const name of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, name.name)
-    if (name.isDirectory()) {
-      out.push(...discoverRoutes(full, `${prefix}/${name.name}`))
-      continue
-    }
-    if (!name.name.endsWith('.html')) continue
-    const base = name.name.replace(/\.html$/, '')
-    if (base === '_global-error') continue
-    out.push(base === 'index' ? prefix || '/' : `${prefix}/${base}`)
-  }
-  return out
-}
+/* The measurement itself lives in lib/perf/measure.mjs, because `pnpm
+   sync:perf` needs the same numbers to write the snapshot the site
+   publishes. This file is now only the part that compares them to a limit
+   and says so. */
+const build = measureBuild()
+const {
+  routes,
+  results,
+  ok,
+  sharedBytes,
+  worstRoute,
+  deferred,
+} = build
 
-/** Route path -> prerendered file. "/" is emitted as index.html. */
-const fileFor = (route) =>
-  join(APP, (route === '/' ? 'index' : route.replace(/^\//, '')) + '.html')
-
-function measure(route) {
-  const file = fileFor(route)
-  if (!existsSync(file)) return { route, missing: true }
-
-  const html = readFileSync(file)
-  const used = { html: gz(html), css: 0, js: 0, font: 0 }
-  const seen = new Set()
-  const refs = []
-
-  for (const m of html
-    .toString()
-    .matchAll(/\/_next\/static\/[^"'\s]+?\.(js|css|woff2)/g)) {
-    const url = m[0]
-    if (seen.has(url)) continue
-    seen.add(url)
-    refs.push(url)
-    const asset = join(ROOT, '.next', url.replace('/_next', ''))
-    if (!existsSync(asset)) continue
-    const cat = CATEGORY['.' + url.split('.').pop()]
-    if (!cat) continue
-    const buf = readFileSync(asset)
-    // woff2 carries its own compression; gzip on top is a rounding error.
-    used[cat] += cat === 'font' ? buf.length : gz(buf)
-  }
-
-  used.total = used.html + used.css + used.js + used.font
-  return { route, used, refs }
-}
-
-/**
- * Deferred weight.
- *
- * A dynamic import does not appear in the initial HTML, so a route can pass
- * its first-load budget while pulling half a megabyte the moment a visitor
- * clicks. "Lazy" is not "free" — it is weight moved, not weight removed.
- *
- * Everything under .next/static/chunks that no prerendered route references
- * on first load is counted here and held to its own limit.
- */
-function measureDeferred(referenced) {
-  const chunkDir = join(ROOT, '.next', 'static', 'chunks')
-  if (!existsSync(chunkDir)) return { bytes: 0, files: [] }
-
-  const walk = (dir) =>
-    readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-      e.isDirectory() ? walk(join(dir, e.name)) : [join(dir, e.name)],
-    )
-
-  const files = []
-  let bytes = 0
-  for (const abs of walk(chunkDir)) {
-    if (!abs.endsWith('.js')) continue
-    const url = '/_next' + abs.slice(join(ROOT, '.next').length).split(sep).join('/')
-    if (referenced.has(url)) continue
-    const size = gz(readFileSync(abs))
-    bytes += size
-    files.push({ name: basename(abs), size })
-  }
-  files.sort((a, b) => b.size - a.size)
-  return { bytes, files }
-}
-
-const KEYS = ['html', 'css', 'js', 'font', 'total']
-const routes = discoverRoutes().sort(
-  (a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b),
-)
-const results = routes.map(measure)
+const KEYS = CATEGORY_KEYS
 
 line('')
 line(`  PERFORMANCE BUDGET — gzip transfer, ${routes.length} prerendered routes`)
@@ -154,7 +74,6 @@ line('  limit'.padEnd(32) + KEYS.map((k) => (budget.budgets[k] / 1024).toFixed(1
 
 // Report the tightest route per category so the next phase knows where the
 // headroom actually is, rather than guessing from the total.
-const ok = results.filter((r) => !r.missing)
 if (ok.length) {
   line('')
   for (const k of KEYS) {
@@ -176,25 +95,9 @@ if (ok.length) {
  * `shared` is the set of chunks EVERY route loads; `route` is what a page
  * adds on top of it. Splitting them makes the budget bind harder on the
  * half we control, not softer.
+ *
+ * Both numbers come from lib/perf/measure.mjs.
  */
-const chunkSets = ok.map((r) => new Set((r.refs ?? []).filter((u) => u.endsWith('.js'))))
-const sharedUrls = chunkSets.length
-  ? [...chunkSets[0]].filter((u) => chunkSets.every((s) => s.has(u)))
-  : []
-const sizeOf = (url) => {
-  const abs = join(ROOT, '.next', url.replace('/_next', ''))
-  return existsSync(abs) ? gz(readFileSync(abs)) : 0
-}
-const sharedBytes = sharedUrls.reduce((n, u) => n + sizeOf(u), 0)
-const sharedSet = new Set(sharedUrls)
-
-const routeExtras = ok.map((r) => ({
-  route: r.route,
-  bytes: (r.refs ?? [])
-    .filter((u) => u.endsWith('.js') && !sharedSet.has(u))
-    .reduce((n, u) => n + sizeOf(u), 0),
-}))
-const worstRoute = routeExtras.reduce((a, b) => (b.bytes > a.bytes ? b : a))
 
 line('')
 line('  JS SPLIT')
@@ -221,8 +124,6 @@ if (routeLimit !== undefined) {
 
 /* --- Deferred ------------------------------------------------------- */
 
-const referenced = new Set(ok.flatMap((r) => r.refs ?? []))
-const deferred = measureDeferred(referenced)
 const deferredLimit = budget.budgets.deferred
 const deferredOver = deferredLimit !== undefined && deferred.bytes > deferredLimit
 

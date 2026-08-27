@@ -2,7 +2,7 @@
   "name": "personal-interface",
   "version": "0.0.0",
   "private": true,
-  "description": "PERSONAL INTERFACE \u2014 an interface for a life in progress.",
+  "description": "PERSONAL INTERFACE — an interface for a life in progress.",
   "engines": {
     "node": ">=20.9.0"
   },
@@ -21,7 +21,8 @@
     "sync:git": "node scripts/sync-git.mjs",
     "check:release": "node scripts/check-release.mjs",
     "release": "pnpm run verify && pnpm run check:release",
-    "check:motion": "node scripts/check-motion.mjs"
+    "check:motion": "node scripts/check-motion.mjs",
+    "sync:perf": "node scripts/sync-perf.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.7.0",

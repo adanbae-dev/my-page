@@ -5,6 +5,7 @@ import { ViewTransition } from 'react'
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
 import { Sigil } from '@/components/Sigil'
+import { Weight } from '@/components/Weight'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
@@ -130,6 +131,11 @@ export default async function GoldenPath({
             {site.title} · {site.name} ·{' '}
             <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link>
           </p>
+
+          {/* The last line of the page is what the page cost. The budget was
+              an internal gate nobody reading the site could see; this is the
+              same number, published. */}
+          <Weight route={localePath(lang, '/')} template={d.weight.thisPage} />
         </div>
       </Section>
     </>

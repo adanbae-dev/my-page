@@ -12,6 +12,7 @@ import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
 import { publishedEntries } from '@/lib/content/load'
+import { heaviest, KB, PCT, perf, PERF_KEYS } from '@/lib/perf'
 import { commits, eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
 import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
@@ -66,11 +67,27 @@ const n = (v: number): string => v.toLocaleString('en-US')
  * a slow page. `deferred` exists in perf.budget.json for exactly this reason:
  * without a limit, "it just grows" becomes a place to hide unbounded weight.
  *
+ * LOWERED 90 -> 64. The cap was set when this page was lighter, and it had
+ * quietly become unreachable: at 52 commits the page measures 21.45 KB of a
+ * 23.4 KB budget, which leaves 1.95 KB, which at ~0.13 KB a row is about
+ * fifteen more commits. The html gate would have failed the build at roughly
+ * 67 commits — before the cap ever engaged. A limit that cannot be reached
+ * before the thing it protects against happens is not a limit; it is a
+ * comment.
+ *
+ * The page grew because it now publishes two things it did not: the generated
+ * mark and the site's own measured weight. Both were measured before being
+ * kept — the weight readout costs 0.20 KB gzip here, which was worth checking
+ * because two guesses about where the kilobyte went were both wrong.
+ *
+ * 64 has no meaning beyond fitting; it is not the sigil's 64 slots wearing a
+ * different hat.
+ *
  * Eras are NEVER dropped — every phase keeps its header and its totals, so
  * the shape of the record stays complete. Only individual rows past the cap
  * are omitted, and the page says how many.
  */
-const ROW_BUDGET = 90
+const ROW_BUDGET = 64
 
 /**
  * Bar length is LOG-scaled, for the same reason lib/field.ts positions by
@@ -204,6 +221,8 @@ export default async function BuildPage({
   const mark = sigilFrom(commits())
   /* Built once and threaded down, rather than looked up per row: the answer is
      identical for every row and the lookup reads the whole content tree. */
+  const weight = perf()
+  const worst = heaviest()
   const live: ReadonlySet<string> = new Set(
     publishedEntries(lang).map((e) => `${e.chapter}/${e.slug}`),
   )
@@ -341,6 +360,48 @@ export default async function BuildPage({
                     })}
                   </p>
                 </div>
+              </div>
+            )}
+
+            {weight && worst && (
+              <div className={styles.sigilBlock}>
+                <p className="label">{d.weight.heading}</p>
+                {/* MEASURED, because the first guess was wrong. Trimming the
+                    seven-row breakdown to three saved 0.2 KB gzip: rows are
+                    near-identical markup and gzip eats them. The cost was the
+                    prose — Next embeds the RSC payload in the same document, so
+                    every Korean sentence here is paid for twice, and unique
+                    Hangul compresses badly. So the breakdown stays, because it
+                    is the informative part and it is nearly free, and the
+                    explanatory paragraph went instead. */}
+                <dl className={cx('label', styles.readout)}>
+                  {PERF_KEYS.map((k) => {
+                    const limit = weight.budgets[k]
+                    return (
+                      <div key={k}>
+                        <dt>{k}</dt>
+                        <dd>
+                          {KB(worst.weight[k])} KB
+                          {limit === undefined
+                            ? ''
+                            : ` / ${KB(limit)} · ${PCT(worst.weight[k], limit)}%`}
+                        </dd>
+                      </div>
+                    )
+                  })}
+                  <div>
+                    <dt>{d.weight.shared}</dt>
+                    <dd>{KB(weight.shared)} KB</dd>
+                  </div>
+                  <div>
+                    <dt>{d.weight.deferred}</dt>
+                    <dd>{KB(weight.deferred)} KB</dd>
+                  </div>
+                </dl>
+                <p className={cx('label', 'muted')}>
+                  {t(d.weight.heaviest, { route: worst.route })} ·{' '}
+                  {t(d.weight.measured, { date: weight.generatedAt, head: weight.head })}
+                </p>
               </div>
             )}
 

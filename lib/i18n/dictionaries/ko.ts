@@ -173,6 +173,20 @@ export const ko = {
       '이 인터페이스의 아트 디렉션. 두 개의 바탕과 하나의 액센트, 대비 계약, 타입 스케일, 모션 어휘, 그리고 저장소의 커밋 기록에서 계산되는 인장.',
   },
 
+  weight: {
+    /* The number is a fact about the previous build, and the sentence says so.
+       A page cannot weigh itself: writing the figure into the HTML changes the
+       HTML being weighed. */
+    thisPage: '이 페이지 {kb} KB · 스스로 정한 예산 {limit} KB 의 {pct}%',
+    measured: '{date} 빌드({head}) 실측 · gzip 전송 크기',
+    heading: '무게',
+    table: '라우트마다 gzip 예산이 있고, 넘으면 빌드가 실패합니다.',
+    row: '{key}',
+    heaviest: '가장 무거운 라우트 {route}',
+    shared: '모든 라우트가 받는 공용 JS',
+    deferred: '첫 페인트에 아무 라우트도 받지 않는 청크',
+  },
+
   notFound: {
     title: 'Not found',
     body: '이 주소에는 아무것도 없습니다. 아래 네 구간이 이 사이트의 전부입니다.',

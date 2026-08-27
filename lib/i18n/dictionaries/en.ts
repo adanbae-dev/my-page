@@ -163,6 +163,17 @@ export const en = {
       'Two grounds and one accent, a machine-checked contrast contract, the type scale, the motion vocabulary, and a mark computed from the commit record.',
   },
 
+  weight: {
+    thisPage: 'This page {kb} KB \u2014 {pct}% of a {limit} KB budget it sets itself',
+    measured: 'Measured on the {date} build ({head}) \u00b7 gzip transfer size',
+    heading: 'Weight',
+    table: 'Every route has a gzip budget, and a build that exceeds one fails.',
+    row: '{key}',
+    heaviest: 'Heaviest route {route}',
+    shared: 'Shared JS, loaded by every route',
+    deferred: 'Chunks no route loads on first paint',
+  },
+
   notFound: {
     title: 'Not found',
     body: 'There is nothing at this address. The four chapters below are the whole site.',
