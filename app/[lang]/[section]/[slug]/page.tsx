@@ -19,6 +19,9 @@ import styles from './page.module.css'
 
 type Params = { lang: string; section: string; slug: string }
 
+/* Next 16 requires this to be a literal boolean — a computed value is a build
+   error ("Next.js can't recognize the exported `dynamicParams` field"), so the
+   dev-only relaxation this route wants is not expressible. See lib/memo.ts. */
 export const dynamicParams = false
 
 export function generateStaticParams(): Params[] {

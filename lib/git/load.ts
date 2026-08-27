@@ -8,6 +8,7 @@ import {
   toCommitRecord,
   type CommitRecord,
 } from '@/lib/git/parse.mjs'
+import { memoStatic } from '@/lib/memo'
 import type { SectionId } from '@/lib/sections'
 import { toEras, type Era } from './eras'
 import { toCommit, type Commit } from './schema'
@@ -115,13 +116,7 @@ function snapshotRepo(): Repo | null {
 
 const EMPTY: Repo = { commits: [], source: 'none', head: '', generatedAt: null }
 
-let cache: Repo | null = null
-
-export function repo(): Repo {
-  if (cache) return cache
-  cache = liveRepo() ?? snapshotRepo() ?? EMPTY
-  return cache
-}
+export const repo = memoStatic((): Repo => liveRepo() ?? snapshotRepo() ?? EMPTY)
 
 export function commits(): readonly Commit[] {
   return repo().commits

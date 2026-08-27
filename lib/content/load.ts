@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import matter from 'gray-matter'
 
 import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/config'
+import { memoStatic } from '@/lib/memo'
 import { SECTION_IDS, type SectionId } from '@/lib/sections'
 import { TOPIC_IDS, type TopicId } from '@/lib/topics'
 import { ContentError, toEntry, type Entry, type Log, type Work } from './schema'
@@ -11,10 +12,13 @@ import { ContentError, toEntry, type Entry, type Log, type Work } from './schema
  * Content loader. Server-only: it touches the filesystem, so importing it
  * from a Client Component fails the build rather than shipping `fs`.
  *
- * Everything is read once at build time — every route in this product is
- * statically prerendered, so there is no request-time cost and no cache to
- * invalidate. Invalid frontmatter throws, which fails `next build`: bad
- * content cannot reach production by being merely unrendered.
+ * Everything is read once per build — every route in this product is
+ * statically prerendered, so there is no request-time cost in production. The
+ * read is memoised by `memoStatic`, which deliberately stops holding in dev:
+ * nothing imports `content/`, so no edit in there can invalidate a module,
+ * and a memo that outlived the tree served 404s for entries that existed.
+ * Invalid frontmatter throws, which fails `next build`: bad content cannot
+ * reach production by being merely unrendered.
  */
 
 const CONTENT_DIR = join(process.cwd(), 'content')
@@ -82,10 +86,7 @@ function readChapter(chapter: SectionId): Loaded[] {
 const byDateDesc = (a: Entry, b: Entry): number =>
   b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)
 
-let cache: readonly Loaded[] | null = null
-
-function allLoaded(): readonly Loaded[] {
-  if (cache) return cache
+const allLoaded = memoStatic((): readonly Loaded[] => {
   const loaded = SECTION_IDS.flatMap(readChapter)
 
   // A collision would make one entry unreachable and the other ambiguous.
@@ -118,9 +119,8 @@ function allLoaded(): readonly Loaded[] {
     }
   }
 
-  cache = loaded.sort((a, b) => byDateDesc(a.entry, b.entry))
-  return cache
-}
+  return loaded.sort((a, b) => byDateDesc(a.entry, b.entry))
+})
 
 /** Drafts are authored freely and never published. */
 const isPublished = (e: Entry): boolean =>
