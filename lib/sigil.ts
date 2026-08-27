@@ -46,13 +46,17 @@ import type { Commit } from '@/lib/git/schema'
 export const SIGIL_SLOTS = 64
 
 /**
- * Authored-line thresholds. A commit's depth is how many it passes, so the
+ * Authored-line thresholds. Exported because /art-direction documents this
+ * scale, and a page that retypes the numbers is a page that will one day
+ * describe a mark the code no longer draws.
+ *
+ * A commit's depth is how many it passes, so the
  * scale is absolute and a slot's appearance is settled the moment it is
  * drawn. Roughly ×3 apart, because commit sizes in this repository span
  * three orders of magnitude and a linear scale renders every ordinary fix as
  * the same invisible sliver.
  */
-const DEPTH_LINES = [12, 36, 108, 324, 972] as const
+export const DEPTH_LINES = [12, 36, 108, 324, 972] as const
 export const SIGIL_DEPTHS = DEPTH_LINES.length + 1
 
 /**

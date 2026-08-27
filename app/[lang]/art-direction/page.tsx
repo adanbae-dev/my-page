@@ -9,7 +9,10 @@ import Link from 'next/link'
 
 import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
+import { Sigil } from '@/components/Sigil'
 import { cx } from '@/lib/cx'
+import { commits } from '@/lib/git/load'
+import { DEPTH_LINES, sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
 import { site } from '@/lib/site.config'
 import {
   CONTRAST_CONTRACT,
@@ -125,6 +128,7 @@ export default async function ArtDirectionPage({
   const { lang } = await params
   if (!isLocale(lang)) notFound()
   const d = dict(lang)
+  const mark = sigilFrom(commits())
 
   return (
     <>
@@ -310,8 +314,68 @@ export default async function ArtDirectionPage({
         </div>
       </Section>
 
-      {/* ---- 05 · CALM ------------------------------------------------ */}
-      <Section tone="light" density="calm" index="05" title="Phases" id="phases">
+      {/* ---- 05 · DENSE ----------------------------------------------- */}
+      {/* On ink, because this is the one specimen on the page whose whole
+          point is that it inverts with its section like type does. */}
+      <Section tone="dark" density="dense" index="05" title="The Mark" id="mark">
+        <div className={styles.split}>
+          <div className="stack">
+            <h2 className="h2">
+              The mark is <span className="accentText">measured</span>, not drawn.
+            </h2>
+            <p className="small muted measure">
+              로고는 사람에 대한 주장입니다. 이 표시는 측정치입니다 — 저장소의
+              커밋 기록을 접어서 만듭니다. 남이 이 마크를 못 그리는 이유는
+              스타일이 아니라 재료입니다.
+            </p>
+
+            <dl className={cx('label', styles.markSpec)}>
+              <div>
+                <dt>칸</dt>
+                <dd>
+                  {SIGIL_SLOTS} · 12시부터 시계방향, 가장 오래된 커밋이 첫 칸
+                </dd>
+              </div>
+              <div>
+                <dt>현재</dt>
+                <dd>
+                  {mark.used} 채움 · {mark.remaining} 비어 있음
+                </dd>
+              </div>
+              <div>
+                <dt>깊이</dt>
+                <dd>
+                  직접 쓴 줄 {DEPTH_LINES.join(' / ')} 을 넘길 때마다 한 단
+                </dd>
+              </div>
+              <div>
+                <dt>돌기</dt>
+                <dd>
+                  저장소가 스스로 선언한 페이즈 (<code>Phase N:</code>)
+                </dd>
+              </div>
+            </dl>
+
+            <p className="small muted measure">
+              생성 마크가 커밋마다 모양을 뒤바꾸면 정체성이 아니라 노이즈입니다.
+              그래서 깊이는 <strong>절대 임계값</strong>에서 나옵니다 — 3번 칸은
+              그것이 최신 칸이던 날과 똑같이 보이고, 5년 뒤에도 그렇습니다.
+              칸이 다 차면 안쪽에 새 링이 열리고 바깥 링은 그대로 굳습니다.
+              이미 그려진 것은 다시 움직이지 않습니다.
+            </p>
+          </div>
+
+          <div className={styles.markSpecimen}>
+            <Sigil id="spec" label={d.sigil.label} className={styles.markFigure} />
+            <p className={cx('label', styles.specimenMeta)}>
+              {d.sigil.heading} · {mark.used} / {SIGIL_SLOTS}
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      {/* ---- 06 · CALM ------------------------------------------------ */}
+      <Section tone="light" density="calm" index="06" title="Phases" id="phases">
         <div className={styles.roadmap}>
           {PHASES.map((p) => (
             <div key={p.n} className={styles.phaseRow}>

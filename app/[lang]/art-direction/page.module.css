@@ -257,3 +257,38 @@
   padding-block-start: var(--space-m);
   border-block-start: var(--rule-w) solid var(--figure);
 }
+
+/* --- 05 · The Mark ----------------------------------------------------- */
+
+.markSpec {
+  display: grid;
+  gap: var(--space-xs);
+  margin-block: var(--space-s);
+}
+
+.markSpec div {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: var(--space-s);
+  padding-block: var(--space-2xs);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.markSpec dt {
+  color: var(--muted);
+}
+
+.markSpecimen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-s);
+  align-self: center;
+}
+
+/* Large here and nowhere else: this is the page that explains the mark, so it
+   is the one place the mark is the subject rather than a stamp. */
+.markFigure {
+  inline-size: min(100%, 18rem);
+  color: var(--fg);
+}

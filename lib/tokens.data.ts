@@ -48,13 +48,53 @@ export const MOTION_TOKENS = [
   { token: 'dur-invert', ms: 900, usage: 'A full ground inversion — the loudest move' },
 ] as const
 
-export const PHASES = [
+/**
+ * The roadmap, as the page shows it.
+ *
+ * This was written during Phase 0 and then not touched for four phases, so
+ * /art-direction spent that whole time telling visitors that Phase 1 was next
+ * and that 2, 3 and 4 had not started — while the repository held a commit for
+ * each of them and the features were live. A roadmap that lags the work is
+ * worse than no roadmap: it is the one element of the page a reader has no way
+ * to check, so it is believed.
+ *
+ * Each entry below was checked against something that exists, not against a
+ * commit subject:
+ *
+ *   1 Golden Path          app/[lang]/page.tsx, the four-chapter scroll
+ *   2 Personal System      content/, 19 entries across 4 chapters
+ *   3 Engineering Showcase app/[lang]/build, 6 gates in scripts/check-*.mjs
+ *   4 Production           sitemap, robots, feed.xml, llms.txt, perf budget
+ *   5 Interaction          styles/interaction.css, gated by check:motion
+ *   6 Identity             lib/sigil.ts, the mark folded from the record
+ *
+ * Phase 7 is 'next' because it is being worked on now, not as an aspiration.
+ * If it sits at 'next' with nothing moving, this comment is the evidence that
+ * it should be corrected rather than left.
+ */
+/**
+ * Declared rather than inferred. With `as const` and every phase shipped, the
+ * union narrowed to 'done' | 'next' and the page's 'todo' branch became
+ * provably dead code — tsc said so. Deleting that branch would have meant
+ * writing it again the next time a phase is planned before it is started, so
+ * the type stays open and the data is what changes.
+ */
+export type PhaseState = 'done' | 'next' | 'todo'
+
+export const PHASES: readonly {
+  readonly n: number
+  readonly name: string
+  readonly state: PhaseState
+}[] = [
   { n: 0, name: 'Art Direction', state: 'done' },
-  { n: 1, name: 'Golden Path', state: 'next' },
-  { n: 2, name: 'Personal System', state: 'todo' },
-  { n: 3, name: 'Engineering Showcase', state: 'todo' },
-  { n: 4, name: 'Production', state: 'todo' },
-] as const
+  { n: 1, name: 'Golden Path', state: 'done' },
+  { n: 2, name: 'Personal System', state: 'done' },
+  { n: 3, name: 'Engineering Showcase', state: 'done' },
+  { n: 4, name: 'Production', state: 'done' },
+  { n: 5, name: 'Interaction', state: 'done' },
+  { n: 6, name: 'Identity', state: 'done' },
+  { n: 7, name: 'Reach', state: 'next' },
+]
 
 /**
  * The two grounds, as literals.
