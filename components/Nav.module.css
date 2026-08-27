@@ -173,9 +173,25 @@
   border-inline-start: var(--rule-w) solid var(--rule);
 }
 
-/* Same target rule the chapter links follow. The bar sized itself around
-   2.75rem; a control that opts out of that is a smaller target in the same
-   row, which is the version of this that fails on a phone. */
+/* A two-letter code, for two reasons that both showed up on screen.
+   
+   WIDTH. `ENGLISH` is 7 tracked uppercase characters and `한국어` is 3 Hangul
+   ones — roughly 110px against 48px. With the code, the control is the same
+   width in every locale, so switching language no longer slides the chapter
+   rail sideways underneath a fixed bar.
+
+   FACE. This bar is Latin uppercase at label size throughout — GOLDIBUG,
+   PERSONAL INTERFACE, 01 THINK. Hangul in it falls through to the platform
+   grotesk, per the Phase 0 decision that Latin display type carries the art
+   direction. `한국어` was therefore a typeface change in the middle of a
+   Latin rail, which is why the two states of one control looked like two
+   different controls.
+
+   The language's own name is not lost: it is the accessible name.
+
+   Same 2.75rem target rule the chapter links follow. The bar sized itself
+   around a 44px target rather than squeezing the target into the bar, and a
+   control that opts out of that is a smaller target in the same row. */
 .lang {
   display: inline-flex;
   align-items: center;
@@ -190,27 +206,4 @@
 
 .lang:hover {
   color: var(--figure);
-}
-
-/* Below 40rem the endonym goes and the code stays — the inverse of the
-   chapter rail, and for a reason. There the name carries the meaning and the
-   number is ornament. Here BOTH carry it, so the choice is made on width:
-   `GOLDIBUG` plus four chapter names plus `English` overflows a 320px bar,
-   and a two-letter code still says which language you would land in. */
-.langName {
-  display: none;
-}
-
-.langShort {
-  display: inline;
-}
-
-@media (min-width: 40rem) {
-  .langName {
-    display: inline;
-  }
-
-  .langShort {
-    display: none;
-  }
 }

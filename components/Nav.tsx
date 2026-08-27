@@ -188,14 +188,15 @@ export function Nav({ initialTone, locale, labels }: NavProps) {
                 <a
                   href={localePath(l, rest)}
                   hrefLang={LOCALE_META[l].lang}
-                  // The endonym is written IN the language it names, so it has
-                  // to be marked as that language or a screen reader will read
-                  // 한국어 with an English voice.
+                  // The visible text is a two-letter code; the accessible name
+                  // is the endonym, written in the language it names — so
+                  // `lang` marks the element for the aria-label's sake, not
+                  // for the Latin code a sighted reader sees.
                   lang={LOCALE_META[l].lang}
+                  aria-label={LOCALE_META[l].endonym}
                   className={cx('label', styles.lang)}
                 >
-                  <span className={styles.langShort}>{l.toUpperCase()}</span>
-                  <span className={styles.langName}>{LOCALE_META[l].endonym}</span>
+                  {l.toUpperCase()}
                 </a>
               </li>
             ))}
