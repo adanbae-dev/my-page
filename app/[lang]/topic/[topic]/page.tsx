@@ -9,7 +9,7 @@ import { Section } from '@/components/Section'
 import { TopicFilter } from '@/components/TopicFilter'
 import { allTopicParams, entriesForTopic, topicCounts } from '@/lib/content/load'
 import { cx } from '@/lib/cx'
-import { toField } from '@/lib/field'
+import { FIELD_MIN_LANES, laneCount, toField } from '@/lib/field'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { breadcrumbSchema, collectionPageSchema, pageMetadata } from '@/lib/seo'
@@ -134,7 +134,9 @@ export default async function TopicPage({ params }: { params: Promise<Params> })
             exists, behind the same button and the same capability probe. A
             topic is a slice through the timeline, which is exactly what this
             scene draws. */}
-        <FieldMount data={toField(entries, d)} labels={d.field} />
+        {laneCount(entries) >= FIELD_MIN_LANES && (
+          <FieldMount data={toField(entries, d, lang)} labels={d.field} />
+        )}
 
         <EntryList entries={entries} locale={lang} showOrigin />
       </Section>

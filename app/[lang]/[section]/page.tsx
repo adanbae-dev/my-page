@@ -10,7 +10,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { TopicScope } from '@/components/TopicScope'
 import { Section } from '@/components/Section'
 import { archive, entriesFor, topicCounts } from '@/lib/content/load'
-import { toField } from '@/lib/field'
+import { FIELD_MIN_LANES, laneCount, toField } from '@/lib/field'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, LOCALES, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
@@ -175,7 +175,12 @@ export default async function SectionPage({
           </div>
 
           <div>
-            {isArchive && <FieldMount data={toField(entries, d)} labels={d.field} />}
+            {/* Offered when the chapter axis has something to say — see
+                laneCount. A single chapter draws one lane and three empty
+                ones, which reads as missing data rather than as a shape. */}
+            {laneCount(entries) >= FIELD_MIN_LANES && (
+              <FieldMount data={toField(entries, d, lang)} labels={d.field} />
+            )}
             <TopicScope
               counts={scoped}
               labels={{
