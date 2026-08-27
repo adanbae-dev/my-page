@@ -22,3 +22,10 @@
   font-variant-numeric: tabular-nums;
   margin-block: var(--space-s);
 }
+
+/* SC 2.5.8 — see the note in [section]/[slug]/page.module.css. */
+.crumb a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}

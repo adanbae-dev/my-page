@@ -187,3 +187,30 @@
   inline-size: 4.5rem;
   color: var(--fg);
 }
+
+/* WCAG 2.2 SC 2.5.8 (AA) — a target is at least 24x24 CSS px.
+   Measured at 390px before this: crumb links 13px tall, sha 17px, topic chips
+   19px. All three are standalone links, so the criterion's "inline in a
+   sentence" exemption does not cover them.
+
+   Real box, not a pseudo-element overlay: an invisible expanded hit area can
+   overlap the next link when rows sit closer than 24px, and an ambiguous tap
+   is a worse bug than a small one. Growing the box cannot do that. */
+.crumb a,
+.provenance a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+.sha {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}

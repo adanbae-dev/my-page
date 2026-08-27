@@ -59,3 +59,10 @@
   text-align: end;
   margin-inline-start: auto;
 }
+
+/* SC 2.5.8 — see the note in [slug]/page.module.css. */
+.crumb a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}

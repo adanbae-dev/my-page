@@ -101,6 +101,29 @@
   font-size: inherit;
 }
 
+/* A diagram scrolls for the same reason, and the reason was measured rather
+   than assumed. The one figure in the archive is 640 units wide with 12- and
+   13-unit labels. Fitted into a 347px column on a 390px phone that is a scale
+   of 0.543, which renders the smallest label at 6.5px. Shrinking a figure
+   until its type is illegible is not responsive; it is just smaller.
+
+   So the figure holds its designed width and the box scrolls, exactly like a
+   wide table on the same page. 40rem is that figure's native 640px, which is
+   also the floor for any future one: a narrower diagram is stretched up,
+   which costs nothing in an SVG and helps on a phone. On a desktop column
+   wider than 40rem nothing changes — max-inline-size still wins. */
+.prose figure {
+  overflow-x: auto;
+  margin-block: var(--space-l);
+}
+
+.prose figure svg {
+  display: block;
+  min-inline-size: 40rem;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
 /* Tables scroll in their own container for the same reason. */
 .prose table {
   inline-size: 100%;

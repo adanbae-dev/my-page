@@ -287,3 +287,28 @@
   flex-direction: column;
   gap: var(--space-xs);
 }
+
+/* SC 2.5.8 — see the note in [section]/[slug]/page.module.css.
+
+   `.touched a` is in here and the repository link in `.note` is not: the repo
+   link sits at the end of a sentence of running prose, which is exactly the
+   criterion's "Inline" exception, while these are a labelled row of links and
+   are not. Skipping a target because a rule is inconvenient and skipping one
+   because the standard exempts it look identical in a diff, so it is written
+   down. */
+.crumb a,
+.touched a,
+.sha {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+/* An entry the record touched that no longer exists. Struck rather than
+   hidden: the commit did touch it, and a record that quietly drops what was
+   deleted is not a record. */
+.gone {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
