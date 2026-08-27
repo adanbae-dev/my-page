@@ -141,16 +141,61 @@
  * in the same view states it in words through its aria-label. This is emphasis
  * on the phrase, not a second copy of the fact.
  */
+/*
+ * Registered so it can be INTERPOLATED. An unregistered custom property is a
+ * token to the animation engine, not a percentage, so it snaps from one value
+ * to the other instead of sweeping. This is the whole reason the fill can be
+ * an arrival rather than a fact that is simply already true.
+ */
+@property --fill {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
 .gauge {
+  /* The measured value is the RESTING state, not the animation's endpoint by
+     accident: with reduced motion the animation never runs, and a gauge whose
+     base value is 0% would then sit empty and lie. */
+  --fill: var(--fill-target, 100%);
   background-color: transparent;
   background-image: linear-gradient(
     to right,
-    var(--accent) 0 var(--fill, 100%),
-    transparent var(--fill, 100%) 100%
+    var(--accent) 0 var(--fill),
+    transparent var(--fill) 100%
   );
   /* The empty remainder needs an edge or the block reads as a broken fill
      rather than as a container with room left in it. */
   box-shadow: inset 0 0 0 var(--rule-w) var(--accent);
+}
+
+/*
+ * The container arrives, then fills.
+ *
+ * Delayed by one --dur-invert so it starts as `markWipe` finishes: the block
+ * wipes in empty and outlined, and only then runs up to its measured value.
+ * Both at once read as one confused move — the wipe travels left to right and
+ * so does the fill, and the eye cannot tell which edge is which.
+ *
+ * --dur-invert is the vocabulary's longest duration, reserved on
+ * /art-direction for "a full ground inversion — the loudest move". A headline
+ * measuring itself is the same order of event, so it borrows the same number
+ * rather than inventing one.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .gauge {
+    animation: gaugeFill var(--dur-invert) var(--ease-inout-quart) var(--dur-invert)
+      both;
+  }
+}
+
+@keyframes gaugeFill {
+  from {
+    --fill: 0%;
+  }
+  to {
+    --fill: var(--fill-target, 100%);
+  }
 }
 
 /* Small and set above the enter link, so the beat reads title → words → mark

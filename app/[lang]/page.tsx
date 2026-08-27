@@ -62,7 +62,7 @@ export default async function GoldenPath({
             <br />
             <span
               className={cx('accentBlock', 'markWipe', styles.gauge)}
-              style={{ ['--fill' as string]: `${fill}%` }}
+              style={{ ['--fill-target' as string]: `${fill}%` }}
             >
               in progress
             </span>
