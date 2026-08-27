@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
+import type React from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
@@ -138,7 +139,15 @@ export default async function SectionPage({
           {/* Same name as the heading on the golden path, so the browser
               carries it across the navigation instead of cutting. */}
           <ViewTransition name={`chapter-${def.id}`}>
-            <h1 id="chapter-title" className={cx('h1', 'arrive', styles.title)} lang="en">
+            {/* Time-based, not scroll-driven: this sits in the first
+                viewport, so `view()` never sees an `entry` for it — the same
+                reason the hero types on load. */}
+            <h1
+              id="chapter-title"
+              className={cx('h1', 'type', 'balance', styles.title)}
+              lang="en"
+              style={{ '--lines': 2 } as React.CSSProperties}
+            >
               <DisplayLines lines={def.titleLines} />
             </h1>
           </ViewTransition>

@@ -86,7 +86,7 @@ export default async function GoldenPath({
               {/* Named so the browser can carry this headline into the depth
                   route instead of cutting to an unrelated page. */}
               <ViewTransition name={`chapter-${s.id}`}>
-                <h2 className="h1 arrive balance" lang="en">
+                <h2 className="h1 typeScroll balance" lang="en">
                   <DisplayLines lines={s.titleLines} />
                 </h2>
               </ViewTransition>

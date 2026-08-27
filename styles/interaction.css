@@ -514,3 +514,34 @@
     }
   }
 }
+
+/* --- Typed reveal, driven by scroll --------------------------------------- */
+
+/* The same stepped reveal as `.type`, but the steps are spent by SCROLLING
+   rather than by time. `steps()` quantises the animation's progress, and
+   nothing in it cares what drives that progress — so the chapter headline on
+   the golden path types itself as it is scrolled into place, one character
+   per step of the wheel.
+
+   Two things had to be measured before relying on them, and both hold:
+   `steps(var(--n), end)` substitutes to `steps(12)`, and the `animation`
+   shorthand with no duration resolves to `duration: auto` under a scroll
+   timeline rather than to `0s`.
+
+   Replaces `arrive` on these headlines rather than joining it: both clip from
+   the same edge, and two clips on one element is one of them doing nothing. */
+
+@layer utilities {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .typeScroll .lineIn {
+        animation: typeIn steps(var(--n, 20), end) both;
+        animation-timeline: view();
+        /* Each line spends its own stretch of the scroll, so the second only
+           starts once the first has finished. */
+        animation-range: entry calc(3% + var(--i, 0) * 23%)
+          entry calc(29% + var(--i, 0) * 23%);
+      }
+    }
+  }
+}
