@@ -89,10 +89,9 @@ export default async function OpenGraphImage() {
               Only on the card, not on the favicon — sixty-four wedges are
               legible at 150px and mush at 16, which is why app/icon.tsx keeps
               its geometric block. */}
-          {seal ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={seal} width={150} height={150} alt="" />
-          ) : null}
+          {/* Satori renders this, not a browser, so next/image does not apply
+              and the no-img-element rule does not fire here. */}
+          {seal ? <img src={seal} width={150} height={150} alt="" /> : null}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 0.88 }}>

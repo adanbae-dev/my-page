@@ -29,7 +29,7 @@ export const en = {
     think: {
       question: 'How does he reason?',
       blurb:
-        'The path to a conclusion, kept rather than the conclusion alone. What was read, where it was wrong, what changed. Essays, notes, and thoughts not yet sorted.',
+        'The path to a conclusion, kept rather than the conclusion alone. What was read, where it was wrong, what changed.',
     },
     make: {
       question: 'What was actually built?',
@@ -44,7 +44,7 @@ export const en = {
     trace: {
       question: 'What is left behind?',
       blurb:
-        'A record that accumulates in time. Versions that passed, attempts abandoned, minds changed. An archive is not a place for successes only.',
+        'A record that accumulates in time. Versions that passed, attempts abandoned, minds changed. Not a place for successes only.',
     },
   },
   home: {
@@ -154,6 +154,13 @@ export const en = {
       'One slot per commit. Depth is how many lines that commit actually changed by hand, and the marks reaching past the ring are the phases the history declared for itself. The {remaining} empty slots have not been earned yet. When they are, a new ring opens inside and the outer one sets for good — nothing already drawn ever moves again.',
     entryLabel: 'The mark with only this entry\u2019s commits lit; the ring is the whole record.',
     caption: '{used} of {slots}',
+  },
+
+  seo: {
+    topicDescription: '{blurb} {n} entries filed under this topic{titles}.',
+    topicTitles: ' — {list}',
+    artDirection:
+      'Two grounds and one accent, a machine-checked contrast contract, the type scale, the motion vocabulary, and a mark computed from the commit record.',
   },
 
   notFound: {

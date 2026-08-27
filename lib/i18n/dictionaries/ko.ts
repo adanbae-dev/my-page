@@ -163,6 +163,16 @@ export const ko = {
     caption: '{slots}칸 중 {used}칸',
   },
 
+  seo: {
+    /* The topic pages had 22–33 character descriptions — the blurb alone. Too
+       short to tell a searcher, or an answer engine, whether the page holds
+       anything. Composed from what the page actually contains instead. */
+    topicDescription: '{blurb} 이 주제로 분류된 글 {n}편{titles}.',
+    topicTitles: ' — {list}',
+    artDirection:
+      '이 인터페이스의 아트 디렉션. 두 개의 바탕과 하나의 액센트, 대비 계약, 타입 스케일, 모션 어휘, 그리고 저장소의 커밋 기록에서 계산되는 인장.',
+  },
+
   notFound: {
     title: 'Not found',
     body: '이 주소에는 아무것도 없습니다. 아래 네 구간이 이 사이트의 전부입니다.',

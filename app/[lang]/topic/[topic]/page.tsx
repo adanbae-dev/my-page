@@ -49,11 +49,33 @@ export async function generateMetadata({
   if (!isLocale(lang) || !isTopicId(topic)) return {}
   const d = dict(lang)
   const meta = d.topics[topic]
+  const entries = entriesForTopic(topic, lang)
+  /*
+   * Titles are added one at a time and only while the whole description still
+   * fits a snippet. A fixed count does not work: three Korean titles came to
+   * 100 characters and three English ones to 171, and check:release caught
+   * both — the same code produced a good description in one language and a
+   * truncated one in the other. So the limit is the length, not the count.
+   */
+  const compose = (titles: readonly string[]): string =>
+    t(d.seo.topicDescription, {
+      blurb: meta.blurb,
+      n: entries.length,
+      titles: titles.length > 0 ? t(d.seo.topicTitles, { list: titles.join(', ') }) : '',
+    })
+
+  const shown: string[] = []
+  for (const candidate of entries.slice(0, 3).map((e) => e.title)) {
+    if (compose([...shown, candidate]).length > 158) break
+    shown.push(candidate)
+  }
+  const description = compose(shown)
   return pageMetadata({
     lang,
     path: `/topic/${topic}`,
     title: meta.name,
-    description: meta.blurb,
+    description,
+    keywords: [meta.name, ...new Set(entries.flatMap((e) => e.tags))],
   })
 }
 

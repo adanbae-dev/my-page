@@ -1,6 +1,12 @@
 import type { Metadata } from 'next'
 
-import { localePath, LOCALES, LOCALE_META, type Locale } from '@/lib/i18n/config'
+import {
+  DEFAULT_LOCALE,
+  localePath,
+  LOCALES,
+  LOCALE_META,
+  type Locale,
+} from '@/lib/i18n/config'
 import { SECTIONS, type SectionId } from '@/lib/sections'
 import { person, site, url } from '@/lib/site.config'
 
@@ -21,10 +27,33 @@ import { person, site, url } from '@/lib/site.config'
  * checks the output rather than the intent.
  */
 
-/** The hreflang set for one locale-free path. Built from LOCALES so a third
- *  locale cannot leave the alternates behind. */
-export const alternateLanguages = (path: string): Record<string, string> =>
-  Object.fromEntries(LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]))
+/**
+ * The hreflang set for one locale-free path.
+ *
+ * Built from LOCALES so a third locale cannot leave the alternates behind.
+ *
+ * `x-default` points at the DEFAULT LOCALE, not at `/`. The usual advice is
+ * to aim it at a language-neutral page, and this site has none: `/` is a
+ * static 307 to `/ko` in next.config.ts that ignores Accept-Language —
+ * measured, with `Accept-Language: en-US` still landing on `/ko`. So the
+ * honest statement is "Korean is what an unmatched visitor gets", and aiming
+ * x-default at a redirect instead would just ask the crawler to resolve one.
+ */
+export const alternateLanguages = (path: string): Record<string, string> => ({
+  ...Object.fromEntries(LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)])),
+  'x-default': localePath(DEFAULT_LOCALE, path),
+})
+
+/**
+ * How many terms `keywords` may carry.
+ *
+ * A chapter page can derive every topic and every tag of every entry it holds,
+ * which for THINK is over twenty terms. Twenty terms is not a claim about what
+ * a page is about; it is a dump. Twelve is enough to name the subject and its
+ * neighbours, and the order is meaningful — callers put the specific terms
+ * first.
+ */
+const KEYWORD_MAX = 12
 
 /** The card image for a locale. Stated once; see the note above. */
 const ogImage = (lang: Locale): string => localePath(lang, '/opengraph-image')
@@ -35,6 +64,18 @@ type PageMetaArgs = {
   path: string
   title: string
   description: string
+  /**
+   * Content terms for `<meta name="keywords">`.
+   *
+   * Derived from the page's own topics and tags, never guessed at: there is no
+   * search-volume data behind this project, so a keyword here is a statement
+   * about what the page contains and nothing more. Google has said since 2009
+   * that it ignores this tag, and whether Naver weighs it is not something
+   * this repository can verify — so it is emitted because it is cheap and true,
+   * not because it is expected to move a ranking. The work that actually
+   * matters is in the title and the description.
+   */
+  keywords?: readonly string[]
   /** An entry is an article; everything else here is a website. */
   article?: {
     publishedTime: string
@@ -48,11 +89,13 @@ export function pageMetadata({
   path,
   title,
   description,
+  keywords,
   article,
 }: PageMetaArgs): Metadata {
   return {
     title,
     description,
+    ...(keywords?.length ? { keywords: [...new Set(keywords)].slice(0, KEYWORD_MAX) } : {}),
     alternates: {
       canonical: localePath(lang, path),
       languages: alternateLanguages(path),

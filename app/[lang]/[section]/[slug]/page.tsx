@@ -44,6 +44,10 @@ export async function generateMetadata({
     path,
     title: entry.title,
     description: entry.summary,
+    keywords: [
+      ...entry.topics.map((tp) => dict(lang).topics[tp].name),
+      ...entry.tags,
+    ],
     article: {
       publishedTime: entry.date,
       ...(entry.chapter === 'think' && entry.updated

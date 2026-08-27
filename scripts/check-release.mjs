@@ -165,6 +165,32 @@ for (const { route, file } of pages) {
     warnings.push(`${route} — no canonical link`)
   }
 
+  /*
+   * Length, not just presence.
+   *
+   * A title and a description that exist but do not fit are a silent defect:
+   * the page indexes, the snippet is cut mid-word, and nothing in the build
+   * says so. These were all measured on this site before the limits went in —
+   * /en/think shipped a 179-character description, and eight topic pages
+   * shipped descriptions of 22 to 33 characters, which is the blurb alone and
+   * tells a searcher nothing.
+   *
+   * WARNINGS, not blockers. The numbers are conventions for how much a result
+   * page renders, not a specification, and Korean occupies more pixels per
+   * character than Latin so the same count truncates sooner. A gate that fails
+   * a deploy over a snippet is a gate that gets disabled.
+   */
+  if (title && title.length > 60) {
+    warnings.push(`${route} — title is ${title.length} chars, over 60`)
+  }
+  if (desc && route !== '/_not-found') {
+    if (desc.length > 160) {
+      warnings.push(`${route} — description is ${desc.length} chars, over 160`)
+    } else if (desc.length < 50) {
+      warnings.push(`${route} — description is only ${desc.length} chars`)
+    }
+  }
+
   // A multilingual site that does not declare its alternates reads to a
   // crawler as duplicate content in two places rather than one page in two
   // languages. Next emits the attribute as `hrefLang`; HTML attributes are
@@ -177,6 +203,12 @@ for (const { route, file } of pages) {
       if (!alts.includes(expected)) {
         blockers.push(`${route} — no hreflang alternate for "${expected}"`)
       }
+    }
+    /* x-default names the fallback for a visitor whose language matches none
+       of the alternates. Without it a crawler has to guess which of two equal
+       alternates is the default, and this site does have an answer. */
+    if (!alts.includes('x-default')) {
+      blockers.push(`${route} — no x-default hreflang alternate`)
     }
   }
 

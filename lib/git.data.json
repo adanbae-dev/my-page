@@ -14,8 +14,141 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "68db941",
+  "head": "09f80a0",
   "commits": [
+    {
+      "sha": "09f80a0",
+      "date": "2026-08-28",
+      "subject": "Fix: /build 의 내부 링크 다섯 개가 404 였다",
+      "insertions": 50,
+      "deletions": 9,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "app"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "2c42496",
+      "date": "2026-08-28",
+      "subject": "Mobile: 도식 가독성과 탭 타깃을 기준까지 올렸다",
+      "insertions": 89,
+      "deletions": 0,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "app",
+        "components"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "3013234",
+      "date": "2026-08-28",
+      "subject": "Art direction: 마크 명세를 추가하고, 거짓말하던 로드맵을 고쳤다",
+      "insertions": 153,
+      "deletions": 10,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "249f792",
+      "date": "2026-08-28",
+      "subject": "Identity: 인장을 계속 돌린다",
+      "insertions": 42,
+      "deletions": 37,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "components",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "c46d6a3",
+      "date": "2026-08-28",
+      "subject": "Identity: 글마다 자기 커밋만 켜진 인장",
+      "insertions": 175,
+      "deletions": 26,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "app",
+        "components",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "bbfc574",
+      "date": "2026-08-28",
+      "subject": "Identity: 저장소가 스스로 그리는 인장",
+      "insertions": 578,
+      "deletions": 14,
+      "generated": 0,
+      "files": 11,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "aba44e3",
+      "date": "2026-08-27",
+      "subject": "Fix: dev 서버가 새로 쓴 글을 못 보던 문제",
+      "insertions": 55,
+      "deletions": 18,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "052f94d",
+      "date": "2026-08-27",
+      "subject": "Fix: sync:git 가드가 되감기를 절단으로 오인하던 문제",
+      "insertions": 49,
+      "deletions": 6,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "8be82d4",
+      "date": "2026-08-27",
+      "subject": "Content: 릴리스 브랜치를 늦게 만들 필요가 없었다",
+      "insertions": 282,
+      "deletions": 1,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "branch-strategy"
+        }
+      ]
+    },
     {
       "sha": "68db941",
       "date": "2026-08-27",

@@ -25,8 +25,10 @@ import styles from './page.module.css'
 
 
 
-const DESCRIPTION =
-  'Phase 0 — Inverted Duotone: the ground, the type, the accent law and the motion vocabulary for PERSONAL INTERFACE.'
+/* Was a single English sentence served on the Korean page too, and stale: it
+   announced "Phase 0" long after the page had grown to document six phases and
+   the generated mark. Localised, and read from the dictionary so it changes
+   with the rest of the copy. */
 
 export async function generateMetadata({
   params,
@@ -35,12 +37,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
+  const d = dict(lang)
   const path = '/art-direction'
   return pageMetadata({
     lang,
     path,
     title: 'Art Direction',
-    description: DESCRIPTION,
+    description: d.seo.artDirection,
   })
 }
 

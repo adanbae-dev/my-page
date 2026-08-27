@@ -50,11 +50,22 @@ export async function generateMetadata({
   const { question, blurb } = d.sections[def.id]
   const description = `${question} — ${blurb}`
   const path = `/${def.id}`
+  const entries = entriesFor(def.id, lang)
+  /* The chapter labels are English by design, so a Korean page's title used to
+     read `THINK · GOLDIBUG` — sixteen characters with no Korean in them at all,
+     on a page whose text is Korean. The chapter's own question is the phrase a
+     reader would actually type, and it is already written, in both languages. */
   return pageMetadata({
     lang,
     path,
-    title: def.label,
+    title: `${def.label} — ${question}`,
     description,
+    keywords: [
+      def.label,
+      question,
+      ...new Set(entries.flatMap((e) => e.topics.map((t) => d.topics[t].name))),
+      ...new Set(entries.flatMap((e) => e.tags)),
+    ],
   })
 }
 
