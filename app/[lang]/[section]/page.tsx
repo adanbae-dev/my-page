@@ -10,6 +10,14 @@ import { Section } from '@/components/Section'
 import { archive, entriesFor } from '@/lib/content/load'
 import { toField } from '@/lib/field'
 import { cx } from '@/lib/cx'
+import {
+  isLocale,
+  localePath,
+  LOCALES,
+  LOCALE_META,
+  t,
+} from '@/lib/i18n/config'
+import { dict } from '@/lib/i18n/dictionary'
 import { SECTIONS, getSection, neighbours } from '@/lib/sections'
 import styles from './page.module.css'
 
@@ -23,13 +31,13 @@ import styles from './page.module.css'
  * thing here is Three.js, and that is deferred inside FieldMount itself.
  */
 
-type Params = { section: string }
+type Params = { lang: string; section: string }
 
 /** Only the four chapters exist. Anything else is a 404, not a blank page. */
 export const dynamicParams = false
 
 export function generateStaticParams(): Params[] {
-  return SECTIONS.map((s) => ({ section: s.id }))
+  return LOCALES.flatMap((lang) => SECTIONS.map((s) => ({ lang, section: s.id })))
 }
 
 export async function generateMetadata({
@@ -37,18 +45,27 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>
 }): Promise<Metadata> {
-  const { section } = await params
+  const { lang, section } = await params
   const def = getSection(section)
-  if (!def) return {}
-  const description = `${def.question} — ${def.blurb}`
+  if (!def || !isLocale(lang)) return {}
+  const d = dict(lang)
+  const { question, blurb } = d.sections[def.id]
+  const description = `${question} — ${blurb}`
+  const path = `/${def.id}`
   return {
     title: def.label,
     description,
-    alternates: { canonical: `/${def.id}` },
+    alternates: {
+      canonical: localePath(lang, path),
+      languages: Object.fromEntries(
+        LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
+      ),
+    },
     openGraph: {
       type: 'website',
-      url: `/${def.id}`,
-      title: `${def.label} — ${def.question}`,
+      locale: LOCALE_META[lang].og,
+      url: localePath(lang, path),
+      title: `${def.label} — ${question}`,
       description,
     },
   }
@@ -68,16 +85,17 @@ export default async function SectionPage({
 }: {
   params: Promise<Params>
 }) {
-  const { section } = await params
+  const { lang, section } = await params
   const def = getSection(section)
-  if (!def) notFound()
+  if (!def || !isLocale(lang)) notFound()
+  const d = dict(lang)
 
   const { prev, next } = neighbours(def.id)
 
   // TRACE is the archive of everything, not a fifth pile of posts: it merges
   // every chapter's entries with its own logs into one chronological stream.
   const isArchive = def.id === 'trace'
-  const entries = isArchive ? archive() : entriesFor(def.id)
+  const entries = isArchive ? archive(lang) : entriesFor(def.id, lang)
 
   return (
     <>
@@ -90,7 +108,7 @@ export default async function SectionPage({
       >
         <div className="wrap">
           <p className={cx('label', styles.crumb)}>
-            <Link href="/">← Golden path</Link>
+            <Link href={localePath(lang)}>{d.nav.backToGoldenPath}</Link>
             <span>
               {def.index} / {def.label}
             </span>
@@ -104,7 +122,7 @@ export default async function SectionPage({
             </h1>
           </ViewTransition>
 
-          <p className="lead measure">{def.blurb}</p>
+          <p className="lead measure">{d.sections[def.id].blurb}</p>
         </div>
       </section>
 
@@ -117,14 +135,12 @@ export default async function SectionPage({
       >
         <div className={styles.body}>
           <div className="stack">
-            <h2 className="h3">{def.question}</h2>
+            <h2 className="h3">{d.sections[def.id].question}</h2>
             <p className="small muted measure">
-              {isArchive
-                ? '이 구간은 다른 세 구간에서 쌓인 기록과 이곳의 자체 기록을 하나의 시간축으로 합칩니다. 별도로 관리되는 목록이 아니라, 작업에서 파생된 흔적입니다.'
-                : def.blurb}
+              {isArchive ? d.chapter.archiveNote : d.sections[def.id].blurb}
             </p>
             <p className={cx('label', styles.count)}>
-              {entries.length} {isArchive ? 'RECORDS' : 'ENTRIES'}
+              {entries.length} {isArchive ? d.chapter.records : d.chapter.entries}
             </p>
 
             {/* The machine-written half of the same promise. It lives on its
@@ -132,20 +148,21 @@ export default async function SectionPage({
                 entry — nobody wrote it. */}
             {isArchive && (
               <p className="label">
-                <Link href="/build">아무도 쓰지 않은 기록 — BUILD →</Link>
+                <Link href={localePath(lang, '/build')}>{d.chapter.buildLink}</Link>
               </p>
             )}
           </div>
 
           <div>
-            {isArchive && <FieldMount data={toField(entries)} />}
+            {isArchive && <FieldMount data={toField(entries, d)} labels={d.field} />}
             <EntryList
               entries={entries}
+              locale={lang}
               showOrigin={isArchive}
               emptyMessage={
                 isArchive
-                  ? '아직 기록이 없습니다.'
-                  : `${def.label} 구간은 아직 비어 있습니다.`
+                  ? d.chapter.emptyArchive
+                  : t(d.chapter.emptyChapter, { label: def.label })
               }
             />
           </div>
@@ -157,16 +174,23 @@ export default async function SectionPage({
         <hr className="ruleStrong" />
         <div className={styles.foot} style={{ marginBlockStart: 'var(--space-m)' }}>
           {prev && (
-            <Link href={`/${prev.id}`} className={styles.step}>
-              <span className="label muted">← {prev.index} 이전</span>
+            <Link href={localePath(lang, `/${prev.id}`)} className={styles.step}>
+              <span className="label muted">
+                ← {t(d.chapter.prev, { index: prev.index })}
+              </span>
               <span className="h3" lang="en">
                 {prev.label}
               </span>
             </Link>
           )}
           {next && (
-            <Link href={`/${next.id}`} className={cx(styles.step, styles.stepNext)}>
-              <span className="label muted">{next.index} 다음 →</span>
+            <Link
+              href={localePath(lang, `/${next.id}`)}
+              className={cx(styles.step, styles.stepNext)}
+            >
+              <span className="label muted">
+                {t(d.chapter.next, { index: next.index })} →
+              </span>
               <span className="h3" lang="en">
                 {next.label}
               </span>

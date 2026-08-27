@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
 import { cx } from '@/lib/cx'
+import { isLocale, localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
+import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
 import { eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
@@ -23,18 +25,37 @@ import styles from './page.module.css'
  * making it interactive would cost weight and buy nothing.
  */
 
-export const metadata: Metadata = {
-  title: 'BUILD',
-  description:
-    '이 인터페이스가 만들어진 기록. 저장소의 커밋을 스스로 선언한 페이즈로 묶어, 각 커밋을 실제 diff로 연결합니다.',
-  alternates: { canonical: '/build' },
-  openGraph: {
-    type: 'website',
-    url: '/build',
-    title: 'BUILD — 무엇을 언제 어떻게 지었는가',
-    description:
-      '이 인터페이스가 만들어진 기록. 직접 쓴 줄과 생성된 줄을 나눠 세고, 각 커밋을 실제 diff로 연결합니다.',
-  },
+
+/** hreflang for one locale-free path, built from LOCALES so it cannot drift. */
+const languages = (path: string) =>
+  Object.fromEntries(
+    LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
+  )
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  if (!isLocale(lang)) return {}
+  const d = dict(lang)
+  const path = '/build'
+  return {
+    title: 'BUILD',
+    description: d.build.description,
+    alternates: {
+      canonical: localePath(lang, path),
+      languages: languages(path),
+    },
+    openGraph: {
+      type: 'website',
+      locale: LOCALE_META[lang].og,
+      url: localePath(lang, path),
+      title: d.build.ogTitle,
+      description: d.build.ogDescription,
+    },
+  }
 }
 
 const n = (v: number): string => v.toLocaleString('en-US')

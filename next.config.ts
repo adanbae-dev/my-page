@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 import { contentSecurityPolicy } from './lib/csp.mjs'
+import { DEFAULT_LOCALE } from './lib/i18n/config'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -10,6 +11,24 @@ const nextConfig: NextConfig = {
   // portfolio with red squiggles in it. (Next 16 dropped the `eslint` key;
   // linting runs as its own `pnpm lint` step.)
   typescript: { ignoreBuildErrors: false },
+
+  /**
+   * `/` has no language, so it cannot render.
+   *
+   * A static redirect rather than a proxy.ts that reads Accept-Language:
+   * this product's posture is that every route is prerendered with no runtime
+   * cost, and a proxy turns every request into an edge function invocation.
+   * What that gives up is automatic language detection — a visitor landing on
+   * `/` gets Korean and can switch. Adding proxy.ts later changes nothing
+   * else.
+   */
+  async redirects() {
+    return [
+      { source: '/', destination: `/${DEFAULT_LOCALE}`, permanent: false },
+      // The feed and the chapter paths were unprefixed before this change.
+      { source: '/feed.xml', destination: `/${DEFAULT_LOCALE}/feed.xml`, permanent: true },
+    ]
+  },
 
   /**
    * Response headers. The policy itself lives in lib/csp.mjs so that the

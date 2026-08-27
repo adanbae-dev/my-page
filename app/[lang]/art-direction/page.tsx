@@ -1,3 +1,9 @@
+import type { Metadata } from 'next'
+
+import { notFound } from 'next/navigation'
+
+import { isLocale, localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
+import { dict } from '@/lib/i18n/dictionary'
 import Link from 'next/link'
 
 import { Section } from '@/components/Section'
@@ -12,11 +18,39 @@ import {
 import type { Tone } from '@/lib/tone'
 import styles from './page.module.css'
 
-export const metadata = {
-  title: 'Art Direction',
-  alternates: { canonical: '/art-direction' },
-  description:
-    'Phase 0 — Inverted Duotone: the ground, the type, the accent law and the motion vocabulary for PERSONAL INTERFACE.',
+
+/** hreflang for one locale-free path, built from LOCALES so it cannot drift. */
+const languages = (path: string) =>
+  Object.fromEntries(
+    LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
+  )
+
+const DESCRIPTION =
+  'Phase 0 — Inverted Duotone: the ground, the type, the accent law and the motion vocabulary for PERSONAL INTERFACE.'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  if (!isLocale(lang)) return {}
+  const path = '/art-direction'
+  return {
+    title: 'Art Direction',
+    description: DESCRIPTION,
+    alternates: {
+      canonical: localePath(lang, path),
+      languages: languages(path),
+    },
+    openGraph: {
+      type: 'website',
+      locale: LOCALE_META[lang].og,
+      url: localePath(lang, path),
+      title: 'Art Direction',
+      description: DESCRIPTION,
+    },
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -95,7 +129,15 @@ const SPECIMEN = [
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-export default function ArtDirectionPage() {
+export default async function ArtDirectionPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}) {
+  const { lang } = await params
+  if (!isLocale(lang)) notFound()
+  const d = dict(lang)
+
   return (
     <>
       {/* ---- 00 · CALM ------------------------------------------------ */}
@@ -122,7 +164,7 @@ export default function ArtDirectionPage() {
             <span className="accentBlock">in progress</span>
           </h1>
 
-          <p className="lead measure">{site.statement}</p>
+          <p className="lead measure">{d.site.statement}</p>
 
           <div className={styles.heroFoot}>
             <div className={cx('label', styles.axes)}>

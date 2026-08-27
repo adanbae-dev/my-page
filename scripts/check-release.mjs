@@ -22,6 +22,19 @@ import { contentSecurityPolicy } from '../lib/csp.mjs'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const APP = join(ROOT, '.next', 'server', 'app')
 
+/* Locales are read out of lib/i18n/config.ts rather than restated here, the
+   same way check-content.mjs reads SECTION_IDS out of lib/sections.ts. A
+   gate with its own copy of the list stops agreeing with the app. */
+const LOCALE_TAGS = (() => {
+  const src = readFileSync(join(ROOT, 'lib', 'i18n', 'config.ts'), 'utf8')
+  const m = /export const LOCALES = \[([^\]]+)\]/.exec(src)
+  if (!m) {
+    process.stderr.write('\n  Could not read LOCALES from lib/i18n/config.ts\n\n')
+    process.exit(1)
+  }
+  return [...m[1].matchAll(/'([a-z-]+)'/g)].map((x) => x[1])
+})()
+
 const line = (s) => process.stdout.write(s + '\n')
 const blockers = []
 const warnings = []
@@ -85,11 +98,21 @@ if (!origin) {
 const REQUIRED = [
   ['sitemap.xml', 'sitemap.xml.body'],
   ['robots.txt', 'robots.txt.body'],
-  ['feed.xml', 'feed.xml.body'],
 ]
 for (const names of REQUIRED) {
   const found = names.some((n) => existsSync(join(APP, n)))
   if (!found) blockers.push(`missing from the build: ${names[0]}`)
+}
+
+/* The feed moved under the locale segment, so there is one per language and
+   none at the root. Checked per locale rather than once: a build that
+   prerendered only the default locale's feed would have passed the old
+   check while shipping a dead URL in every English page's <link>. */
+for (const tag of LOCALE_TAGS) {
+  const found = [`${tag}/feed.xml`, `${tag}/feed.xml.body`].some((n) =>
+    existsSync(join(APP, n)),
+  )
+  if (!found) blockers.push(`missing from the build: /${tag}/feed.xml`)
 }
 
 const hasImage = (name) =>
@@ -131,10 +154,37 @@ for (const { route, file } of pages) {
     warnings.push(`${route} — no canonical link`)
   }
 
+  // A multilingual site that does not declare its alternates reads to a
+  // crawler as duplicate content in two places rather than one page in two
+  // languages. Next emits the attribute as `hrefLang`; HTML attributes are
+  // case-insensitive, so the match has to be too.
+  if (route !== '/_not-found' && route !== '/_global-error') {
+    const alts = [...html.matchAll(/rel="alternate"\s+hreflang="([^"]+)"/gi)].map(
+      (m) => m[1].toLowerCase(),
+    )
+    for (const expected of LOCALE_TAGS) {
+      if (!alts.includes(expected)) {
+        blockers.push(`${route} — no hreflang alternate for "${expected}"`)
+      }
+    }
+  }
+
   // A localhost URL baked into shipped HTML is the classic "worked on my
   // machine" deploy: crawlers follow it, and it points at nothing.
+  //
+  // One page legitimately carries one. `/_not-found` is emitted by Next
+  // without a layout — the root layout now lives under app/[lang] — so it has
+  // no `metadataBase` to resolve og:image against and falls back to
+  // localhost. That is harmless ONLY because the page is noindex, so the
+  // exemption demands proof of exactly that rather than trusting the route
+  // name: an indexable page with a localhost URL is still a blocker.
   if (/https?:\/\/localhost/.test(html)) {
-    blockers.push(`${route} — localhost URL baked into the HTML`)
+    const noindex = /<meta name="robots" content="[^"]*noindex/.test(html)
+    if (noindex) {
+      warnings.push(`${route} — localhost URL in HTML, tolerated because the page is noindex`)
+    } else {
+      blockers.push(`${route} — localhost URL baked into the HTML`)
+    }
   }
 }
 

@@ -54,11 +54,9 @@ export type Fragment = BaseEntry & {
 export const LOG_KINDS = ['version', 'abandoned', 'reconsidered'] as const
 export type LogKind = (typeof LOG_KINDS)[number]
 
-export const LOG_KIND_LABEL: Readonly<Record<LogKind, string>> = {
-  version: '지나간 버전',
-  abandoned: '폐기된 시도',
-  reconsidered: '바뀐 마음',
-}
+/* The human-readable name of each kind lives in lib/i18n, not here. A label
+   is a sentence fragment and a sentence has a language; keeping a Korean copy
+   next to the type would be a second source of truth for the same string. */
 
 export type Log = BaseEntry & {
   readonly chapter: 'trace'

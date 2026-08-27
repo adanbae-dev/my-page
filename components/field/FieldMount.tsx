@@ -10,12 +10,26 @@ import {
 
 import { cx } from '@/lib/cx'
 import type { FieldDatum } from '@/lib/field'
+import { t } from '@/lib/i18n/config'
+import type { Dictionary } from '@/lib/i18n/dictionary'
 import { detectWebGL, type WebGLSupport } from '@/lib/webgl'
 import styles from './Field.module.css'
+
+/**
+ * Only the strings, not the dictionary.
+ *
+ * This whole subtree is a Client Component, so nothing here can call
+ * `dict()` or read `next/root-params`. `Dictionary['field']` is a plain
+ * object of strings, which serialises; the dictionary itself would not have
+ * to, but passing the whole thing would ship every other locale's key names
+ * into the client for no reason.
+ */
+export type FieldLabels = Dictionary['field']
 
 type FieldProps = {
   data: readonly FieldDatum[]
   reduced: boolean
+  labels: FieldLabels
   onFps: (fps: number) => void
   onContextLost: () => void
 }
@@ -53,7 +67,13 @@ const readReducedMotionOnServer = () => false
  * The list underneath is never removed. This view is an addition, not a
  * replacement: keyboard and screen-reader users always have the archive.
  */
-export function FieldMount({ data }: { data: readonly FieldDatum[] }) {
+export function FieldMount({
+  data,
+  labels,
+}: {
+  data: readonly FieldDatum[]
+  labels: FieldLabels
+}) {
   const [state, setState] = useState<State>('idle')
   const [support, setSupport] = useState<WebGLSupport>('unknown')
   const [Field, setField] = useState<ComponentType<FieldProps> | null>(null)
@@ -120,12 +140,12 @@ export function FieldMount({ data }: { data: readonly FieldDatum[] }) {
           disabled={disabled}
           onClick={shown ? close : open}
         >
-          {shown ? '목록으로' : '공간으로 보기'}
+          {shown ? labels.toList : labels.toSpace}
           <span aria-hidden="true">{shown ? '↑' : '↗'}</span>
         </button>
 
         <p className={cx('label', styles.readout)}>
-          <span>{data.length} RECORDS</span>
+          <span>{t(labels.records, { n: data.length })}</span>
           {bytes !== null && <span>+{(bytes / 1024).toFixed(0)} KB ON DEMAND</span>}
           {shown && fps !== null && <span>{fps} FPS</span>}
           {reduced && <span>REDUCED MOTION</span>}
@@ -134,20 +154,15 @@ export function FieldMount({ data }: { data: readonly FieldDatum[] }) {
       </div>
 
       {state === 'loading' && (
-        <p className={cx('small', styles.state)}>WebGL 씬을 불러오는 중…</p>
+        <p className={cx('small', styles.state)}>{labels.loading}</p>
       )}
 
       {state === 'failed' && (
-        <p className={cx('small', styles.state)}>
-          씬을 불러오지 못했습니다. 아래 목록에 같은 기록이 전부 있습니다.
-        </p>
+        <p className={cx('small', styles.state)}>{labels.failed}</p>
       )}
 
       {state === 'unsupported' && (
-        <p className={cx('small', styles.state)}>
-          이 브라우저에서 WebGL을 쓸 수 없어 공간 보기를 열지 않았습니다.
-          아래 목록에 같은 기록이 전부 있습니다.
-        </p>
+        <p className={cx('small', styles.state)}>{labels.unsupported}</p>
       )}
 
       {shown && Field && (
@@ -155,12 +170,13 @@ export function FieldMount({ data }: { data: readonly FieldDatum[] }) {
           <Field
             data={data}
             reduced={reduced}
+            labels={labels}
             onFps={setFps}
             onContextLost={() => setState('failed')}
           />
           <p className={cx('label', styles.note)}>
-            막대 하나가 기록 하나입니다. 높이는 분량, 안쪽 줄은 구간, 가로축은
-            시간순. {reduced ? '모션 설정을 존중해 카메라는 고정돼 있습니다.' : '포인터를 움직이면 시점이 따라옵니다.'}
+            {labels.note}{' '}
+            {reduced ? labels.reducedNote : labels.pointerNote}
           </p>
         </>
       )}

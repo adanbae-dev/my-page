@@ -1,5 +1,6 @@
 import type { Entry } from '@/lib/content/schema'
-import { LOG_KIND_LABEL } from '@/lib/content/schema'
+import { t } from '@/lib/i18n/config'
+import type { Dictionary } from '@/lib/i18n/dictionary'
 import { SECTION_IDS, type SectionId } from '@/lib/sections'
 
 /**
@@ -25,16 +26,20 @@ export type FieldDatum = {
   readonly meta: string
 }
 
-function metaFor(entry: Entry): string {
+/** Labels are injected: this projection crosses to the client, and the text
+ *  on it has a language. */
+type MetaLabels = Pick<Dictionary, 'logKind' | 'entry'>
+
+function metaFor(entry: Entry, d: MetaLabels): string {
   switch (entry.chapter) {
     case 'make':
       return entry.role
     case 'trace':
-      return LOG_KIND_LABEL[entry.kind]
+      return d.logKind[entry.kind]
     case 'live':
       return entry.place ?? ''
     case 'think':
-      return `약 ${entry.readingMinutes}분`
+      return t(d.entry.readingMinutes, { n: entry.readingMinutes })
   }
 }
 
@@ -47,7 +52,7 @@ function metaFor(entry: Entry): string {
  * stays readable at 7 and at 700, and the axis is still strictly
  * chronological — it just refuses to let one outlier eat the layout.
  */
-export function toField(entries: readonly Entry[]): FieldDatum[] {
+export function toField(entries: readonly Entry[], d: MetaLabels): FieldDatum[] {
   const ordered = [...entries].sort(
     (a, b) => a.date.localeCompare(b.date) || a.slug.localeCompare(b.slug),
   )
@@ -62,6 +67,6 @@ export function toField(entries: readonly Entry[]): FieldDatum[] {
     lane: SECTION_IDS.indexOf(entry.chapter),
     t: i / last,
     weight: Math.max(1, entry.readingMinutes),
-    meta: metaFor(entry),
+    meta: metaFor(entry, d),
   }))
 }

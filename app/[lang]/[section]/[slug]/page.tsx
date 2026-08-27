@@ -7,14 +7,23 @@ import { Prose } from '@/components/Prose'
 import { Section } from '@/components/Section'
 import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
 import { historyFor } from '@/lib/git/load'
-import { LOG_KIND_LABEL, type Entry } from '@/lib/content/schema'
+import { type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
+import {
+  isLocale,
+  localePath,
+  LOCALES,
+  LOCALE_META,
+  t,
+  type Locale,
+} from '@/lib/i18n/config'
+import { dict, type Dictionary } from '@/lib/i18n/dictionary'
 import { getSection, isSectionId } from '@/lib/sections'
-import { commitUrl, person, site, url } from '@/lib/site.config'
+import { commitUrl, person, url } from '@/lib/site.config'
 import styles from './page.module.css'
 
-type Params = { section: string; slug: string }
+type Params = { lang: string; section: string; slug: string }
 
 export const dynamicParams = false
 
@@ -27,17 +36,24 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>
 }): Promise<Metadata> {
-  const { section, slug } = await params
-  if (!isSectionId(section)) return {}
-  const entry = getEntry(section, slug)
+  const { lang, section, slug } = await params
+  if (!isSectionId(section) || !isLocale(lang)) return {}
+  const entry = getEntry(section, slug, lang)
   if (!entry) return {}
+  const path = `/${section}/${slug}`
   return {
     title: entry.title,
     description: entry.summary,
-    alternates: { canonical: `/${section}/${slug}` },
+    alternates: {
+      canonical: localePath(lang, path),
+      languages: Object.fromEntries(
+        LOCALES.map((l) => [LOCALE_META[l].lang, localePath(l, path)]),
+      ),
+    },
     openGraph: {
       type: 'article',
-      url: `/${section}/${slug}`,
+      locale: LOCALE_META[lang].og,
+      url: localePath(lang, path),
       title: entry.title,
       description: entry.summary,
       publishedTime: entry.date,
@@ -50,21 +66,23 @@ export async function generateMetadata({
 }
 
 /** The metadata line under the title — different per chapter, on purpose. */
-function byline(entry: Entry): string[] {
+function byline(entry: Entry, d: Dictionary): string[] {
   const base = [formatDate(entry.date)]
   switch (entry.chapter) {
     case 'think':
       return [
         ...base,
-        ...(entry.updated ? [`고침 ${formatDate(entry.updated)}`] : []),
-        `약 ${entry.readingMinutes}분`,
+        ...(entry.updated
+          ? [t(d.entry.updatedAt, { date: formatDate(entry.updated) })]
+          : []),
+        t(d.entry.readingMinutes, { n: entry.readingMinutes }),
       ]
     case 'make':
       return [...base, entry.period, entry.role]
     case 'live':
       return entry.place ? [...base, entry.place] : base
     case 'trace':
-      return [...base, LOG_KIND_LABEL[entry.kind]]
+      return [...base, d.logKind[entry.kind]]
   }
 }
 
@@ -73,14 +91,16 @@ export default async function EntryPage({
 }: {
   params: Promise<Params>
 }) {
-  const { section, slug } = await params
-  if (!isSectionId(section)) notFound()
+  const { lang, section, slug } = await params
+  if (!isSectionId(section) || !isLocale(lang)) notFound()
+  const locale: Locale = lang
+  const d = dict(locale)
 
-  const entry = getEntry(section, slug)
+  const entry = getEntry(section, slug, locale)
   const chapter = getSection(section)
   if (!entry || !chapter) notFound()
 
-  const { newer, older } = entryNeighbours(section, slug)
+  const { newer, older } = entryNeighbours(section, slug, locale)
 
   /*
    * Provenance, from the repository.
@@ -106,10 +126,10 @@ export default async function EntryPage({
           datePublished: entry.date,
           dateModified:
             entry.chapter === 'think' && entry.updated ? entry.updated : entry.date,
-          inLanguage: site.lang,
+          inLanguage: LOCALE_META[entry.locale].lang,
           keywords: entry.tags.join(', '),
           articleSection: chapter.label,
-          mainEntityOfPage: url(`/${entry.chapter}/${entry.slug}`),
+          mainEntityOfPage: url(localePath(locale, `/${entry.chapter}/${entry.slug}`)),
           author: person(),
           publisher: person(),
         }}
@@ -118,10 +138,10 @@ export default async function EntryPage({
       <Section tone="light" density="calm">
         <div className={styles.head}>
           <p className={cx('label', styles.crumb)}>
-            <Link href={`/${chapter.id}`}>
+            <Link href={localePath(locale, `/${chapter.id}`)}>
               ← {chapter.index} {chapter.label}
             </Link>
-            <span>{chapter.question}</span>
+            <span>{d.sections[chapter.id].question}</span>
           </p>
 
           <h1 className={cx('h2', styles.title)} lang="ko">
@@ -131,28 +151,37 @@ export default async function EntryPage({
           <p className="lead measure">{entry.summary}</p>
 
           <p className={cx('label', styles.byline)}>
-            {byline(entry).map((bit) => (
+            {byline(entry, d).map((bit) => (
               <span key={bit}>{bit}</span>
             ))}
           </p>
+
+          {/* The entry exists; its translation does not. Said plainly rather
+              than hidden — an archive that shrinks per language is a filtered
+              view, not a trace. */}
+          {!entry.translated && (
+            <p className={cx('small', 'muted', styles.untranslated)}>
+              {d.entry.untranslated}
+            </p>
+          )}
         </div>
       </Section>
 
       {/* Dense — the decisions. Only MAKE carries the full slab; the fields
           exist because the brief promised decisions rather than screenshots. */}
       {isWork(entry) && (
-        <Section tone="dark" density="dense" index={chapter.index} title="Decisions">
+        <Section tone="dark" density="dense" index={chapter.index} title={d.entry.decisions}>
           <div className={styles.decisions}>
             <div className={styles.decision}>
-              <p className={cx('label', styles.decisionLabel)}>제약</p>
+              <p className={cx('label', styles.decisionLabel)}>{d.entry.constraint}</p>
               <p className="small">{entry.constraint}</p>
             </div>
             <div className={styles.decision}>
-              <p className={cx('label', styles.decisionLabel)}>포기한 것</p>
+              <p className={cx('label', styles.decisionLabel)}>{d.entry.tradeoff}</p>
               <p className="small">{entry.tradeoff}</p>
             </div>
             <div className={styles.decision}>
-              <p className={cx('label', styles.decisionLabel)}>남은 것</p>
+              <p className={cx('label', styles.decisionLabel)}>{d.entry.outcome}</p>
               <p className="small">{entry.outcome}</p>
             </div>
           </div>
@@ -189,13 +218,13 @@ export default async function EntryPage({
             authored; it is all derived, the way the reading estimate is. */}
         {born && (
           <div className={styles.provenance}>
-            <p className={cx('label', styles.provenanceHead)}>기록</p>
+            <p className={cx('label', styles.provenanceHead)}>{d.entry.provenance}</p>
 
             <p className="small">
-              {formatDate(born.date)}에 처음 커밋됐고,{' '}
+              {t(d.entry.bornAt, { date: formatDate(born.date) })}{' '}
               {history.length === 1
-                ? '이후 손대지 않았습니다.'
-                : `이후 ${history.length - 1}번 더 손댔습니다.`}
+                ? d.entry.untouched
+                : t(d.entry.touchedAgain, { n: history.length - 1 })}
             </p>
 
             <ul className={styles.commits}>
@@ -213,7 +242,9 @@ export default async function EntryPage({
             </ul>
 
             <p className="label">
-              <Link href="/build">전체 빌드 기록 →</Link>
+              <Link href={localePath(locale, '/build')}>
+                {d.entry.fullBuildRecord}
+              </Link>
             </p>
           </div>
         )}
@@ -224,17 +255,20 @@ export default async function EntryPage({
         <hr className="ruleStrong" />
         <div className={styles.foot}>
           {newer && (
-            <Link href={`/${newer.chapter}/${newer.slug}`} className={styles.step}>
-              <span className="label muted">← 다음 글</span>
+            <Link
+              href={localePath(locale, `/${newer.chapter}/${newer.slug}`)}
+              className={styles.step}
+            >
+              <span className="label muted">{d.entry.newer}</span>
               <span className={styles.stepTitle}>{newer.title}</span>
             </Link>
           )}
           {older && (
             <Link
-              href={`/${older.chapter}/${older.slug}`}
+              href={localePath(locale, `/${older.chapter}/${older.slug}`)}
               className={cx(styles.step, styles.stepOlder)}
             >
-              <span className="label muted">이전 글 →</span>
+              <span className="label muted">{d.entry.older}</span>
               <span className={styles.stepTitle}>{older.title}</span>
             </Link>
           )}

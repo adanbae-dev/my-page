@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
 import type { Entry } from '@/lib/content/schema'
-import { LOG_KIND_LABEL } from '@/lib/content/schema'
+import { localePath, t, type Locale } from '@/lib/i18n/config'
+import { dict, type Dictionary } from '@/lib/i18n/dictionary'
 import { getSection } from '@/lib/sections'
 import styles from './EntryList.module.css'
 
@@ -15,21 +16,22 @@ import styles from './EntryList.module.css'
  * click: a work is identified by its role, a log by what kind of change it
  * was, a note by how long it takes to read.
  */
-function trailing(entry: Entry): string {
+function trailing(entry: Entry, d: Dictionary): string {
   switch (entry.chapter) {
     case 'make':
       return entry.role
     case 'trace':
-      return LOG_KIND_LABEL[entry.kind]
+      return d.logKind[entry.kind]
     case 'live':
       return entry.place ?? ''
     case 'think':
-      return `약 ${entry.readingMinutes}분`
+      return t(d.entry.readingMinutes, { n: entry.readingMinutes })
   }
 }
 
 type EntryListProps = {
   entries: readonly Entry[]
+  locale: Locale
   /** Show which chapter each entry came from — used by the archive. */
   showOrigin?: boolean
   emptyMessage?: string
@@ -37,11 +39,15 @@ type EntryListProps = {
 
 export function EntryList({
   entries,
+  locale,
   showOrigin = false,
-  emptyMessage = '아직 항목이 없습니다.',
+  emptyMessage,
 }: EntryListProps) {
+  const d = dict(locale)
   if (entries.length === 0) {
-    return <p className={cx('small', styles.empty)}>{emptyMessage}</p>
+    return (
+      <p className={cx('small', styles.empty)}>{emptyMessage ?? d.entry.empty}</p>
+    )
   }
 
   return (
@@ -51,7 +57,7 @@ export function EntryList({
         return (
           <Link
             key={`${entry.chapter}/${entry.slug}`}
-            href={`/${entry.chapter}/${entry.slug}`}
+            href={localePath(locale, `/${entry.chapter}/${entry.slug}`)}
             className={cx('settle', styles.row)}
           >
             <span className={cx('label', styles.meta)}>
@@ -71,8 +77,8 @@ export function EntryList({
               {showOrigin && origin && (
                 <span className={styles.origin}>{origin.label}</span>
               )}
-              {showOrigin && trailing(entry) ? ' ' : ''}
-              {trailing(entry)}
+              {showOrigin && trailing(entry, d) ? ' ' : ''}
+              {trailing(entry, d)}
             </span>
           </Link>
         )

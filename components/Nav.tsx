@@ -5,6 +5,13 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { cx } from '@/lib/cx'
+import {
+  localePath,
+  LOCALES,
+  LOCALE_META,
+  splitLocale,
+  type Locale,
+} from '@/lib/i18n/config'
 import { SECTIONS } from '@/lib/sections'
 import { site } from '@/lib/site.config'
 import type { Tone } from '@/lib/tone'
@@ -13,6 +20,18 @@ import styles from './Nav.module.css'
 type NavProps = {
   /** Ground to show before any measurement has happened, and forever if JS never runs. */
   initialTone: Tone
+  locale: Locale
+  /**
+   * Strings, not a dictionary.
+   *
+   * This is a Client Component: it cannot read `next/root-params` and it
+   * cannot call `dict()`. Plain strings cross the boundary; anything with a
+   * function on it does not.
+   */
+  labels: {
+    navLabel: string
+    languageLabel: string
+  }
 }
 
 /**
@@ -27,9 +46,14 @@ type NavProps = {
  * With JavaScript off you still get four labelled links to four real routes
  * on the server-rendered ground. Nothing here is load-bearing for navigation.
  */
-export function Nav({ initialTone }: NavProps) {
+export function Nav({ initialTone, locale, labels }: NavProps) {
   const pathname = usePathname()
-  const onGoldenPath = pathname === '/'
+  // The locale prefix has to come off before any of the path logic below.
+  // Without this every check is one segment out: the golden path is `/ko`
+  // rather than `/`, the current chapter reads as "ko", and an entry page
+  // has three segments instead of two.
+  const { rest } = splitLocale(pathname)
+  const onGoldenPath = rest === '/'
 
   const [tone, setTone] = useState<Tone>(initialTone)
   const [active, setActive] = useState<string | null>(null)
@@ -94,25 +118,25 @@ export function Nav({ initialTone }: NavProps) {
     // Re-measure when the route changes: a different page has different sections.
   }, [pathname, onGoldenPath])
 
-  const currentId = onGoldenPath ? active : pathname.replace(/^\//, '')
+  const currentId = onGoldenPath ? active : rest.replace(/^\//, '')
 
   // An entry page is the only place with enough text for progress to mean
   // anything. `/think` is a list; `/think/slug` is something you read.
-  const isReading = pathname.split('/').filter(Boolean).length === 2
+  const isReading = rest.split('/').filter(Boolean).length === 2
 
   return (
     <nav
       ref={navRef}
       className={styles.nav}
       data-tone={tone}
-      aria-label="섹션 색인"
+      aria-label={labels.navLabel}
     >
       {/* Reading progress. Driven by the document scroll timeline, so it
           costs no JavaScript, cannot fall behind the scroll, and simply
           does not appear where the browser has no scroll timelines. */}
       {isReading && <div className={styles.progress} aria-hidden="true" />}
       <div className={cx('wrap', styles.inner)}>
-        <Link href="/" className={cx('label', styles.brand)}>
+        <Link href={localePath(locale)} className={cx('label', styles.brand)}>
           {site.name} <span className={styles.brandSuffix}>· {site.title}</span>
         </Link>
 
@@ -124,7 +148,7 @@ export function Nav({ initialTone }: NavProps) {
                 <Link
                   // On the golden path the bar moves you within the page; from a
                   // depth route it moves you between pages.
-                  href={onGoldenPath ? `#${s.id}` : `/${s.id}`}
+                  href={onGoldenPath ? `#${s.id}` : localePath(locale, `/${s.id}`)}
                   className={cx('label', styles.item)}
                   {...(isCurrent
                     ? { 'aria-current': onGoldenPath ? 'true' : 'page' }
@@ -136,6 +160,26 @@ export function Nav({ initialTone }: NavProps) {
               </li>
             )
           })}
+        </ul>
+
+        {/* Plain anchors, not <Link>. Switching locale changes a root dynamic
+            param, and therefore `<html lang>` — which a client-side
+            navigation has no reason to get right. A full document request
+            does, and costs zero JavaScript, which matters here: the shared
+            bundle has about 3 KB of headroom. */}
+        <ul className={styles.langs} aria-label={labels.languageLabel}>
+          {LOCALES.map((l) => (
+            <li key={l}>
+              <a
+                href={localePath(l, rest)}
+                hrefLang={LOCALE_META[l].lang}
+                className={cx('label', styles.lang)}
+                {...(l === locale ? { 'aria-current': 'true' } : {})}
+              >
+                {l.toUpperCase()}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </nav>

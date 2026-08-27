@@ -1,9 +1,12 @@
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
 import { cx } from '@/lib/cx'
+import { isLocale, localePath, t } from '@/lib/i18n/config'
+import { dict } from '@/lib/i18n/dictionary'
 import { SECTIONS } from '@/lib/sections'
 import { site } from '@/lib/site.config'
 import styles from './page.module.css'
@@ -19,7 +22,15 @@ import styles from './page.module.css'
  * The tone score is calm → dense → dense → calm → calm, taken from
  * lib/sections.ts so the golden path and the depth routes cannot drift.
  */
-export default function GoldenPath() {
+export default async function GoldenPath({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}) {
+  const { lang } = await params
+  if (!isLocale(lang)) notFound()
+  const d = dict(lang)
+
   return (
     <>
       <section
@@ -37,7 +48,7 @@ export default function GoldenPath() {
             <span className="accentBlock markWipe">in progress</span>
           </h1>
 
-          <p className="lead measure">{site.statement}</p>
+          <p className="lead measure">{d.site.statement}</p>
 
           <div className={styles.heroFoot}>
             <div className={cx('label', 'focusGroup', styles.axes)}>
@@ -47,7 +58,7 @@ export default function GoldenPath() {
                 </a>
               ))}
             </div>
-            <p className="label">스크롤 한 번이면 전부 봅니다</p>
+            <p className="label">{d.home.scrollHint}</p>
           </div>
         </div>
       </section>
@@ -63,7 +74,7 @@ export default function GoldenPath() {
         >
           <div className={styles.chapter}>
             <div>
-              <p className={cx('label', styles.chapterQuestion)}>{s.question}</p>
+              <p className={cx('label', styles.chapterQuestion)}>{d.sections[s.id].question}</p>
               {/* Named so the browser can carry this headline into the depth
                   route instead of cutting to an unrelated page. */}
               <ViewTransition name={`chapter-${s.id}`}>
@@ -74,9 +85,9 @@ export default function GoldenPath() {
             </div>
 
             <div className={styles.chapterAside}>
-              <p className="small muted">{s.blurb}</p>
-              <Link href={`/${s.id}`} className={cx('label', styles.enter)}>
-                <span className={styles.enterLabel}>{s.label} 더 보기</span>
+              <p className="small muted">{d.sections[s.id].blurb}</p>
+              <Link href={localePath(lang, `/${s.id}`)} className={cx('label', styles.enter)}>
+                <span className={styles.enterLabel}>{t(d.home.enter, { label: s.label })}</span>
                 <span className={styles.enterArrow} aria-hidden="true">
                   →
                 </span>
@@ -94,7 +105,7 @@ export default function GoldenPath() {
           </p>
           <p className="label muted">
             {site.title} · {site.name} ·{' '}
-            <Link href="/art-direction">Art direction</Link>
+            <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link>
           </p>
         </div>
       </Section>

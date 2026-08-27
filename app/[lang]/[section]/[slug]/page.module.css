@@ -160,3 +160,10 @@
   letter-spacing: 0;
   color: var(--accent-text);
 }
+
+/* Stated when the requested locale has no translation for this entry. */
+.untranslated {
+  margin-block-start: var(--space-xs);
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+}

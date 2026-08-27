@@ -20,15 +20,42 @@
  * Run after `pnpm build`.
  */
 
-import { readFileSync, existsSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const EXPECTED = ['reset', 'tokens', 'base', 'layout', 'utilities']
 
-const HTML = join(ROOT, '.next', 'server', 'app', 'index.html')
-if (!existsSync(HTML)) {
+/**
+ * The entry document to read.
+ *
+ * `app/index.html` was correct until the tree moved under `app/[lang]/`;
+ * there is no unprefixed home page any more. Discovered rather than named,
+ * for the same reason check-budget.mjs discovers routes: a path written by
+ * hand is a path that goes stale silently, and this gate failing open would
+ * be worse than it failing loudly.
+ */
+function findEntryHtml(dir) {
+  for (const candidate of ['ko.html', 'index.html']) {
+    const p = join(dir, candidate)
+    if (existsSync(p)) return p
+  }
+  const stack = [dir]
+  while (stack.length) {
+    const current = stack.pop()
+    for (const e of readdirSync(current, { withFileTypes: true })) {
+      const full = join(current, e.name)
+      if (e.isDirectory()) stack.push(full)
+      else if (e.name.endsWith('.html') && !e.name.startsWith('_')) return full
+    }
+  }
+  return null
+}
+
+const APP_DIR = join(ROOT, '.next', 'server', 'app')
+const HTML = findEntryHtml(APP_DIR)
+if (!HTML || !existsSync(HTML)) {
   process.stderr.write('\n  No production build found. Run `pnpm build` first.\n\n')
   process.exit(1)
 }

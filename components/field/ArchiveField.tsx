@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 
 import type { FieldDatum } from '@/lib/field'
+import { t } from '@/lib/i18n/config'
+import type { FieldLabels } from './FieldMount'
 import { SCENE_FALLBACK } from '@/lib/tokens.data'
 import { SECTIONS } from '@/lib/sections'
 import styles from './Field.module.css'
@@ -186,11 +188,13 @@ function FpsProbe({ onSample }: { onSample: (fps: number) => void }) {
 export default function ArchiveField({
   data,
   reduced,
+  labels,
   onFps,
   onContextLost,
 }: {
   data: readonly FieldDatum[]
   reduced: boolean
+  labels: FieldLabels
   onFps: (fps: number) => void
   onContextLost: () => void
 }) {
@@ -274,8 +278,8 @@ export default function ArchiveField({
                   first.date === last.date
                     ? first.date
                     : `${first.date} — ${last.date}`
-                } · ${data.length} records · 막대를 가리키면 제목이 나옵니다`
-              : '기록 없음'}
+                } · ${t(labels.records, { n: data.length })} · ${labels.hudHint}`
+              : labels.noRecords}
           </span>
         )}
       </div>

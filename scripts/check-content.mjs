@@ -31,6 +31,17 @@ if (!idsMatch) {
 const CHAPTERS = [...idsMatch[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1])
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/* Translations are siblings: `slug.en.mdx` beside `slug.mdx`. Read the locale
+   list from lib/i18n/config.ts so this cannot disagree with the app. */
+const i18nSrc = readFileSync(join(ROOT, 'lib', 'i18n', 'config.ts'), 'utf8')
+const LOCALES = [
+  ...(/export const LOCALES = \[([^\]]+)\]/.exec(i18nSrc)?.[1] ?? '').matchAll(
+    /'([a-z-]+)'/g,
+  ),
+].map((m) => m[1])
+const DEFAULT_LOCALE = /export const DEFAULT_LOCALE: Locale = '([a-z-]+)'/.exec(i18nSrc)?.[1]
+const translations = Object.fromEntries(LOCALES.map((l) => [l, 0]))
 const MAX_SUMMARY = 160
 const today = new Date().toISOString().slice(0, 10)
 
