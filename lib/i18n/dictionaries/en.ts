@@ -165,7 +165,6 @@ export const en = {
   },
 
   weight: {
-    thisPage: 'This page {kb} KB \u2014 {pct}% of a {limit} KB budget it sets itself',
     measured: 'Measured on the {date} build ({head}) \u00b7 gzip transfer size',
     heading: 'Weight',
     table: 'Every route has a gzip budget, and a build that exceeds one fails.',
@@ -173,6 +172,18 @@ export const en = {
     heaviest: 'Heaviest route {route}',
     shared: 'Shared JS, loaded by every route',
     deferred: 'Chunks no route loads on first paint',
+  },
+
+  colophon: {
+    heading: 'Colophon',
+    commits: 'Commits',
+    span: 'Span',
+    entries: 'Entries',
+    lines: 'Lines written by hand',
+    weight: 'This page',
+    head: 'Measured at',
+    note:
+      'Every figure in this block is computed from the repository. None of it is typed by hand, and a build fails when the gate behind any of these numbers disagrees.',
   },
 
   notFound: {

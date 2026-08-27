@@ -5,11 +5,13 @@ import { ViewTransition } from 'react'
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
 import { Sigil } from '@/components/Sigil'
-import { Weight } from '@/components/Weight'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
-import { commits, historyForChapter } from '@/lib/git/load'
+import { commits, historyForChapter, stats } from '@/lib/git/load'
+import { publishedEntries } from '@/lib/content/load'
+import { formatDate } from '@/lib/format'
+import { KB, PCT, perf, weightOf } from '@/lib/perf'
 import { SECTIONS } from '@/lib/sections'
 import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
 import { site } from '@/lib/site.config'
@@ -39,6 +41,10 @@ export default async function GoldenPath({
      along it is. They were two separate claims on one screen until this made
      them the same one. */
   const all = commits()
+  const record = stats()
+  const entries = publishedEntries(lang)
+  const snap = perf()
+  const here = weightOf(localePath(lang, '/'))
   const mark = sigilFrom(all)
   const fill = Math.round((mark.used / SIGIL_SLOTS) * 1000) / 10
 
@@ -159,10 +165,54 @@ export default async function GoldenPath({
             <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link>
           </p>
 
-          {/* The last line of the page is what the page cost. The budget was
-              an internal gate nobody reading the site could see; this is the
-              same number, published. */}
-          <Weight route={localePath(lang, '/')} template={d.weight.thisPage} />
+          {/*
+            A COLOPHON, the way a book carries one — set at the back, in small
+            type, stating how the thing in your hands was made.
+
+            Every figure is derived. That is the only reason this block can
+            exist: a site without a build record has nothing to put here and
+            would have to write a paragraph about craft instead. This one can
+            print numbers, and each of them has a gate behind it that fails a
+            build when it stops being true.
+          */}
+          <dl className={cx('label', styles.colophon)}>
+            <div>
+              <dt>{d.colophon.commits}</dt>
+              <dd>{record.count}</dd>
+            </div>
+            <div className={styles.colophonWide}>
+              <dt>{d.colophon.span}</dt>
+              <dd>
+                {record.first === record.last
+                  ? formatDate(record.first)
+                  : `${formatDate(record.first)} — ${formatDate(record.last)}`}
+              </dd>
+            </div>
+            <div>
+              <dt>{d.colophon.entries}</dt>
+              <dd>{entries.length}</dd>
+            </div>
+            <div>
+              <dt>{d.colophon.lines}</dt>
+              <dd>+{record.insertions.toLocaleString('en-US')}</dd>
+            </div>
+            {here && snap?.budgets['total'] !== undefined && (
+              <div>
+                <dt>{d.colophon.weight}</dt>
+                <dd>
+                  {KB(here.total)} KB · {PCT(here.total, snap.budgets['total'])}%
+                </dd>
+              </div>
+            )}
+            {record.head && (
+              <div>
+                <dt>{d.colophon.head}</dt>
+                <dd className={styles.colophonSha}>{record.head}</dd>
+              </div>
+            )}
+          </dl>
+
+          <p className="small muted measure">{d.colophon.note}</p>
         </div>
       </Section>
     </>

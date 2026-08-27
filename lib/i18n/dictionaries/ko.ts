@@ -175,10 +175,6 @@ export const ko = {
   },
 
   weight: {
-    /* The number is a fact about the previous build, and the sentence says so.
-       A page cannot weigh itself: writing the figure into the HTML changes the
-       HTML being weighed. */
-    thisPage: '이 페이지 {kb} KB · 스스로 정한 예산 {limit} KB 의 {pct}%',
     measured: '{date} 빌드({head}) 실측 · gzip 전송 크기',
     heading: '무게',
     table: '라우트마다 gzip 예산이 있고, 넘으면 빌드가 실패합니다.',
@@ -186,6 +182,18 @@ export const ko = {
     heaviest: '가장 무거운 라우트 {route}',
     shared: '모든 라우트가 받는 공용 JS',
     deferred: '첫 페인트에 아무 라우트도 받지 않는 청크',
+  },
+
+  colophon: {
+    heading: '판권',
+    commits: '커밋',
+    span: '기간',
+    entries: '글',
+    lines: '직접 쓴 줄',
+    weight: '이 페이지',
+    head: '기준 커밋',
+    note:
+      '이 블록의 모든 숫자는 저장소에서 계산됩니다. 손으로 적은 것은 하나도 없고, 각 숫자를 만드는 게이트가 어긋나면 빌드가 실패합니다.',
   },
 
   notFound: {
