@@ -14,8 +14,35 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "27c3d0a",
+  "head": "6ae09ad",
   "commits": [
+    {
+      "sha": "6ae09ad",
+      "date": "2026-08-27",
+      "subject": "Fix: clicking a bar in the field navigated to a URL that no longer exists",
+      "insertions": 50,
+      "deletions": 7,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "533f141",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 27c3d0a",
+      "insertions": 86,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "27c3d0a",
       "date": "2026-08-27",
