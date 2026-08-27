@@ -14,8 +14,34 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "759e01b",
+  "head": "d4cf6fe",
   "commits": [
+    {
+      "sha": "d4cf6fe",
+      "date": "2026-08-27",
+      "subject": "Fix: DisplayLines mutated a captured variable during render",
+      "insertions": 6,
+      "deletions": 6,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "components"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "b1abec7",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 759e01b",
+      "insertions": 29,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "759e01b",
       "date": "2026-08-27",
