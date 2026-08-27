@@ -1,0 +1,95 @@
+/* Unlayered on purpose — see any other *.module.css in this product. */
+
+.set {
+  border: 0;
+  margin: 0 0 var(--space-m);
+  padding: 0;
+}
+
+.legend {
+  color: var(--muted);
+  padding: 0;
+  margin-block-end: var(--space-2xs);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+}
+
+.pair {
+  display: contents;
+}
+
+/* The input is the state, so it cannot be display:none — that would take it
+   out of the tab order and out of `:has()`'s way of being reached by
+   keyboard. Hidden by clipping instead, the same technique .visuallyHidden
+   uses, and the label is the visible control. */
+.input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-block-size: 2.75rem;
+  padding-inline: 0.7em;
+  border: var(--rule-w) solid var(--rule);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard),
+    background-color var(--dur-quick) var(--ease-standard);
+}
+
+.option:hover {
+  color: var(--figure);
+  border-color: var(--figure);
+}
+
+/* Checked reads as the accent block, the same mark the nav puts on the
+   chapter you are standing in. */
+.input:checked + .option {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Focus has to be visible on the LABEL, because the input it belongs to is
+   clipped. Without this the control is unusable by keyboard — you would be
+   moving through it blind. */
+.input:focus-visible + .option {
+  outline: 2px solid var(--figure);
+  outline-offset: 2px;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+
+/* --- The filter itself -------------------------------------------------- */
+
+/* One static rule per topic. Seven, because the vocabulary is controlled.
+   Each hides the rows that do not carry the checked topic. */
+.scope:has(.input[value='frontend']:checked) .body [data-topics]:not([data-topics~='frontend']),
+.scope:has(.input[value='architecture']:checked) .body [data-topics]:not([data-topics~='architecture']),
+.scope:has(.input[value='design']:checked) .body [data-topics]:not([data-topics~='design']),
+.scope:has(.input[value='tooling']:checked) .body [data-topics]:not([data-topics~='tooling']),
+.scope:has(.input[value='debugging']:checked) .body [data-topics]:not([data-topics~='debugging']),
+.scope:has(.input[value='knowledge']:checked) .body [data-topics]:not([data-topics~='knowledge']),
+.scope:has(.input[value='process']:checked) .body [data-topics]:not([data-topics~='process']) {
+  display: none;
+}
+
+/* A browser without :has() shows the whole list and the control does
+   nothing, which is the correct failure: the list was never hidden behind
+   the filter. */

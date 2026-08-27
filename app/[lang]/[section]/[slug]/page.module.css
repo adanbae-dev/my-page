@@ -167,3 +167,17 @@
   border-inline-start: 2px solid var(--accent);
   padding-inline-start: var(--space-s);
 }
+
+/* A topic is a link, so it reads as one — the tag chips beside it are not. */
+.topicChip {
+  text-decoration: none;
+  border-color: var(--accent);
+  color: var(--accent-text);
+  transition: background-color var(--dur-quick) var(--ease-standard),
+    color var(--dur-quick) var(--ease-standard);
+}
+
+.topicChip:hover {
+  background-color: var(--accent);
+  color: var(--on-accent);
+}

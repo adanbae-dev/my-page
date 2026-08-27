@@ -95,6 +95,19 @@ export const ko = {
     untranslated: '이 글은 한국어로만 있습니다.',
   },
 
+  topics: {
+    label: '주제',
+    all: '전체',
+    filterLabel: '주제로 좁히기',
+    countOf: '{n}편',
+    frontend: { name: '프론트엔드', blurb: '브라우저에서 실제로 일어나는 것들 — 렌더링, 상태, 번들.' },
+    architecture: { name: '구조', blurb: '무엇을 어디에 두었고 왜 그렇게 나눴는지.' },
+    design: { name: '디자인', blurb: '색, 타입, 대비. 눈으로 고르지 않고 계산한 것들.' },
+    tooling: { name: '도구', blurb: '만드는 것을 만드는 것. 빌드, 게이트, 스크립트.' },
+    debugging: { name: '디버깅', blurb: '조용히 틀린 것을 찾아낸 기록. 가설과 반증.' },
+    knowledge: { name: '지식', blurb: '읽고 정리하고 다시 찾을 수 있게 만드는 방법.' },
+    process: { name: '과정', blurb: '어떻게 일하는지. 습관, 결정, 되돌린 것들.' },
+  },
   logKind: {
     version: '지나간 버전',
     abandoned: '폐기된 시도',

@@ -59,6 +59,9 @@ export function EntryList({
             key={`${entry.chapter}/${entry.slug}`}
             href={localePath(locale, `/${entry.chapter}/${entry.slug}`)}
             className={cx('settle', styles.row)}
+            // The row's own topics, space-separated, so TopicScope can filter
+            // on them with `[data-topics~="x"]` and no JavaScript.
+            data-topics={entry.topics.join(' ')}
           >
             <span className={cx('label', styles.meta)}>
               <time dateTime={entry.date}>{formatDate(entry.date)}</time>

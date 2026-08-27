@@ -32,6 +32,18 @@ const CHAPTERS = [...idsMatch[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1])
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+/* The controlled topic vocabulary, read from lib/topics.ts so this cannot
+   disagree with the app. lib/content/schema.ts already rejects an unknown
+   topic during the build; what it cannot see is the opposite failure — a
+   topic nobody writes about. */
+const topicsSrc = readFileSync(join(ROOT, 'lib', 'topics.ts'), 'utf8')
+const TOPICS = [
+  ...(/export const TOPIC_IDS = \[([^\]]+)\]/.exec(topicsSrc)?.[1] ?? '').matchAll(
+    /'([a-z-]+)'/g,
+  ),
+].map((m) => m[1])
+const topicUse = Object.fromEntries(TOPICS.map((t) => [t, 0]))
+
 /* Translations are siblings: `slug.en.mdx` beside `slug.mdx`. Read the locale
    list from lib/i18n/config.ts so this cannot disagree with the app. */
 const i18nSrc = readFileSync(join(ROOT, 'lib', 'i18n', 'config.ts'), 'utf8')
@@ -107,6 +119,12 @@ for (const chapter of CHAPTERS) {
 
     const { data } = matter(readFileSync(join(dir, f), 'utf8'))
 
+    // Count topic usage. The build already rejects an unknown topic; this
+    // catches the reverse — a declared topic nobody writes about.
+    for (const tp of Array.isArray(data.topics) ? data.topics : []) {
+      if (tp in topicUse) topicUse[tp] += 1
+    }
+
     // 3. A future date on a published entry is almost always a typo, and it
     //    silently sorts the entry to the top of every list.
     const date = toISO(data.date)
@@ -130,6 +148,18 @@ for (const chapter of CHAPTERS) {
 
 line(`  ${count} entr${count === 1 ? 'y' : 'ies'} across ${CHAPTERS.length} chapters` +
      (drafts ? `, ${drafts} draft` : ''))
+/* A topic with fewer than two entries is not a classification — it is a
+   dead end that still gets its own page and its own sitemap row. Two is the
+   threshold at which "browse by this" starts meaning something. This is the
+   exact failure the old free-form tags had: 27 tags, 22 of them used once. */
+for (const [topic, n] of Object.entries(topicUse)) {
+  if (n === 0) {
+    problems.push(`topic "${topic}" has no entries — remove it from lib/topics.ts or write one`)
+  } else if (n === 1) {
+    notes.push(`topic "${topic}" has only 1 entry — a one-entry topic page is a dead end`)
+  }
+}
+
 for (const n of notes) line(`  · ${n}`)
 for (const p of problems) line(`  ✗ ${p}`)
 

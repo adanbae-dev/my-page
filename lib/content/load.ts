@@ -4,6 +4,7 @@ import matter from 'gray-matter'
 
 import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/config'
 import { SECTION_IDS, type SectionId } from '@/lib/sections'
+import { TOPIC_IDS, type TopicId } from '@/lib/topics'
 import { ContentError, toEntry, type Entry, type Log, type Work } from './schema'
 
 /**
@@ -235,4 +236,44 @@ export function entryNeighbours(
   if (i === -1) return { newer: undefined, older: undefined }
   // The list is newest-first, so the previous index is the newer entry.
   return { newer: list[i - 1], older: list[i + 1] }
+}
+
+/* ------------------------------------------------------------------ */
+/* Topics — the browsable axis                                         */
+/* ------------------------------------------------------------------ */
+
+/** Every published entry carrying this topic, newest first, across chapters. */
+export function entriesForTopic(
+  topic: TopicId,
+  locale: Locale,
+): readonly LocalisedEntry[] {
+  return publishedEntries(locale).filter((e) => e.topics.includes(topic))
+}
+
+/** How many entries each topic has, for counts beside the filter. */
+export function topicCounts(locale: Locale): Readonly<Record<TopicId, number>> {
+  const out = {} as Record<TopicId, number>
+  for (const t of TOPIC_IDS) out[t] = 0
+  for (const e of publishedEntries(locale)) {
+    for (const t of e.topics) out[t] += 1
+  }
+  return out
+}
+
+/**
+ * (locale, topic) pairs to prerender.
+ *
+ * Only topics that actually have entries. An empty topic page is a dead end
+ * a crawler indexes and a reader bounces off — and with a controlled
+ * vocabulary an empty one means the vocabulary is ahead of the writing, which
+ * is a content problem rather than a routing one.
+ */
+export function allTopicParams(): { lang: Locale; topic: TopicId }[] {
+  const locales = ['ko', 'en'] as const
+  return locales.flatMap((lang) =>
+    TOPIC_IDS.filter((t) => entriesForTopic(t, lang).length > 0).map((topic) => ({
+      lang,
+      topic,
+    })),
+  )
 }

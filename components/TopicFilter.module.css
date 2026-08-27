@@ -1,0 +1,50 @@
+/* Unlayered on purpose — see any other *.module.css in this product. */
+.rail {
+  margin-block-end: var(--space-m);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-block-size: 2.75rem;
+  padding-inline: 0.7em;
+  border: var(--rule-w) solid var(--rule);
+  color: var(--muted);
+  text-decoration: none;
+  transition:
+    color var(--dur-quick) var(--ease-standard),
+    border-color var(--dur-quick) var(--ease-standard);
+}
+
+.chip:hover {
+  color: var(--figure);
+  border-color: var(--figure);
+}
+
+/* The same idiom the nav uses for the chapter you are standing in: a solid
+   accent block with ink on top. One meaning, one treatment. */
+.chipCurrent {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.chipCurrent:hover {
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}

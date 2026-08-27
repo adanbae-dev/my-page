@@ -88,6 +88,19 @@ export const en = {
     untranslated: 'This entry exists only in Korean.',
   },
 
+  topics: {
+    label: 'Topics',
+    all: 'All',
+    filterLabel: 'Narrow by topic',
+    countOf: '{n}',
+    frontend: { name: 'Frontend', blurb: 'What actually happens in a browser — rendering, state, bundles.' },
+    architecture: { name: 'Architecture', blurb: 'What was put where, and why it was divided that way.' },
+    design: { name: 'Design', blurb: 'Colour, type, contrast. The parts that were calculated rather than chosen by eye.' },
+    tooling: { name: 'Tooling', blurb: 'The things that make the things. Builds, gates, scripts.' },
+    debugging: { name: 'Debugging', blurb: 'Finding what was quietly wrong. Hypotheses and refutations.' },
+    knowledge: { name: 'Knowledge', blurb: 'Reading, sorting, and making it findable again.' },
+    process: { name: 'Process', blurb: 'How the work is done. Habits, decisions, and reversals.' },
+  },
   logKind: {
     version: 'a version that passed',
     abandoned: 'an attempt abandoned',

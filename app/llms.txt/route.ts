@@ -1,4 +1,5 @@
-import { publishedEntries } from '@/lib/content/load'
+import { publishedEntries, topicCounts } from '@/lib/content/load'
+import { TOPIC_IDS } from '@/lib/topics'
 import { DEFAULT_LOCALE, localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { SECTIONS } from '@/lib/sections'
@@ -50,6 +51,22 @@ export function GET(): Response {
   }
   lines.push('')
 
+  /* Topics are the axis that cuts across chapters, so they are stated
+     separately: a chapter says what kind of thing an entry is, a topic says
+     what it is about. An answer engine looking for "everything this person
+     wrote about debugging" wants this list, not the chapter list. */
+  const counts = topicCounts(DEFAULT_LOCALE)
+  lines.push('## Topics')
+  lines.push('')
+  for (const tp of TOPIC_IDS) {
+    if (counts[tp] === 0) continue
+    const meta = d.topics[tp]
+    lines.push(
+      `- [${meta.name}](${url(localePath(DEFAULT_LOCALE, `/topic/${tp}`))}) — ${counts[tp]} entries. ${meta.blurb}`,
+    )
+  }
+  lines.push('')
+
   /* Every entry, newest first, with its summary. Both locale URLs are given
      because an entry may exist in one language only, and saying so is more
      useful than silently offering a URL that serves the original. */
@@ -59,7 +76,7 @@ export function GET(): Response {
   for (const e of entries) {
     const path = `/${e.chapter}/${e.slug}`
     lines.push(
-      `- [${e.title}](${url(localePath(DEFAULT_LOCALE, path))}) — ${e.chapter.toUpperCase()}, ${e.date}. ${e.summary}`,
+      `- [${e.title}](${url(localePath(DEFAULT_LOCALE, path))}) — ${e.chapter.toUpperCase()}, ${e.date}, topics: ${e.topics.join('/')}. ${e.summary}`,
     )
   }
   lines.push('')

@@ -8,6 +8,7 @@ stack: [Next.js 15, App Router, Turbopack, TypeScript, Jotai, Radix UI, Tailwind
 constraint: 상담원이 회원 목록을 띄운 채로 계약을 확인하고 매물을 검수한다. 브라우저 탭이 아니라 앱 안의 탭이어야 했고, 각 탭이 필터와 스크롤 위치를 자기 것으로 기억해야 했다.
 tradeoff: 탭 상태를 한 저장소에 담는 단순함을 버렸다. localStorage와 메모리로 쪼개지 않으면 비동기 응답이 도착할 때 남의 탭 슬롯에 기록된다.
 outcome: 재마운트 키 3줄로 탭 전환 시 조회 API 재호출을 없앴고, 진입 판정을 순수 함수로 분리해 진리표로 검증 가능하게 만들었다.
+topics: [architecture, frontend]
 tags: [nextjs, architecture, admin, state-management]
 ---
 

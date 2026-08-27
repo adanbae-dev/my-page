@@ -7,8 +7,9 @@ import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
 import { FieldMount } from '@/components/field/FieldMount'
 import { JsonLd } from '@/components/JsonLd'
+import { TopicScope } from '@/components/TopicScope'
 import { Section } from '@/components/Section'
-import { archive, entriesFor } from '@/lib/content/load'
+import { archive, entriesFor, topicCounts } from '@/lib/content/load'
 import { toField } from '@/lib/field'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, LOCALES, t } from '@/lib/i18n/config'
@@ -82,6 +83,16 @@ export default async function SectionPage({
   // every chapter's entries with its own logs into one chronological stream.
   const isArchive = def.id === 'trace'
   const entries = isArchive ? archive(lang) : entriesFor(def.id, lang)
+
+  /* Counts are for THIS list, not the whole site: a filter offering a topic
+     that would empty the list is a control that lies about what it does. */
+  const counts = topicCounts(lang)
+  const scoped = Object.fromEntries(
+    (Object.keys(counts) as (keyof typeof counts)[]).map((k) => [
+      k,
+      entries.filter((e) => e.topics.includes(k)).length,
+    ]),
+  ) as typeof counts
 
   return (
     <>
@@ -165,16 +176,30 @@ export default async function SectionPage({
 
           <div>
             {isArchive && <FieldMount data={toField(entries, d)} labels={d.field} />}
-            <EntryList
-              entries={entries}
-              locale={lang}
-              showOrigin={isArchive}
-              emptyMessage={
-                isArchive
-                  ? d.chapter.emptyArchive
-                  : t(d.chapter.emptyChapter, { label: def.label })
-              }
-            />
+            <TopicScope
+              counts={scoped}
+              labels={{
+                all: d.topics.all,
+                filterLabel: d.topics.filterLabel,
+                names: Object.fromEntries(
+                  (Object.keys(scoped) as (keyof typeof scoped)[]).map((k) => [
+                    k,
+                    d.topics[k].name,
+                  ]),
+                ),
+              }}
+            >
+              <EntryList
+                entries={entries}
+                locale={lang}
+                showOrigin={isArchive}
+                emptyMessage={
+                  isArchive
+                    ? d.chapter.emptyArchive
+                    : t(d.chapter.emptyChapter, { label: def.label })
+                }
+              />
+            </TopicScope>
           </div>
         </div>
       </Section>

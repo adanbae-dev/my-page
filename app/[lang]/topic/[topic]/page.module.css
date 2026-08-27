@@ -1,0 +1,24 @@
+/* Unlayered on purpose — see any other *.module.css in this product. */
+.head {
+  min-block-size: 48svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.crumb {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+  margin-block-end: var(--space-l);
+}
+
+.title {
+  margin-block-end: var(--space-m);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  margin-block: var(--space-s);
+}

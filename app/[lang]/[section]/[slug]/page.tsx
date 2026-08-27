@@ -201,6 +201,21 @@ export default async function EntryPage({
       <Section tone="light" density="dense">
         <Prose source={entry.body} />
 
+        {/* Topics are links; tags below are not. That is the distinction:
+            a topic is somewhere you can go, a tag is a fact about this
+            entry. */}
+        <div className={cx('label', styles.facts)}>
+          {entry.topics.map((tp) => (
+            <Link
+              key={tp}
+              href={localePath(locale, `/topic/${tp}`)}
+              className={cx(styles.chip, styles.topicChip)}
+            >
+              {d.topics[tp].name}
+            </Link>
+          ))}
+        </div>
+
         {entry.tags.length > 0 && (
           <div className={cx('label', styles.facts)}>
             {entry.tags.map((t) => (

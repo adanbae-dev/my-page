@@ -1,4 +1,5 @@
 import type { SectionId } from '@/lib/sections'
+import { isTopicId, type TopicId } from '@/lib/topics'
 
 /**
  * The content model.
@@ -24,6 +25,14 @@ export type BaseEntry = {
   readonly date: string
   readonly summary: string
   readonly draft: boolean
+  /**
+   * The browsable axis — controlled, validated, never invented here.
+   *
+   * Separate from `tags` because they answer different questions: this is
+   * what a reader navigates by and what gets its own page, while `tags`
+   * stays free-form for the specificity JSON-LD keywords want.
+   */
+  readonly topics: readonly TopicId[]
   readonly tags: readonly string[]
   /** Raw MDX body, compiled at render time in a Server Component. */
   readonly body: string
@@ -168,12 +177,34 @@ export function toEntry(args: {
     throw new ContentError(file, 'frontmatter "draft" must be a boolean')
   }
 
+  /* Required and non-empty. An entry with no topic is unreachable by the
+     only axis a reader can browse, and defaulting it to something would put
+     it under a heading it does not belong to. */
+  const rawTopics = data['topics']
+  if (!isStringArray(rawTopics) || rawTopics.length === 0) {
+    throw new ContentError(
+      file,
+      'frontmatter "topics" must be a non-empty array of strings',
+    )
+  }
+  const topics: TopicId[] = []
+  for (const t of rawTopics) {
+    if (!isTopicId(t)) {
+      throw new ContentError(
+        file,
+        `frontmatter "topics" contains "${t}", which is not a topic — see lib/topics.ts`,
+      )
+    }
+    topics.push(t)
+  }
+
   const base = {
     slug,
     title: requireString(file, data, 'title'),
     date,
     summary: requireString(file, data, 'summary'),
     draft,
+    topics,
     tags,
     body,
     readingMinutes: estimateReadingMinutes(body),

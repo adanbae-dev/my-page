@@ -8,6 +8,7 @@ stack: [Node 24, node:sqlite, launchd, Playwright, 정적 파일]
 constraint: 의존성 0, 빌드 단계 없음. 데이터는 맥의 SQLite 파일 하나이고, 모든 변경이 append-only 이력에 남아 배치 단위로 되돌릴 수 있어야 했다.
 tradeoff: 로그인을 앱에 만들지 않았다. 사용자 표·세션·해시·시도 제한이 전부 따라오고 권한 모델을 통째로 갈아야 한다. 인증은 앞단에 맡기고 앱은 단순하게 뒀다.
 outcome: 배포 18건 대 업무 11건이라는 실측이 기능 우선순위를 뒤집었다. 27일째 미완료인 배포가 화면에 아무 표시도 없다는 것을 발견해 지연 신호를 붙였다.
+topics: [architecture, debugging, tooling]
 tags: [nodejs, sqlite, tooling, measurement]
 ---
 

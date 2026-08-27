@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 
-import { publishedEntries } from '@/lib/content/load'
+import { entriesForTopic, publishedEntries } from '@/lib/content/load'
+import { TOPIC_IDS } from '@/lib/topics'
 import { localePath, LOCALES, LOCALE_META } from '@/lib/i18n/config'
 import { SECTIONS } from '@/lib/sections'
 import { url } from '@/lib/site.config'
@@ -48,6 +49,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency: 'monthly' as const,
         priority: 0.6,
         alternates: { languages: languages(`/${e.chapter}/${e.slug}`) },
+      })),
+      /* Topic pages, only where there is something to show. An empty topic
+         page indexed is a dead end a reader bounces off. */
+      ...TOPIC_IDS.filter((tp) => entriesForTopic(tp, lang).length > 0).map((tp) => ({
+        url: url(localePath(lang, `/topic/${tp}`)),
+        lastModified: entriesForTopic(tp, lang)[0]?.date,
+        changeFrequency: 'weekly' as const,
+        priority: 0.5,
+        alternates: { languages: languages(`/topic/${tp}`) },
       })),
       // /build has no lastModified on purpose: it changes on every commit,
       // and telling a crawler that daily would be noise, not information.

@@ -14,8 +14,23 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "b949b78",
+  "head": "010baa4",
   "commits": [
+    {
+      "sha": "010baa4",
+      "date": "2026-08-27",
+      "subject": "SEO/AEO: one builder for what machines read, and the og:image regression it found",
+      "insertions": 422,
+      "deletions": 113,
+      "generated": 0,
+      "files": 10,
+      "areas": [
+        "app",
+        "lib",
+        "scripts"
+      ],
+      "entries": []
+    },
     {
       "sha": "b949b78",
       "date": "2026-08-27",
