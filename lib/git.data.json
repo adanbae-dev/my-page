@@ -14,8 +14,86 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "6ae09ad",
+  "head": "6c2ddbe",
   "commits": [
+    {
+      "sha": "6c2ddbe",
+      "date": "2026-08-27",
+      "subject": "LIVE: four entries, from facts the author supplied",
+      "insertions": 58,
+      "deletions": 107,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "live",
+          "slug": "off-hours"
+        },
+        {
+          "chapter": "live",
+          "slug": "placeholder"
+        },
+        {
+          "chapter": "live",
+          "slug": "the-long-chore"
+        },
+        {
+          "chapter": "live",
+          "slug": "where-i-live"
+        },
+        {
+          "chapter": "live",
+          "slug": "who-goldibug-is"
+        }
+      ]
+    },
+    {
+      "sha": "95bd325",
+      "date": "2026-08-27",
+      "subject": "LIVE: an eighth topic, and four drafts that ask instead of inventing",
+      "insertions": 121,
+      "deletions": 3,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "live",
+          "slug": "off-hours"
+        },
+        {
+          "chapter": "live",
+          "slug": "the-long-chore"
+        },
+        {
+          "chapter": "live",
+          "slug": "where-i-live"
+        },
+        {
+          "chapter": "live",
+          "slug": "who-goldibug-is"
+        }
+      ]
+    },
+    {
+      "sha": "c02f235",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 6ae09ad",
+      "insertions": 28,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "6ae09ad",
       "date": "2026-08-27",
