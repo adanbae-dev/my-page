@@ -573,44 +573,44 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* 15 · SIGIL DIAL                                                     */
+/* 15 · SIGIL SPIN                                                     */
 /* ------------------------------------------------------------------ */
 
-/* The generated mark turns with the page.
+/* The generated mark turns, continuously.
 
-   `scroll()` rather than `view()`, because this one is not reacting to its own
-   arrival — it is a dial reading the whole document's progress, and it should
-   keep turning long after the mark itself has left the viewport.
+   This began as a scroll dial — `scroll(root block)`, 45° across the whole
+   document — and was replaced on request with a plain rotation. The scroll
+   version was quieter, but it only moved while the page did, and a mark that
+   is still whenever the reader is still does not read as alive.
 
-   45° is eight of the sixty-four slots. Enough that the mark is plainly alive
-   and reading something, small enough that it never becomes the thing you are
-   looking at instead of the page. A full turn would land the mark back where
-   it started, which is the one rotation that reads as broken.
+   24s per revolution is 15°/s. A loading spinner is about one second, so this
+   is nowhere near one; at the size the hero draws the mark its rim travels
+   roughly 17px a second, which is plainly moving and never urgent.
 
-   Nothing here hides content — with no scroll timeline, or with reduced motion
-   asked for, the mark simply does not turn. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .sigilDial {
-      transform-box: fill-box;
-      transform-origin: 50% 50%;
-      /* Shorthand first, timeline after — the `animation` shorthand resets
-         `animation-timeline` to `auto`, so the longhand has to follow it or
-         the dial silently runs on time instead of on scroll. Written this way
-         rather than as five longhands for a second reason: check:motion reads
-         the shorthand to learn the keyframes name, and without it the gate
-         reports the rule as "(unnamed)" and cannot classify what it does. */
-      animation: sigilTurn linear both;
-      animation-timeline: scroll(root block);
-    }
+   NOT applied to every instance. Rotation destroys the reading that twelve
+   o'clock is the oldest commit, so the two marks that make positional claims
+   in words — the specimen on /art-direction, which says "12시부터
+   시계방향", and each entry's mark, whose whole point is WHERE in the record
+   it sits — stay still. A stamp may turn; a diagram may not.
+
+   Time-based, so there is no `animation-timeline` here and check:motion has
+   nothing to classify. It still sits inside the reduced-motion gate: this one
+   never stops, which makes it the least appropriate animation on the page to
+   force on someone who asked for less. Without it the mark simply holds at
+   its drawn angle, which is the finished state. */
+@media (prefers-reduced-motion: no-preference) {
+  .sigilSpin {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: sigilSpin 24s linear infinite;
   }
 }
 
-@keyframes sigilTurn {
+@keyframes sigilSpin {
   from {
     rotate: 0deg;
   }
   to {
-    rotate: 45deg;
+    rotate: 360deg;
   }
 }

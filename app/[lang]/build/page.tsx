@@ -293,7 +293,7 @@ export default async function BuildPage({
 
             {mark.count > 0 && (
               <div className={styles.sigilBlock}>
-                <Sigil label={d.sigil.label} className={styles.sigilMark} />
+                <Sigil spin label={d.sigil.label} className={styles.sigilMark} />
                 <div className={styles.sigilText}>
                   <p className="label">{d.sigil.heading}</p>
                   <p className="small muted measure">

@@ -75,7 +75,7 @@ export default async function GoldenPath({
                 repository, so it is the one element of this page that nobody
                 else could put on theirs. */}
             <Sigil
-              dial
+              spin
               label={d.sigil.label}
               className={cx('onLoad', styles.heroSeal)}
             />

@@ -18,16 +18,15 @@ const KINDS = ['tick', 'wedge', 'nub'] as const
  * version of the same claim, but the caller has to say so, by passing the
  * record it is a subset OF as `within`.
  *
- * Zero client JavaScript: three paths and a class. The dial rotation is a
- * scroll-driven CSS animation living with the other effects in
- * styles/interaction.css, so a browser without scroll timelines simply gets a
- * mark that does not turn.
+ * Zero client JavaScript: a handful of paths and a class. The rotation is a
+ * CSS animation living with the other effects in styles/interaction.css, so a
+ * visitor who asked for reduced motion simply gets a mark that holds still.
  */
 export function Sigil({
   commits = allCommits(),
   within,
   label,
-  dial = false,
+  spin = false,
   id = 'sigil',
   className,
 }: {
@@ -49,8 +48,14 @@ export function Sigil({
    * two copies of the same arithmetic in every page.
    */
   label: string
-  /** Turn with the page scroll. */
-  dial?: boolean
+  /**
+   * Rotate continuously.
+   *
+   * Only for marks that make no positional claim in words — see the note in
+   * styles/interaction.css. A turning mark cannot also be the thing a caption
+   * points at.
+   */
+  spin?: boolean
   /** Distinguishes this mark's shape ids from any other mark on the page. */
   id?: string
   className?: string
@@ -83,7 +88,7 @@ export function Sigil({
       {sigil.outlines.map((r) => (
         <circle key={r} cx="100" cy="100" r={r} className={styles.outline} />
       ))}
-      <g className={dial ? 'sigilDial' : undefined}>
+      <g className={spin ? 'sigilSpin' : undefined}>
         {/* Grouped BY KIND rather than one class per element, since a CSS-
             module class name is long and there are seventy elements. Measured
             on /build's html: 21.1 KB writing every wedge out longhand, 19.8
