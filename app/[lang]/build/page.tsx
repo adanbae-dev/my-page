@@ -7,10 +7,11 @@ import { JsonLd } from '@/components/JsonLd'
 import { Section } from '@/components/Section'
 import { Sigil } from '@/components/Sigil'
 import { cx } from '@/lib/cx'
-import { isLocale, t } from '@/lib/i18n/config'
+import { isLocale, localePath, t, type Locale } from '@/lib/i18n/config'
 import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
+import { publishedEntries } from '@/lib/content/load'
 import { commits, eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
 import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
@@ -85,10 +86,31 @@ function scaler(max: number): (v: number) => number {
 function CommitRow({
   commit,
   width,
+  locale,
+  live,
 }: {
   commit: Commit
   /** Percentage of the bar track this commit's authored churn occupies. */
   width: number
+  /**
+   * REQUIRED, and required for the same reason lib/field.ts made it required:
+   * every route on this site lives under /{lang}, so a link built without it
+   * is a 404. This row's entry links were exactly that — `/make/personal-
+   * interface` returned 404, measured — and the type is the only thing that
+   * makes forgetting it impossible rather than merely unlikely.
+   */
+  locale: Locale
+  /**
+   * Entry keys (`chapter/slug`) that still exist.
+   *
+   * A commit's entry list is a fact about the past and stays in the record
+   * whatever happens to the file afterwards. But `live/placeholder` was
+   * deleted during this project's own history, and the row went on linking to
+   * it — measured: /ko/live/placeholder returned 404 from this page. So the
+   * reference survives as text and only a readable entry becomes a link. The
+   * record keeps its claim; it just stops pretending you can follow it.
+   */
+  live: ReadonlySet<string>
 }) {
   const churn = commit.insertions + commit.deletions
   // Split the row's own bar by its insertion/deletion ratio. A commit that
@@ -127,9 +149,18 @@ function CommitRow({
           <p className={cx('small', styles.touched)}>
             <span className="label muted">이 커밋이 쓴 글</span>
             {commit.entries.map((e) => (
-              <Link key={`${e.chapter}/${e.slug}`} href={`/${e.chapter}/${e.slug}`}>
-                {e.chapter}/{e.slug}
-              </Link>
+              live.has(`${e.chapter}/${e.slug}`) ? (
+                <Link
+                  key={`${e.chapter}/${e.slug}`}
+                  href={localePath(locale, `/${e.chapter}/${e.slug}`)}
+                >
+                  {e.chapter}/{e.slug}
+                </Link>
+              ) : (
+                <span key={`${e.chapter}/${e.slug}`} className={styles.gone}>
+                  {e.chapter}/{e.slug}
+                </span>
+              )
             ))}
           </p>
         )}
@@ -171,6 +202,11 @@ export default async function BuildPage({
      it is describing. Two passes over 64 slots is not worth an API that makes
      every caller thread geometry through its props. */
   const mark = sigilFrom(commits())
+  /* Built once and threaded down, rather than looked up per row: the answer is
+     identical for every row and the lookup reads the whole content tree. */
+  const live: ReadonlySet<string> = new Set(
+    publishedEntries(lang).map((e) => `${e.chapter}/${e.slug}`),
+  )
   const groups = eras()
 
   const widthOf = scaler(
@@ -219,7 +255,7 @@ export default async function BuildPage({
       >
         <div className="wrap">
           <p className={cx('label', styles.crumb)}>
-            <Link href="/trace">← 04 / TRACE</Link>
+            <Link href={localePath(lang, '/trace')}>← 04 / TRACE</Link>
             <span>BUILD</span>
           </p>
 
@@ -362,6 +398,8 @@ export default async function BuildPage({
                 <ol className={styles.rows}>
                   {rows.map((c) => (
                     <CommitRow
+                      locale={lang}
+                      live={live}
                       key={c.sha}
                       commit={c}
                       width={widthOf(c.insertions + c.deletions)}
@@ -384,13 +422,16 @@ export default async function BuildPage({
       <Section tone="light" density="calm">
         <hr className="ruleStrong" />
         <div className={styles.foot} style={{ marginBlockStart: 'var(--space-m)' }}>
-          <Link href="/trace" className={styles.step}>
+          <Link href={localePath(lang, '/trace')} className={styles.step}>
             <span className="label muted">← 04 손으로 쓴 기록</span>
             <span className="h3" lang="en">
               TRACE
             </span>
           </Link>
-          <Link href="/make/personal-interface" className={cx(styles.step, styles.stepNext)}>
+          <Link
+            href={localePath(lang, '/make/personal-interface')}
+            className={cx(styles.step, styles.stepNext)}
+          >
             <span className="label muted">이 제품의 결정들 →</span>
             <span className="h3" lang="en">
               THE CASE

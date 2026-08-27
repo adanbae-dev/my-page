@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 import { notFound } from 'next/navigation'
 
-import { isLocale } from '@/lib/i18n/config'
+import { isLocale, localePath } from '@/lib/i18n/config'
 import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import Link from 'next/link'
@@ -148,7 +148,7 @@ export default async function ArtDirectionPage({
       >
         <div className={cx('wrap', styles.heroInner)}>
           <p className="label">
-            <Link href="/">{site.title}</Link> — Phase 0 / Art Direction
+            <Link href={localePath(lang, '/')}>{site.title}</Link> — Phase 0 / Art Direction
           </p>
 
           {/* Explicit trailing spaces: JSX drops the whitespace around a <br />,
