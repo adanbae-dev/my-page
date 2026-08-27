@@ -181,3 +181,9 @@
   background-color: var(--accent);
   color: var(--on-accent);
 }
+
+/* Small: this is a footnote to the commit list, not a crest. */
+.provenanceMark {
+  inline-size: 4.5rem;
+  color: var(--fg);
+}

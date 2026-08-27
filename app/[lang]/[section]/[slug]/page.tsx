@@ -5,8 +5,9 @@ import { notFound } from 'next/navigation'
 import { JsonLd } from '@/components/JsonLd'
 import { Prose } from '@/components/Prose'
 import { Section } from '@/components/Section'
+import { Sigil } from '@/components/Sigil'
 import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
-import { historyFor } from '@/lib/git/load'
+import { commits as allCommits, historyFor } from '@/lib/git/load'
 import { type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
@@ -239,6 +240,17 @@ export default async function EntryPage({
         {born && (
           <div className={styles.provenance}>
             <p className={cx('label', styles.provenanceHead)}>{d.entry.provenance}</p>
+
+            {/* The site's mark with only this entry's commits lit. It sits
+                here rather than in the header because it is a reading of the
+                list below it, not a badge on the article. */}
+            <Sigil
+              id="prov"
+              commits={history}
+              within={allCommits()}
+              label={d.sigil.entryLabel}
+              className={styles.provenanceMark}
+            />
 
             <p className="small">
               {t(d.entry.bornAt, { date: formatDate(born.date) })}{' '}

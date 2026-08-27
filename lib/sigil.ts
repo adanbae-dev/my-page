@@ -143,6 +143,16 @@ export type Sigil = {
   readonly per: number
   /** Slots left in the ring currently filling. 0 once every ring is closed. */
   readonly remaining: number
+  /**
+   * Baseline circles to draw, as radii.
+   *
+   * Empty for the full mark, where the unearned slots are drawn as ticks and
+   * the ring is implied by them. A SUBSET mark has no ticks — it lights only
+   * its own slots — so it needs the ring stated, or a piece written in one
+   * commit renders as a single stroke floating in white space with nothing to
+   * say where in the record it sits.
+   */
+  readonly outlines: readonly number[]
 }
 
 const EMPTY: Sigil = {
@@ -153,44 +163,85 @@ const EMPTY: Sigil = {
   rings: 1,
   per: 1,
   remaining: SIGIL_SLOTS,
+  outlines: [],
 }
 
-export function sigilFrom(commits: readonly Commit[]): Sigil {
-  if (commits.length === 0) return EMPTY
+/** One slot's contents, before any geometry. */
+type Slot = {
+  readonly lines: number
+  readonly milestone: boolean
+  readonly shas: readonly string[]
+}
 
+/**
+ * Assign commits to slots. Shared, so a subset mark lands its wedges on
+ * exactly the slots the full mark would — which is the whole point of the
+ * subset variant: two entries' marks are comparable because they are cut from
+ * the same ring.
+ */
+function fold(commits: readonly Commit[]): { slots: Slot[]; per: number } {
   // Oldest first: slot 0 is where the work started, and it stays there.
   const oldestFirst = [...commits].reverse()
   const per = Math.max(1, Math.ceil(oldestFirst.length / SIGIL_CAPACITY))
-
-  const slots: { lines: number; milestone: boolean }[] = []
+  const slots: Slot[] = []
   for (let i = 0; i < oldestFirst.length; i += per) {
     const group = oldestFirst.slice(i, i + per)
     slots.push({
       lines: group.reduce((n, c) => n + c.insertions + c.deletions, 0),
       milestone: group.some((c) => c.milestone !== null),
+      shas: group.map((c) => c.sha),
     })
   }
+  return { slots, per }
+}
 
-  /* Shapes are collected in a map keyed by identity, so two slots at the same
-     depth in the same ring emit one definition and two rotations. */
+/** Rings the record occupies, as a count. */
+const ringsUsed = (slotCount: number): number =>
+  Math.min(RINGS.length, Math.floor(Math.max(0, slotCount - 1) / SIGIL_SLOTS) + 1)
+
+/** A collector for wedges, so both emitters share one shape table. */
+function emitter() {
   const shapes = new Map<string, string>()
   const uses: SigilUse[] = []
-
-  const place = (id: string, d: string, slot: number, kind: SigilUse['kind']): void => {
-    if (!shapes.has(id)) shapes.set(id, d)
-    uses.push({ id, angle: Math.round(slot * SPAN * 1000) / 1000, kind })
+  return {
+    shapes,
+    uses,
+    place(id: string, d: string, slot: number, kind: SigilUse['kind']): void {
+      if (!shapes.has(id)) shapes.set(id, d)
+      uses.push({ id, angle: Math.round(slot * SPAN * 1000) / 1000, kind })
+    },
   }
+}
+
+/** Where slot `i` lands: which ring, and which position within it. */
+function seat(i: number): { ringIndex: number; ring: (typeof RINGS)[number]; slot: number } | null {
+  const ringIndex = Math.floor(i / SIGIL_SLOTS)
+  const ring = RINGS[ringIndex]
+  if (!ring) return null
+  return { ringIndex, ring, slot: i % SIGIL_SLOTS }
+}
+
+/**
+ * Fold the whole record into a mark.
+ *
+ * Pure, and pure on purpose: the same commits always produce the same paths,
+ * so the mark is reproducible from the committed snapshot alone and nothing
+ * about it depends on when the page was built.
+ */
+export function sigilFrom(commits: readonly Commit[]): Sigil {
+  if (commits.length === 0) return EMPTY
+
+  const { slots, per } = fold(commits)
+  const e = emitter()
 
   slots.forEach((s, i) => {
-    const ringIndex = Math.floor(i / SIGIL_SLOTS)
-    const ring = RINGS[ringIndex]
-    if (!ring) return
-    const slot = i % SIGIL_SLOTS
+    const at = seat(i)
+    if (!at) return
     const depth = depthOf(s.lines)
-    const to = ring.inner + ((ring.outer - ring.inner) * depth) / SIGIL_DEPTHS
-    place(`${ringIndex}${depth}`, wedge(ring.inner, to), slot, 'wedge')
+    const to = at.ring.inner + ((at.ring.outer - at.ring.inner) * depth) / SIGIL_DEPTHS
+    e.place(`${at.ringIndex}${depth}`, wedge(at.ring.inner, to), at.slot, 'wedge')
     if (s.milestone) {
-      place(`${ringIndex}n`, wedge(ring.outer, ring.outer + NUB), slot, 'nub')
+      e.place(`${at.ringIndex}n`, wedge(at.ring.outer, at.ring.outer + NUB), at.slot, 'nub')
     }
   })
 
@@ -201,18 +252,72 @@ export function sigilFrom(commits: readonly Commit[]): Sigil {
   const filledInOpen = slots.length % SIGIL_SLOTS
   if (open) {
     for (let slot = filledInOpen; slot < SIGIL_SLOTS; slot += 1) {
-      place(`${openIndex}t`, wedge(open.outer - TICK, open.outer), slot, 'tick')
+      e.place(`${openIndex}t`, wedge(open.outer - TICK, open.outer), slot, 'tick')
     }
   }
 
   return {
-    shapes: [...shapes].map(([id, d]) => ({ id, d })),
-    uses,
-    count: oldestFirst.length,
+    shapes: [...e.shapes].map(([id, d]) => ({ id, d })),
+    uses: e.uses,
+    count: commits.length,
     used: slots.length,
-    rings: Math.min(RINGS.length, Math.floor((slots.length - 1) / SIGIL_SLOTS) + 1),
+    rings: ringsUsed(slots.length),
     per,
     remaining: open ? SIGIL_SLOTS - filledInOpen : 0,
+    outlines: [],
+  }
+}
+
+/**
+ * The same ring, with only one piece of work lit.
+ *
+ * `subset` is expected to be the commits that touched one entry. Its wedges
+ * land on the slots the FULL record gave them, so an entry's mark says where
+ * in the life of this interface that entry happened — and two entries' marks
+ * can be compared, because they are cut from the same ring rather than each
+ * being scaled to its own handful of commits.
+ *
+ * No ticks. Sixty-four of them to light three would spend the page's html
+ * budget drawing everything the entry is not. The ring is stated once as a
+ * baseline circle instead.
+ */
+export function sigilOf(
+  all: readonly Commit[],
+  subset: readonly Commit[],
+): Sigil {
+  if (all.length === 0 || subset.length === 0) return EMPTY
+
+  const wanted = new Set(subset.map((c) => c.sha))
+  const { slots, per } = fold(all)
+  const e = emitter()
+  const outlines = new Set<number>()
+  let lit = 0
+
+  slots.forEach((s, i) => {
+    const at = seat(i)
+    if (!at) return
+    outlines.add(at.ring.inner)
+    if (!s.shas.some((sha) => wanted.has(sha))) return
+    lit += 1
+    const depth = depthOf(s.lines)
+    const to = at.ring.inner + ((at.ring.outer - at.ring.inner) * depth) / SIGIL_DEPTHS
+    e.place(`${at.ringIndex}${depth}`, wedge(at.ring.inner, to), at.slot, 'wedge')
+    if (s.milestone) {
+      e.place(`${at.ringIndex}n`, wedge(at.ring.outer, at.ring.outer + NUB), at.slot, 'nub')
+    }
+  })
+
+  return {
+    shapes: [...e.shapes].map(([id, d]) => ({ id, d })),
+    uses: e.uses,
+    count: subset.length,
+    used: lit,
+    rings: ringsUsed(slots.length),
+    per,
+    remaining: 0,
+    /* The innermost ring's baseline is 0 — a circle of radius zero is a point,
+       and drawing it is noise. */
+    outlines: [...outlines].filter((r) => r > 0).sort((a, b) => b - a),
   }
 }
 

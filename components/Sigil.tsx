@@ -2,7 +2,7 @@ import { commits as allCommits } from '@/lib/git/load'
 import type { Commit } from '@/lib/git/schema'
 import { cx } from '@/lib/cx'
 import { t } from '@/lib/i18n/config'
-import { sigilFrom, SIGIL_SLOTS, SIGIL_VIEWBOX } from '@/lib/sigil'
+import { sigilFrom, sigilOf, SIGIL_SLOTS, SIGIL_VIEWBOX } from '@/lib/sigil'
 import styles from './Sigil.module.css'
 
 /** Paint order, back to front. */
@@ -15,7 +15,8 @@ const KINDS = ['tick', 'wedge', 'nub'] as const
  * it is this interface's history — handing it an arbitrary subset and calling
  * the result the site's identity would make it a decoration again. A subset
  * is still allowed, because one entry's own history is a legitimate smaller
- * version of the same claim, but the caller has to say so.
+ * version of the same claim, but the caller has to say so, by passing the
+ * record it is a subset OF as `within`.
  *
  * Zero client JavaScript: three paths and a class. The dial rotation is a
  * scroll-driven CSS animation living with the other effects in
@@ -24,12 +25,21 @@ const KINDS = ['tick', 'wedge', 'nub'] as const
  */
 export function Sigil({
   commits = allCommits(),
+  within,
   label,
   dial = false,
   id = 'sigil',
   className,
 }: {
   commits?: readonly Commit[]
+  /**
+   * The record `commits` is a part of.
+   *
+   * Given, the mark lights only `commits` and states the rest as a ring, so
+   * one entry's wedges sit at the slots the whole record gave them. Omitted,
+   * `commits` IS the record and the unearned slots are drawn as ticks.
+   */
+  within?: readonly Commit[]
   /**
    * Required: the mark carries meaning, so it is an image, not decoration.
    *
@@ -45,7 +55,7 @@ export function Sigil({
   id?: string
   className?: string
 }) {
-  const sigil = sigilFrom(commits)
+  const sigil = within ? sigilOf(within, commits) : sigilFrom(commits)
   if (sigil.count === 0) return null
 
   /* Shape ids live in the document, not in the component, so two marks on one
@@ -70,6 +80,9 @@ export function Sigil({
           <path key={shape.id} id={`${idPrefix}${shape.id}`} d={shape.d} />
         ))}
       </defs>
+      {sigil.outlines.map((r) => (
+        <circle key={r} cx="100" cy="100" r={r} className={styles.outline} />
+      ))}
       <g className={dial ? 'sigilDial' : undefined}>
         {/* Grouped BY KIND rather than one class per element, since a CSS-
             module class name is long and there are seventy elements. Measured

@@ -23,3 +23,14 @@
 .nub {
   fill: var(--accent);
 }
+
+/* The whole record, stated once, when the mark is lighting only part of it.
+   Stroke rather than fill, and it does NOT scale with the mark: at 3rem a
+   proportional hairline disappears, and a ring you cannot see is not a ring. */
+.outline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: 0.28;
+  vector-effect: non-scaling-stroke;
+}

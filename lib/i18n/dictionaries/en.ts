@@ -152,6 +152,7 @@ export const en = {
       'A mark computed from this repository\u2019s own record: {count} commits, {used} of {slots} slots filled.',
     legend:
       'One slot per commit. Depth is how many lines that commit actually changed by hand, and the marks reaching past the ring are the phases the history declared for itself. The {remaining} empty slots have not been earned yet. When they are, a new ring opens inside and the outer one sets for good — nothing already drawn ever moves again.',
+    entryLabel: 'The mark with only this entry\u2019s commits lit; the ring is the whole record.',
     caption: '{used} of {slots}',
   },
 
