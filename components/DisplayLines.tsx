@@ -23,12 +23,12 @@ export function DisplayLines({ lines }: { lines: readonly string[] }) {
      at different speeds. With a per-character duration the delay for line i
      is the sum of the lines before it, which is what `--o` carries. */
   const total = lines.reduce((n, l) => n + l.length, 0)
-  let before = 0
-  const offsets = lines.map((l) => {
-    const o = before
-    before += l.length
-    return o
-  })
+  /* No running accumulator: React Compiler rejects reassigning a captured
+     variable during render, and it is right to. Summing the lines before
+     this one is equivalent and there are never more than a handful. */
+  const offsets = lines.map((_, i) =>
+    lines.slice(0, i).reduce((n, l) => n + l.length, 0),
+  )
 
   return (
     <>
