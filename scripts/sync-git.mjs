@@ -9,9 +9,10 @@
  * Two refusals, both deliberate:
  *
  *   shallow repository   Would write a truncated record that looks complete.
- *   fewer commits        Would silently shrink a good snapshot. History only
- *                        grows; a smaller result means something is wrong
- *                        with the clone, not with the history.
+ *   truncated history    Would silently drop the beginning of the record. A
+ *                        shorter result is fine when the oldest commit on
+ *                        file is still reachable — that is a local rewind,
+ *                        not a bad clone. See the guard below.
  *
  * And one assertion: no email address may reach the file. The parser does not
  * collect authors, so a match here means the projection regressed.
@@ -59,9 +60,51 @@ const head = commits[0].sha
 
 if (existsSync(OUT)) {
   const prev = JSON.parse(readFileSync(OUT, 'utf8'))
-  const prevCount = Array.isArray(prev.commits) ? prev.commits.length : 0
-  if (commits.length < prevCount) {
-    die(`would shrink the record from ${prevCount} to ${commits.length} commits`)
+  /*
+   * A shorter record than the one on disk has two causes and they are not
+   * remotely the same thing.
+   *
+   *   TRUNCATED AT THE ROOT — a partial or filtered clone, a graft, the wrong
+   *     repository. The record would silently lose its beginning and the
+   *     build would publish a history that starts in the middle.
+   *   REWOUND AT THE TIP — a local reset, squashing commits before they are
+   *     pushed. Ordinary, and the record should follow.
+   *
+   * This used to compare COUNTS, which cannot tell them apart: both make the
+   * number smaller. It refused a legitimate squash twice before this was
+   * fixed, and the workaround was to delete the file — which disables the
+   * check entirely rather than for one run.
+   *
+   * The OLDEST commit tells them apart. Root truncation loses it; a tip
+   * rewind keeps it reachable from HEAD. Commits are stored newest-first, so
+   * the oldest is the last element.
+   */
+  const prevCommits = Array.isArray(prev.commits) ? prev.commits : []
+  const prevOldest = prevCommits[prevCommits.length - 1]?.sha
+
+  if (typeof prevOldest === 'string' && commits.length < prevCommits.length) {
+    let rootReachable = false
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', prevOldest, 'HEAD'], {
+        cwd: ROOT,
+        stdio: 'ignore',
+      })
+      rootReachable = true
+    } catch {
+      rootReachable = false
+    }
+
+    if (!rootReachable) {
+      die(
+        `the record's oldest commit ${prevOldest} is not reachable from HEAD — ` +
+          `this history is truncated, not rewound`,
+      )
+    }
+
+    line(
+      `  · rewound ${prevCommits.length} -> ${commits.length} commits ` +
+        `(oldest ${prevOldest} still reachable)`,
+    )
   }
   if (prev.head === head) {
     line(`  · already at ${head} — nothing to write`)
