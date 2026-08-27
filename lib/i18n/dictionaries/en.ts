@@ -100,6 +100,7 @@ export const en = {
     debugging: { name: 'Debugging', blurb: 'Finding what was quietly wrong. Hypotheses and refutations.' },
     knowledge: { name: 'Knowledge', blurb: 'Reading, sorting, and making it findable again.' },
     process: { name: 'Process', blurb: 'How the work is done. Habits, decisions, and reversals.' },
+    life: { name: 'Life', blurb: 'The hours that are not work. Habits, people, places.' },
   },
   logKind: {
     version: 'a version that passed',

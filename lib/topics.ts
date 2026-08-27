@@ -15,9 +15,12 @@
  *   tags    Free-form. Displayed on the entry, and fed to JSON-LD `keywords`
  *           where specificity is the point (`nextjs`, `sqlite`, `rsc`).
  *
- * Seven, because seven is what the existing thirteen entries actually
- * support at two or more each. Adding an eighth means having something to
- * put in it.
+ * Seven were what the first thirteen entries supported at two or more each,
+ * and all seven were about the craft. `life` is the eighth and it exists
+ * because LIVE had nothing to be filed under: its one entry had been given
+ * `process`, a work topic, which is how a taxonomy starts lying. Adding a
+ * topic still means having something to put in it — check:content blocks a
+ * topic with no entries.
  */
 
 export const TOPIC_IDS = [
@@ -28,6 +31,7 @@ export const TOPIC_IDS = [
   'debugging',
   'knowledge',
   'process',
+  'life',
 ] as const
 
 export type TopicId = (typeof TOPIC_IDS)[number]

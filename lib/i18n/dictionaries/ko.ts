@@ -107,6 +107,7 @@ export const ko = {
     debugging: { name: '디버깅', blurb: '조용히 틀린 것을 찾아낸 기록. 가설과 반증.' },
     knowledge: { name: '지식', blurb: '읽고 정리하고 다시 찾을 수 있게 만드는 방법.' },
     process: { name: '과정', blurb: '어떻게 일하는지. 습관, 결정, 되돌린 것들.' },
+    life: { name: '생활', blurb: '일하지 않는 시간. 습관, 사람, 장소.' },
   },
   logKind: {
     version: '지나간 버전',
