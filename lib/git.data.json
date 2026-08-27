@@ -13,9 +13,39 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-08-26",
-  "head": "373352e",
+  "generatedAt": "2026-08-27",
+  "head": "7c554fa",
   "commits": [
+    {
+      "sha": "7c554fa",
+      "date": "2026-08-27",
+      "subject": "i18n: ko and en, every route prerendered in both",
+      "insertions": 1347,
+      "deletions": 338,
+      "generated": 0,
+      "files": 35,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "40356d6",
+      "date": "2026-08-26",
+      "subject": "Record: snapshot at 373352e",
+      "insertions": 41,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "373352e",
       "date": "2026-08-26",
