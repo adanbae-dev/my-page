@@ -14,8 +14,34 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "d4cf6fe",
+  "head": "0308ab5",
   "commits": [
+    {
+      "sha": "0308ab5",
+      "date": "2026-08-27",
+      "subject": "Effects: the typing now finishes as the headline reaches the middle of the screen",
+      "insertions": 23,
+      "deletions": 6,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "b792454",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at d4cf6fe",
+      "insertions": 27,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "d4cf6fe",
       "date": "2026-08-27",
