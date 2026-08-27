@@ -140,47 +140,67 @@ export function Nav({ initialTone, locale, labels }: NavProps) {
           {site.name} <span className={styles.brandSuffix}>· {site.title}</span>
         </Link>
 
-        <ul className={styles.list}>
-          {SECTIONS.map((s) => {
-            const isCurrent = s.id === currentId
-            return (
-              <li key={s.id}>
-                <Link
-                  // On the golden path the bar moves you within the page; from a
-                  // depth route it moves you between pages.
-                  href={onGoldenPath ? `#${s.id}` : localePath(locale, `/${s.id}`)}
-                  className={cx('label', styles.item)}
-                  {...(isCurrent
-                    ? { 'aria-current': onGoldenPath ? 'true' : 'page' }
-                    : {})}
-                >
-                  <span className={styles.num}>{s.index}</span>
-                  <span className={styles.itemName}>{s.label}</span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+        {/* One flex child, not two.
+            `.inner` is `space-between` and was built for exactly two
+            children: the brand goes left, this goes right. Adding the
+            language control as a third child made the browser distribute
+            three, which pushed the chapter rail from the right edge into the
+            middle of the bar — a composition change disguised as an
+            addition. Grouping restores it. */}
+        <div className={styles.right}>
+          <ul className={styles.list}>
+            {SECTIONS.map((s) => {
+              const isCurrent = s.id === currentId
+              return (
+                <li key={s.id}>
+                  <Link
+                    // On the golden path the bar moves you within the page; from a
+                    // depth route it moves you between pages.
+                    href={onGoldenPath ? `#${s.id}` : localePath(locale, `/${s.id}`)}
+                    className={cx('label', styles.item)}
+                    {...(isCurrent
+                      ? { 'aria-current': onGoldenPath ? 'true' : 'page' }
+                      : {})}
+                  >
+                    <span className={styles.num}>{s.index}</span>
+                    <span className={styles.itemName}>{s.label}</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
 
-        {/* Plain anchors, not <Link>. Switching locale changes a root dynamic
-            param, and therefore `<html lang>` — which a client-side
-            navigation has no reason to get right. A full document request
-            does, and costs zero JavaScript, which matters here: the shared
-            bundle has about 3 KB of headroom. */}
-        <ul className={styles.langs} aria-label={labels.languageLabel}>
-          {LOCALES.map((l) => (
-            <li key={l}>
-              <a
-                href={localePath(l, rest)}
-                hrefLang={LOCALE_META[l].lang}
-                className={cx('label', styles.lang)}
-                {...(l === locale ? { 'aria-current': 'true' } : {})}
-              >
-                {l.toUpperCase()}
-              </a>
-            </li>
-          ))}
-        </ul>
+          {/* Only the languages you are NOT reading.
+              Showing the current one too meant marking it, and the bar
+              already has an idiom for "current" — the solid accent block on
+              the chapter you are standing in. A second, weaker marker (a
+              colour change) competing with it made the bar say "current" two
+              different ways. Omitting the current language removes the
+              question instead of answering it twice.
+
+              Plain anchors, not <Link>: switching locale changes a root
+              dynamic param and therefore `<html lang>`, which a client-side
+              navigation has no reason to get right. A full document request
+              does, and it costs no JavaScript. */}
+          <ul className={styles.langs} aria-label={labels.languageLabel}>
+            {LOCALES.filter((l) => l !== locale).map((l) => (
+              <li key={l}>
+                <a
+                  href={localePath(l, rest)}
+                  hrefLang={LOCALE_META[l].lang}
+                  // The endonym is written IN the language it names, so it has
+                  // to be marked as that language or a screen reader will read
+                  // 한국어 with an English voice.
+                  lang={LOCALE_META[l].lang}
+                  className={cx('label', styles.lang)}
+                >
+                  <span className={styles.langShort}>{l.toUpperCase()}</span>
+                  <span className={styles.langName}>{LOCALE_META[l].endonym}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </nav>
   )

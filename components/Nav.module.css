@@ -140,28 +140,77 @@
   }
 }
 
-/* --- Locale switcher --------------------------------------------------- */
+/* --- Right group ------------------------------------------------------- */
 
-.langs {
+/* The chapter rail and the language control travel together, so `.inner`
+   keeps exactly two children and `space-between` keeps meaning what it
+   meant. */
+.right {
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 
+@media (min-width: 40rem) {
+  .right {
+    gap: var(--space-s);
+  }
+}
+
+/* --- Locale switcher --------------------------------------------------- */
+
+/* A hairline, not a gap. The language control is a different KIND of thing
+   from the chapter rail — it changes what language you read, not where you
+   are — and a rule says that where extra space only suggests it. */
+.langs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-inline-start: var(--space-2xs);
+  border-inline-start: var(--rule-w) solid var(--rule);
+}
+
+/* Same target rule the chapter links follow. The bar sized itself around
+   2.75rem; a control that opts out of that is a smaller target in the same
+   row, which is the version of this that fails on a phone. */
 .lang {
-  color: var(--muted);
-  text-decoration: none;
-  padding-inline: 0.2em;
-  min-block-size: 2.75rem;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-block-size: 2.75rem;
+  min-inline-size: 2.75rem;
+  padding-inline: 0.4em;
+  text-decoration: none;
+  color: var(--muted);
+  transition: color var(--dur-quick) var(--ease-standard);
 }
 
-/* The current language is stated, not merely highlighted — aria-current
-   carries it for assistive tech and this carries it visually. */
-.lang[aria-current='true'] {
+.lang:hover {
   color: var(--figure);
+}
+
+/* Below 40rem the endonym goes and the code stays — the inverse of the
+   chapter rail, and for a reason. There the name carries the meaning and the
+   number is ornament. Here BOTH carry it, so the choice is made on width:
+   `GOLDIBUG` plus four chapter names plus `English` overflows a 320px bar,
+   and a two-letter code still says which language you would land in. */
+.langName {
+  display: none;
+}
+
+.langShort {
+  display: inline;
+}
+
+@media (min-width: 40rem) {
+  .langName {
+    display: inline;
+  }
+
+  .langShort {
+    display: none;
+  }
 }
