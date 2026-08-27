@@ -14,8 +14,36 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "414853a",
+  "head": "2361a68",
   "commits": [
+    {
+      "sha": "2361a68",
+      "date": "2026-08-27",
+      "subject": "Fix: `sweep` made the home page headline invisible",
+      "insertions": 37,
+      "deletions": 56,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "styles",
+        "docs"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "ece0f9b",
+      "date": "2026-08-27",
+      "subject": "Record: snapshot at 414853a",
+      "insertions": 31,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "414853a",
       "date": "2026-08-27",
