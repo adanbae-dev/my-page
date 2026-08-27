@@ -7,13 +7,30 @@
   padding-block: var(--section-y);
 }
 
+/*
+ * Density set vertical rhythm and nothing else, so "calm sections breathe,
+ * dense sections pack" was true of the space between things and false of the
+ * things. Four chapter beats on the golden path came out of one template at
+ * one size, and the page read as four copies of a beat rather than as an arc.
+ *
+ * So density also carries a type scale, following the pattern already here:
+ * the section publishes a token and the consumer reads it, rather than the
+ * consumer knowing which density it is in.
+ *
+ * DENSE STAYS AT 1. Scaling it up would be the obvious move and it is the
+ * wrong one — the display lines on those beats are authored, not wrapped, and
+ * --t-h1 already tops out at 6rem. Only calm comes down, so no line can get
+ * wider than it is today and the page decrescendos instead of shouting louder.
+ */
 .section[data-density='dense'] {
   --section-y: clamp(3rem, 1.5rem + 7vw, 8rem);
   --stack-gap: var(--space-s);
+  --beat-scale: 1;
 }
 
 .section[data-density='calm'] {
   --stack-gap: var(--space-l);
+  --beat-scale: 0.82;
 }
 
 /* Two adjacent sections on the same ground are one continuous field, not
