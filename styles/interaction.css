@@ -434,3 +434,83 @@
     }
   }
 }
+
+/* --- Typed reveal --------------------------------------------------------- */
+
+/* The hero headline types itself in, one character per step.
+   
+   Time-based, not scroll-driven, and that is forced rather than chosen: the
+   hero is above the fold, so `view()` never sees an `entry` for it and a
+   scroll-linked reveal would sit at its from-state permanently. That is the
+   same reason `onLoad` exists.
+
+   `clip-path` stepped by the LINE'S OWN character count. `--n` comes from
+   DisplayLines and substitutes into `steps()` — verified in the browser:
+   `steps(var(--n), end)` computes to `steps(11)`. One step per character, so
+   the rhythm is the text's rhythm rather than a number someone picked.
+
+   Not per-character spans, deliberately. Splitting a headline into one
+   element per letter is the usual way to do this and it is how a headline
+   ends up being spelled out by a screen reader. The text stays whole; only
+   the paint is stepped.
+
+   Gated: the from-state hides content, and a visitor who asked for less
+   motion gets the finished headline immediately. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .type .lineIn {
+    /* Replaces the scroll-driven arrival .lineIn would otherwise apply, which
+       cannot fire above the fold anyway.
+
+       No `animation-timeline: auto` here even though that is what is wanted:
+       the `animation` SHORTHAND already resets it. Measured rather than taken
+       from the spec — a rule with `animation: … ` over one with
+       `animation-timeline: view()` computes to `animation-timeline: auto`.
+       Writing it explicitly would put an `animation-timeline` mention outside
+       `@supports (animation-timeline: …)`, which check:motion refuses, and it
+       is right to: the exception is invisible from the outside. */
+    animation: typeIn var(--dur-type) steps(var(--n, 20), end) both;
+    animation-delay: calc(var(--i, 0) * var(--dur-type));
+  }
+
+  @keyframes typeIn {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 -0.08em 0 0);
+    }
+  }
+
+  /* The accent block is the last thing said, so it waits for the lines to
+     finish before wiping in. markWipe already owns the transition; this only
+     moves when it starts. */
+  .type .markWipe {
+    transition-delay: calc(var(--lines, 2) * var(--dur-type));
+  }
+
+  /* A caret, blinking where the typing stopped. Three blinks and it leaves —
+     a cursor that never stops is a cursor that is waiting for input, and
+     nothing here is. */
+  .type::after {
+    content: '';
+    display: inline-block;
+    inline-size: 0.06em;
+    block-size: 0.78em;
+    margin-inline-start: 0.06em;
+    vertical-align: baseline;
+    background-color: var(--accent);
+    animation: caret 520ms steps(1, end) calc(var(--lines, 2) * var(--dur-type)) 6
+      both;
+  }
+
+  @keyframes caret {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+}

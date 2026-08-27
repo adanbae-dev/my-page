@@ -34,7 +34,11 @@
       system-ui, sans-serif;
     /* Archivo carries no Hangul. Korean falls through to the platform
        grotesk. See docs/ART-DIRECTION.md -> "Open: Korean typeface". */
-    --font-kr: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo',
+    /* One typed line. Long enough to read as typing rather than as a wipe,
+     short enough that the headline is finished before anyone waits for it. */
+  --dur-type: 620ms;
+
+  --font-kr: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo',
       'Malgun Gothic', system-ui, sans-serif;
     --font-body: var(--font-grotesk), var(--font-kr);
 
