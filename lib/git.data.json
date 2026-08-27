@@ -14,8 +14,93 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-08-27",
-  "head": "010baa4",
+  "head": "27c3d0a",
   "commits": [
+    {
+      "sha": "27c3d0a",
+      "date": "2026-08-27",
+      "subject": "Interaction: cross-document transitions, a row that answers, and the scene on topics",
+      "insertions": 65,
+      "deletions": 3,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "components",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "029cada",
+      "date": "2026-08-27",
+      "subject": "Topics: a controlled axis to browse by, and a filter that costs no JavaScript",
+      "insertions": 741,
+      "deletions": 15,
+      "generated": 0,
+      "files": 32,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "content",
+        "scripts"
+      ],
+      "entries": [
+        {
+          "chapter": "live",
+          "slug": "placeholder"
+        },
+        {
+          "chapter": "make",
+          "slug": "crm-tab-browser"
+        },
+        {
+          "chapter": "make",
+          "slug": "gam-ml-teaching-tool"
+        },
+        {
+          "chapter": "make",
+          "slug": "personal-interface"
+        },
+        {
+          "chapter": "make",
+          "slug": "work-calendar"
+        },
+        {
+          "chapter": "think",
+          "slug": "crm-sidebar-vanished"
+        },
+        {
+          "chapter": "think",
+          "slug": "personal-llm-wiki"
+        },
+        {
+          "chapter": "think",
+          "slug": "the-guard-that-never-failed"
+        },
+        {
+          "chapter": "think",
+          "slug": "why-contrast-came-first"
+        },
+        {
+          "chapter": "trace",
+          "slug": "cascade-layer-inversion"
+        },
+        {
+          "chapter": "trace",
+          "slug": "git-remote-push-mistake"
+        },
+        {
+          "chapter": "trace",
+          "slug": "phase-0-to-1"
+        },
+        {
+          "chapter": "trace",
+          "slug": "typescript-7-rollback"
+        }
+      ]
+    },
     {
       "sha": "010baa4",
       "date": "2026-08-27",
