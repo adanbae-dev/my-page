@@ -11,7 +11,7 @@
   ],
   "unit": "gzip-bytes",
   "generatedAt": "2026-08-27",
-  "head": "41d3b58",
+  "head": "451e057",
   "budgets": {
     "html": 24000,
     "css": 9216,
@@ -26,487 +26,487 @@
   "deferred": 234261,
   "routes": {
     "/_not-found": {
-      "html": 1909,
+      "html": 1907,
       "css": 0,
       "js": 173548,
       "font": 0,
-      "total": 175457
+      "total": 175455
     },
     "/en": {
-      "html": 7862,
-      "css": 7797,
+      "html": 8530,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 284570
+      "total": 285300
     },
     "/ko": {
-      "html": 8309,
-      "css": 7797,
+      "html": 8991,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 285017
+      "total": 285761
     },
     "/en/art-direction": {
-      "html": 13643,
-      "css": 7797,
+      "html": 13640,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 290351
+      "total": 290410
     },
     "/en/build": {
-      "html": 21804,
-      "css": 7797,
+      "html": 21994,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 298512
+      "total": 298764
     },
     "/en/live": {
-      "html": 6664,
-      "css": 8416,
+      "html": 6662,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 285360
+      "total": 285420
     },
     "/en/make": {
-      "html": 7519,
-      "css": 8416,
+      "html": 7518,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 286215
+      "total": 286276
     },
     "/en/think": {
       "html": 8134,
-      "css": 8416,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 286830
+      "total": 286892
     },
     "/en/trace": {
       "html": 13408,
-      "css": 8416,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 292104
+      "total": 292166
     },
     "/ko/art-direction": {
-      "html": 13758,
-      "css": 7797,
+      "html": 13764,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 290466
+      "total": 290534
     },
     "/ko/build": {
-      "html": 21968,
-      "css": 7797,
+      "html": 22177,
+      "css": 7859,
       "js": 178815,
       "font": 90096,
-      "total": 298676
+      "total": 298947
     },
     "/ko/live": {
-      "html": 6779,
-      "css": 8416,
+      "html": 6778,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 285475
+      "total": 285536
     },
     "/ko/make": {
-      "html": 7556,
-      "css": 8416,
+      "html": 7555,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 286252
+      "total": 286313
     },
     "/ko/think": {
-      "html": 8302,
-      "css": 8416,
+      "html": 8299,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 286998
+      "total": 287057
     },
     "/ko/trace": {
       "html": 13483,
-      "css": 8416,
+      "css": 8478,
       "js": 180184,
       "font": 90096,
-      "total": 292179
+      "total": 292241
     },
     "/en/live/off-hours": {
-      "html": 7024,
-      "css": 8538,
+      "html": 7022,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284473
+      "total": 284533
     },
     "/en/live/the-long-chore": {
-      "html": 6582,
-      "css": 8538,
+      "html": 6578,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284031
+      "total": 284089
     },
     "/en/live/where-i-live": {
-      "html": 6311,
-      "css": 8538,
+      "html": 6309,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 283760
+      "total": 283820
     },
     "/en/live/who-goldibug-is": {
-      "html": 6661,
-      "css": 8538,
+      "html": 6660,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284110
+      "total": 284171
     },
     "/en/make/crm-tab-browser": {
-      "html": 19925,
-      "css": 8538,
+      "html": 19924,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 297374
+      "total": 297435
     },
     "/en/make/gam-ml-teaching-tool": {
-      "html": 9364,
-      "css": 8538,
+      "html": 9363,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 286813
+      "total": 286874
     },
     "/en/make/personal-interface": {
-      "html": 8314,
-      "css": 8538,
+      "html": 8312,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 285763
+      "total": 285823
     },
     "/en/make/work-calendar": {
-      "html": 18586,
-      "css": 8538,
+      "html": 18584,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 296035
+      "total": 296095
     },
     "/en/think/branch-strategy": {
       "html": 19347,
-      "css": 8538,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 296796
+      "total": 296858
     },
     "/en/think/crm-sidebar-vanished": {
-      "html": 11043,
-      "css": 8538,
+      "html": 11041,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 288492
+      "total": 288552
     },
     "/en/think/gates-that-passed": {
-      "html": 13916,
-      "css": 8538,
+      "html": 13914,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 291365
+      "total": 291425
     },
     "/en/think/personal-llm-wiki": {
-      "html": 15159,
-      "css": 8538,
+      "html": 15157,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 292608
+      "total": 292668
     },
     "/en/think/statistics-notation": {
-      "html": 12177,
-      "css": 8538,
+      "html": 12175,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 289626
+      "total": 289686
     },
     "/en/think/the-guard-that-never-failed": {
-      "html": 7318,
-      "css": 8538,
+      "html": 7316,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284767
+      "total": 284827
     },
     "/en/think/why-contrast-came-first": {
-      "html": 7719,
-      "css": 8538,
+      "html": 7717,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 285168
+      "total": 285228
     },
     "/en/topic/architecture": {
-      "html": 7204,
-      "css": 7797,
+      "html": 7202,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 285281
+      "total": 285341
     },
     "/en/topic/debugging": {
-      "html": 7623,
-      "css": 7797,
+      "html": 7622,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 285700
+      "total": 285761
     },
     "/en/topic/design": {
-      "html": 6685,
-      "css": 7797,
+      "html": 6683,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 284762
+      "total": 284822
     },
     "/en/topic/frontend": {
-      "html": 7694,
-      "css": 7797,
+      "html": 7692,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 285771
+      "total": 285831
     },
     "/en/topic/knowledge": {
-      "html": 6771,
-      "css": 7797,
+      "html": 6769,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 284848
+      "total": 284908
     },
     "/en/topic/life": {
-      "html": 6116,
-      "css": 7797,
+      "html": 6114,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 284193
+      "total": 284253
     },
     "/en/topic/process": {
-      "html": 8925,
-      "css": 7797,
+      "html": 8924,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 287002
+      "total": 287063
     },
     "/en/topic/tooling": {
-      "html": 7594,
-      "css": 7797,
+      "html": 7593,
+      "css": 7859,
       "js": 180184,
       "font": 90096,
-      "total": 285671
+      "total": 285732
     },
     "/en/trace/cascade-layer-inversion": {
-      "html": 7523,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284972
-    },
-    "/en/trace/git-remote-push-mistake": {
-      "html": 6820,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284269
-    },
-    "/en/trace/phase-0-to-1": {
-      "html": 6853,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284302
-    },
-    "/en/trace/typescript-7-rollback": {
-      "html": 6922,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284371
-    },
-    "/ko/live/off-hours": {
-      "html": 7033,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284482
-    },
-    "/ko/live/the-long-chore": {
-      "html": 6651,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284100
-    },
-    "/ko/live/where-i-live": {
-      "html": 6417,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 283866
-    },
-    "/ko/live/who-goldibug-is": {
-      "html": 6714,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284163
-    },
-    "/ko/make/crm-tab-browser": {
-      "html": 19849,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 297298
-    },
-    "/ko/make/gam-ml-teaching-tool": {
-      "html": 9353,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 286802
-    },
-    "/ko/make/personal-interface": {
-      "html": 8288,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 285737
-    },
-    "/ko/make/work-calendar": {
-      "html": 18483,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 295932
-    },
-    "/ko/think/branch-strategy": {
-      "html": 19269,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 296718
-    },
-    "/ko/think/crm-sidebar-vanished": {
-      "html": 11053,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 288502
-    },
-    "/ko/think/gates-that-passed": {
-      "html": 13890,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 291339
-    },
-    "/ko/think/personal-llm-wiki": {
-      "html": 15121,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 292570
-    },
-    "/ko/think/statistics-notation": {
-      "html": 12167,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 289616
-    },
-    "/ko/think/the-guard-that-never-failed": {
-      "html": 7353,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 284802
-    },
-    "/ko/think/why-contrast-came-first": {
-      "html": 7763,
-      "css": 8538,
-      "js": 178815,
-      "font": 90096,
-      "total": 285212
-    },
-    "/ko/topic/architecture": {
-      "html": 7392,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 285469
-    },
-    "/ko/topic/debugging": {
-      "html": 7802,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 285879
-    },
-    "/ko/topic/design": {
-      "html": 6860,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 284937
-    },
-    "/ko/topic/frontend": {
-      "html": 7883,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 285960
-    },
-    "/ko/topic/knowledge": {
-      "html": 7002,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 285079
-    },
-    "/ko/topic/life": {
-      "html": 6261,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 284338
-    },
-    "/ko/topic/process": {
-      "html": 9117,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 287194
-    },
-    "/ko/topic/tooling": {
-      "html": 7795,
-      "css": 7797,
-      "js": 180184,
-      "font": 90096,
-      "total": 285872
-    },
-    "/ko/trace/cascade-layer-inversion": {
-      "html": 7583,
-      "css": 8538,
+      "html": 7521,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
       "total": 285032
     },
-    "/ko/trace/git-remote-push-mistake": {
-      "html": 6917,
-      "css": 8538,
+    "/en/trace/git-remote-push-mistake": {
+      "html": 6818,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284366
+      "total": 284329
+    },
+    "/en/trace/phase-0-to-1": {
+      "html": 6850,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284361
+    },
+    "/en/trace/typescript-7-rollback": {
+      "html": 6919,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284430
+    },
+    "/ko/live/off-hours": {
+      "html": 7030,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284541
+    },
+    "/ko/live/the-long-chore": {
+      "html": 6648,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284159
+    },
+    "/ko/live/where-i-live": {
+      "html": 6416,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 283927
+    },
+    "/ko/live/who-goldibug-is": {
+      "html": 6711,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284222
+    },
+    "/ko/make/crm-tab-browser": {
+      "html": 19846,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 297357
+    },
+    "/ko/make/gam-ml-teaching-tool": {
+      "html": 9352,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 286863
+    },
+    "/ko/make/personal-interface": {
+      "html": 8289,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 285800
+    },
+    "/ko/make/work-calendar": {
+      "html": 18484,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 295995
+    },
+    "/ko/think/branch-strategy": {
+      "html": 19268,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 296779
+    },
+    "/ko/think/crm-sidebar-vanished": {
+      "html": 11051,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 288562
+    },
+    "/ko/think/gates-that-passed": {
+      "html": 13888,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 291399
+    },
+    "/ko/think/personal-llm-wiki": {
+      "html": 15118,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 292629
+    },
+    "/ko/think/statistics-notation": {
+      "html": 12164,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 289675
+    },
+    "/ko/think/the-guard-that-never-failed": {
+      "html": 7350,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284861
+    },
+    "/ko/think/why-contrast-came-first": {
+      "html": 7761,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 285272
+    },
+    "/ko/topic/architecture": {
+      "html": 7391,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 285530
+    },
+    "/ko/topic/debugging": {
+      "html": 7801,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 285940
+    },
+    "/ko/topic/design": {
+      "html": 6858,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 284997
+    },
+    "/ko/topic/frontend": {
+      "html": 7881,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 286020
+    },
+    "/ko/topic/knowledge": {
+      "html": 7000,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 285139
+    },
+    "/ko/topic/life": {
+      "html": 6260,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 284399
+    },
+    "/ko/topic/process": {
+      "html": 9115,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 287254
+    },
+    "/ko/topic/tooling": {
+      "html": 7793,
+      "css": 7859,
+      "js": 180184,
+      "font": 90096,
+      "total": 285932
+    },
+    "/ko/trace/cascade-layer-inversion": {
+      "html": 7580,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 285091
+    },
+    "/ko/trace/git-remote-push-mistake": {
+      "html": 6915,
+      "css": 8600,
+      "js": 178815,
+      "font": 90096,
+      "total": 284426
     },
     "/ko/trace/phase-0-to-1": {
-      "html": 6935,
-      "css": 8538,
+      "html": 6932,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284384
+      "total": 284443
     },
     "/ko/trace/typescript-7-rollback": {
-      "html": 6949,
-      "css": 8538,
+      "html": 6946,
+      "css": 8600,
       "js": 178815,
       "font": 90096,
-      "total": 284398
+      "total": 284457
     }
   }
 }

@@ -118,3 +118,45 @@
   flex-direction: column;
   gap: var(--space-s);
 }
+
+/* --- The headline as a gauge ------------------------------------------- */
+
+/*
+ * "in progress" stops being a slogan and becomes a readout: the accent block
+ * is filled to the same fraction the sigil beside it is — commits earned, of
+ * sixty-four. Two claims about the same thing on one screen became one.
+ *
+ * A HARD colour stop, never a gradient. Every pixel is either accent or
+ * ground, so both halves are pairings the contrast contract already covers:
+ * ink on accent is 5.91:1, ink on paper 18.06:1. A blended edge would put the
+ * text over colours nothing has checked.
+ *
+ * LIGHT TONE ONLY, and that is not a style preference. `--on-accent` is ink in
+ * BOTH tones (styles/tokens.css), so on an ink ground the unfilled part of the
+ * block would be ink text on ink — invisible, which is exactly the bug the
+ * removed `sweep` effect shipped. This class lives in the home page's module
+ * and is used once, inside a `data-tone="light"` hero. It must not travel.
+ *
+ * The number itself is not carried by the fill for a screen reader: the sigil
+ * in the same view states it in words through its aria-label. This is emphasis
+ * on the phrase, not a second copy of the fact.
+ */
+.gauge {
+  background-color: transparent;
+  background-image: linear-gradient(
+    to right,
+    var(--accent) 0 var(--fill, 100%),
+    transparent var(--fill, 100%) 100%
+  );
+  /* The empty remainder needs an edge or the block reads as a broken fill
+     rather than as a container with room left in it. */
+  box-shadow: inset 0 0 0 var(--rule-w) var(--accent);
+}
+
+/* Small and set above the enter link, so the beat reads title → words → mark
+   → way in. Static: see the note in styles/interaction.css about why the two
+   marks that make positional claims do not turn. */
+.chapterMark {
+  inline-size: 3.5rem;
+  color: var(--fg);
+}

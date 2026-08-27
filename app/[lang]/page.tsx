@@ -9,7 +9,9 @@ import { Weight } from '@/components/Weight'
 import { cx } from '@/lib/cx'
 import { isLocale, localePath, t } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
+import { commits, historyForChapter } from '@/lib/git/load'
 import { SECTIONS } from '@/lib/sections'
+import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
 import { site } from '@/lib/site.config'
 import styles from './page.module.css'
 
@@ -33,6 +35,13 @@ export default async function GoldenPath({
   if (!isLocale(lang)) notFound()
   const d = dict(lang)
 
+  /* The headline already said "in progress". The record already knew how far
+     along it is. They were two separate claims on one screen until this made
+     them the same one. */
+  const all = commits()
+  const mark = sigilFrom(all)
+  const fill = Math.round((mark.used / SIGIL_SLOTS) * 1000) / 10
+
   return (
     <>
       <section
@@ -51,7 +60,12 @@ export default async function GoldenPath({
           >
             <DisplayLines lines={['An interface', 'for a life']} />
             <br />
-            <span className="accentBlock markWipe">in progress</span>
+            <span
+              className={cx('accentBlock', 'markWipe', styles.gauge)}
+              style={{ ['--fill' as string]: `${fill}%` }}
+            >
+              in progress
+            </span>
           </h1>
 
           <p className="lead measure balance trail">{d.site.statement}</p>
@@ -107,6 +121,19 @@ export default async function GoldenPath({
 
             <div className={styles.chapterAside}>
               <p className="small muted trail">{d.sections[s.id].blurb}</p>
+              {/* Each beat carries the work that went into it. Four beats
+                  from one template read as four copies of one beat; the marks
+                  are the only thing on this page that differs between them
+                  because of something real. Static, not spinning: the wedge
+                  positions are the claim. */}
+              <Sigil
+                id={`ch-${s.id}`}
+                commits={historyForChapter(s.id)}
+                within={all}
+                label={d.sigil.chapterLabel}
+                className={styles.chapterMark}
+              />
+
               <Link
                 href={localePath(lang, `/${s.id}`)}
                 className={cx('label', 'accentRise', styles.enter)}

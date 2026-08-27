@@ -138,6 +138,18 @@ export function historyFor(chapter: SectionId, slug: string): readonly Commit[] 
   )
 }
 
+/**
+ * Every commit that touched any entry in one chapter, newest first.
+ *
+ * The chapter-level counterpart of historyFor. It exists so each beat on the
+ * golden path can carry its own mark: four beats built from the same template
+ * looked like four copies of one beat, and the thing that actually differs
+ * between them is which work went into them. That is already in the record.
+ */
+export function historyForChapter(chapter: SectionId): readonly Commit[] {
+  return commits().filter((c) => c.entries.some((e) => e.chapter === chapter))
+}
+
 export type RepoStats = {
   readonly count: number
   /** Oldest and newest dates in the record. Empty strings when there is none. */
