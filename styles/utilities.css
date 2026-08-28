@@ -139,13 +139,13 @@
     letter-spacing: var(--beat-track, var(--tr-display));
   }
 
-  /* A mark set at reading scale rather than as a crest. Global because more
-     than one page now wants the same size, and a third copy of three
-     declarations in a third module is how a design system stops being one. */
-  .beatMark {
-    inline-size: clamp(4.5rem, 12vw, 7rem);
-    color: var(--fg);
-  }
+  /* A `.beatMark` utility lived here and could never have worked. Sizing the
+     sigil means overriding `.sigil { inline-size: 100% }` in
+     components/Sigil.module.css, and CSS Modules in this project are
+     deliberately UNLAYERED — an unlayered rule beats every layer, including
+     this one. The mark left on the 404 at full page width until it was
+     measured. Callers size it from an unlayered place: their own module, or
+     an inline style where they have no module. */
 
   /* --- Rules ---------------------------------------------------------- */
 

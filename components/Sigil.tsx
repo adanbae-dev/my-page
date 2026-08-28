@@ -29,6 +29,7 @@ export function Sigil({
   spin = false,
   id = 'sigil',
   className,
+  style,
 }: {
   commits?: readonly Commit[]
   /**
@@ -58,6 +59,8 @@ export function Sigil({
   spin?: boolean
   /** Distinguishes this mark's shape ids from any other mark on the page. */
   id?: string
+  /** For callers with no module of their own — see the note in utilities.css. */
+  style?: React.CSSProperties
   className?: string
 }) {
   const sigil = within ? sigilOf(within, commits) : sigilFrom(commits)
@@ -79,6 +82,7 @@ export function Sigil({
         remaining: sigil.remaining,
       })}
       className={cx(styles.sigil, className)}
+      style={style}
     >
       <defs>
         {sigil.shapes.map((shape) => (
