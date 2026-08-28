@@ -279,3 +279,9 @@
     align-items: flex-start;
   }
 }
+
+/* The beat's SIZE. Its voice comes from `.beat`; only the scale is decided
+   here, because only here is --t-h1 the size that was chosen. */
+.chapterTitle {
+  font-size: calc(var(--t-h1) * var(--beat-scale, 1));
+}

@@ -151,7 +151,7 @@ export default async function EntryPage({
 
           {/* Paired with the same title in the list it was clicked from. */}
           <h1
-            className={cx('h2', styles.title)}
+            className={cx('h2', 'beat', styles.title)}
             lang={LOCALE_META[entry.locale].lang}
             style={{ viewTransitionName: `entry-${entry.chapter}-${entry.slug}` }}
           >

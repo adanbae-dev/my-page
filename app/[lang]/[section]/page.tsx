@@ -154,7 +154,7 @@ export default async function SectionPage({
                 reason the hero types on load. */}
             <h1
               id="chapter-title"
-              className={cx('h1', 'type', 'balance', styles.title)}
+              className={cx('h1', 'type', 'beat', 'balance', styles.title)}
               lang="en"
               >
               <DisplayLines lines={def.titleLines} />
