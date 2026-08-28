@@ -243,20 +243,35 @@ export default async function BuildPage({
    * — allocation is greedy, so every earlier era was either drawn in full or
    * the budget was already exhausted.
    */
-  let spent = 0
-  let shownRows = 0
-  const rendered = groups.map((era) => {
-    const rows: Commit[] = []
-    for (const c of era.commits) {
-      const cost = rowCost(c)
-      /* Always take the first row of the newest era even if one commit is
-         somehow larger than the whole allowance: a record whose first entry is
-         omitted reads as broken rather than as capped. */
-      if (spent + cost > ROW_CHAR_BUDGET && shownRows > 0) break
-      spent += cost
-      shownRows += 1
-      rows.push(c)
-    }
+  /* A pure fold, not a running total.
+     The obvious version accumulates `spent` in a loop inside .map(), and the
+     React Compiler rejects it — "Cannot reassign `spent` after render
+     completes". That is the third time this session it has caught the same
+     shape, so it is worth naming: anything the render reads must be derived,
+     not carried. `stopped` is in the accumulator because the allowance is a
+     BREAK, not a filter; without it a later, cheaper commit would slip in
+     after a costly one had already closed the list. */
+  const fit = groups
+    .flatMap((g) => g.commits)
+    .reduce<{ spent: number; n: number; stopped: boolean }>(
+      (acc, c) => {
+        if (acc.stopped) return acc
+        const cost = rowCost(c)
+        /* The first row is always drawn, even if one commit is larger than the
+           whole allowance: a record whose first entry is missing reads as
+           broken rather than as capped. */
+        if (acc.n > 0 && acc.spent + cost > ROW_CHAR_BUDGET) {
+          return { ...acc, stopped: true }
+        }
+        return { spent: acc.spent + cost, n: acc.n + 1, stopped: false }
+      },
+      { spent: 0, n: 0, stopped: false },
+    )
+  const shownRows = fit.n
+
+  const rendered = groups.map((era, i) => {
+    const before = groups.slice(0, i).reduce((t, e) => t + e.commits.length, 0)
+    const rows = era.commits.slice(0, Math.max(0, shownRows - before))
     return { era, rows, hidden: era.commits.length - rows.length }
   })
   const hiddenTotal = rendered.reduce((sum, g) => sum + g.hidden, 0)
