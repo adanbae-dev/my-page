@@ -25,6 +25,30 @@ tags: [design-system, accessibility, color]
 여기서 흥미로운 일이 일어났다. 액센트는 밝은 바탕에서 3.05:1이라 *면*으로만
 쓸 수 있고, 어두운 바탕에서는 5.91:1이라 *글자*로 쓸 수 있다.
 
+같은 주황인데 바탕에 따라 할 수 있는 일이 다르다는 뜻이다.
+종이 위에서는 **칠할 수만** 있고, 잉크 위에서는 **글자가 될 수도** 있다.
+
+<figure>
+  <svg viewBox="0 0 640 190" role="img"
+       aria-label="같은 액센트 색이 종이 바탕에서는 3.05대 1이라 면으로만 쓸 수 있고, 잉크 바탕에서는 5.91대 1이라 글자로도 쓸 수 있다"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">종이 바탕 · 3.05:1</text>
+    <rect x="0" y="26" width="300" height="90" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <rect x="20" y="50" width="150" height="34" fill="var(--accent)" stroke="none" />
+    <text x="32" y="73" fontSize="15" fill="var(--on-accent)">면은 된다</text>
+    <text x="20" y="106" fontSize="13" fill="var(--accent)" opacity="0.45">글자는 안 된다</text>
+
+    <text x="340" y="14" fontSize="12" fill="currentColor" opacity="0.55">잉크 바탕 · 5.91:1</text>
+    <rect x="340" y="26" width="300" height="90" fill="currentColor" stroke="none" />
+    <text x="360" y="63" fontSize="15" fill="var(--accent)">글자도 된다</text>
+    <rect x="360" y="78" width="120" height="22" fill="var(--accent)" stroke="none" />
+    <text x="370" y="94" fontSize="13" fill="var(--on-accent)">면도 된다</text>
+
+    <text x="0" y="150" fontSize="13" fill="currentColor">색은 하나. 바탕이 뒤집히면 그 색이 할 수 있는 일이 바뀐다.</text>
+    <text x="0" y="172" fontSize="13" fill="currentColor" opacity="0.6">그래서 반전이 리듬이 된다 — 우회한 것이 아니라 제약이 만들어 준 것이다.</text>
+  </svg>
+</figure>
+
 그래서 같은 색이 밝은 쪽에서는 덩어리로, 어두운 쪽에서는 letterform으로
 나타난다. 이건 대비 제약을 우회한 게 아니라, 제약이 반전 리듬을 만들어 준
 것이다.

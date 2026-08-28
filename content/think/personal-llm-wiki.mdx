@@ -14,6 +14,33 @@ tags: [obsidian, knowledge-management, llm]
 **필요할 때만 링크로 딸려 오는 원자 노트**로 나눈다. frontmatter는 그
 노트가 무슨 타입인지 기계에게 알려주는 유일한 자리다.
 
+<figure>
+  <svg viewBox="0 0 640 200" role="img"
+       aria-label="작은 커널은 항상 컨텍스트에 주입되고, 타입별 원자 노트는 링크를 따라 필요할 때만 딸려 온다. 긴 문서 하나를 통째로 넣는 방식과 대비된다"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">사람용 — 긴 문서 하나</text>
+    <rect x="0" y="26" width="240" height="70" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+    <text x="14" y="52" fontSize="13" fill="currentColor" opacity="0.6">훑다가 필요한 데서 멈춘다</text>
+    <text x="14" y="76" fontSize="13" fill="currentColor" opacity="0.6">LLM 은 멈출 줄 모른다</text>
+
+    <text x="330" y="14" fontSize="12" fill="currentColor" opacity="0.55">LLM용 — 커널 + 원자 노트</text>
+    <rect x="330" y="26" width="120" height="34" fill="var(--accent)" stroke="none" />
+    <text x="344" y="48" fontSize="13" fill="var(--on-accent)">커널 (항상)</text>
+
+    <path d="M390 60 L390 78" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L470 78 L470 96" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L330 78 L330 96" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L390 96" stroke="currentColor" strokeWidth="1" fill="none" />
+
+    <rect x="300" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="368" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="436" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="300" y="142" fontSize="12" fill="currentColor" opacity="0.55">링크를 따라 필요할 때만</text>
+
+    <text x="0" y="180" fontSize="13" fill="currentColor">커널은 작게 유지한다. 항상 들어가는 비용이라서다.</text>
+  </svg>
+</figure>
+
 아래는 이 vault를 제로부터 다시 만들 때 이 문서 하나로 재현되도록
 적어 둔 절차다.
 

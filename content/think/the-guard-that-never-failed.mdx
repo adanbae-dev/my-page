@@ -8,9 +8,27 @@ tags: [testing, tooling]
 
 대비 가드를 만들고 바로 통과시켰다. 초록불이 떴다.
 
-그런데 그 초록불은 무엇을 의미하는가? 값이 올바르다는 뜻일 수도 있고,
-**가드가 아무것도 검사하지 않는다는 뜻일 수도 있다.** 통과만으로는 둘을
-구분할 수 없다.
+그런데 초록불 하나로는 두 가지를 구분할 수 없다.
+
+<figure>
+  <svg viewBox="0 0 640 170" role="img"
+       aria-label="가드가 통과했다는 신호 하나에서 값이 올바르다는 뜻과 가드가 아무것도 검사하지 않는다는 뜻 두 갈래가 나오고, 통과만으로는 둘을 구분할 수 없다"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <rect x="0" y="52" width="150" height="34" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="14" y="74" fontSize="14" fill="currentColor">가드 통과</text>
+
+    <path d="M150 62 L250 30" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M150 76 L250 108" stroke="currentColor" strokeWidth="1" fill="none" />
+
+    <rect x="250" y="14" width="300" height="34" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="264" y="36" fontSize="14" fill="currentColor">값이 올바르다</text>
+
+    <rect x="250" y="92" width="300" height="34" fill="var(--accent)" stroke="none" />
+    <text x="264" y="114" fontSize="14" fill="var(--on-accent)">아무것도 검사하지 않는다</text>
+
+    <text x="0" y="158" fontSize="13" fill="currentColor" opacity="0.6">두 갈래가 같은 신호를 낸다. 그래서 매번 일부러 깨뜨려 본다.</text>
+  </svg>
+</figure>
 
 그래서 매번 일부러 깨뜨린다.
 
