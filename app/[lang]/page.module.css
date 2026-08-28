@@ -208,11 +208,6 @@
 
 /* Reads the scale the enclosing section published. The fallback is 1, so a
    title used outside a Section is unchanged rather than mysteriously small. */
-.chapterTitle {
-  font-size: calc(var(--t-h1) * var(--beat-scale, 1));
-  font-variation-settings: 'wdth' var(--beat-width, var(--wd-expanded));
-  letter-spacing: var(--beat-track, var(--tr-display));
-}
 
 /* --- Colophon ---------------------------------------------------------- */
 

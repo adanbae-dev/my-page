@@ -113,6 +113,25 @@
     -webkit-box-decoration-break: clone;
   }
 
+  /*
+   * A heading that speaks in its section's voice.
+   *
+   * OPT-IN, not automatic on every h1 and h2, and the reason matters: density
+   * was authored as a spacing axis (lib/sections.ts), and a chapter page's own
+   * hero carries data-density="calm" because of how it breathes, not because
+   * it should be quiet. Making every heading obey would shrink the loudest
+   * element on those pages by 18% for a reason nobody chose.
+   *
+   * So a beat asks for the voice. The fallbacks reproduce today's --t-h1
+   * exactly where no density is in scope, which means adding this class to a
+   * heading outside a section changes nothing.
+   */
+  .beat {
+    font-size: calc(var(--t-h1) * var(--beat-scale, 1));
+    font-variation-settings: 'wdth' var(--beat-width, var(--wd-expanded));
+    letter-spacing: var(--beat-track, var(--tr-display));
+  }
+
   /* --- Rules ---------------------------------------------------------- */
 
   .rule {

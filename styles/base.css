@@ -4,6 +4,33 @@
    ========================================================================== */
 
 @layer base {
+  /*
+   * The voice of a beat, published by the density attribute itself.
+   *
+   * These lived on components/Section.module.css, keyed to that component's
+   * own class, which made them a fact about one component rather than about
+   * the model. The chapter pages prove the difference: their hero is a
+   * hand-written <section data-density="calm">, not a <Section>, so it carried
+   * the attribute and received none of the tokens. A system that only works
+   * inside one component is not a system.
+   *
+   * Density is a field on lib/sections.ts, so the tokens key off the attribute
+   * and anything carrying it publishes them. Consumers still OPT IN — see the
+   * note on .beat in styles/utilities.css — because density was authored as a
+   * spacing axis and a page hero is not a beat.
+   */
+  [data-density='dense'] {
+    --beat-scale: 1;
+    --beat-width: var(--wd-expanded);
+    --beat-track: var(--tr-display);
+  }
+
+  [data-density='calm'] {
+    --beat-scale: 0.82;
+    --beat-width: 106;
+    --beat-track: -0.022em;
+  }
+
   body {
     background-color: var(--ground);
     color: var(--figure);
