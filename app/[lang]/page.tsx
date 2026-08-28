@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { Section } from '@/components/Section'
@@ -125,13 +124,23 @@ export default async function GoldenPath({
           <div className={cx(styles.chapter, i % 2 === 1 && styles.chapterFlip)}>
             <div>
               <p className={cx('label', styles.chapterQuestion)}>{d.sections[s.id].question}</p>
-              {/* Named so the browser can carry this headline into the depth
-                  route instead of cutting to an unrelated page. */}
-              <ViewTransition name={`chapter-${s.id}`}>
-                <h2 className={cx('h1', 'beat', 'typeScroll', 'balance', styles.chapterTitle)} lang="en">
+                {/* The shared element that carries the headline from the
+                    golden path into the chapter. A plain style property, not
+                    React's <ViewTransition>: react 19.2.8 exports neither
+                    `ViewTransition` nor `unstable_ViewTransition`, so that
+                    wrapper applied no name at all — measured by sampling the
+                    DOM inside document.startViewTransition, where the only
+                    named elements were `root` and `brand`. The transition ran
+                    and cross-faded the whole page instead of morphing the one
+                    thing it was written for. This is the form that already
+                    works here, in Nav.tsx and on the entry titles. */}
+                <h2
+                  className={cx('h1', 'beat', 'typeScroll', 'balance', styles.chapterTitle)}
+                  lang="en"
+                  style={{ viewTransitionName: `chapter-${s.id}` }}
+                >
                   <DisplayLines lines={s.titleLines} />
                 </h2>
-              </ViewTransition>
             </div>
 
             <div className={styles.chapterAside}>

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ViewTransition } from 'react'
 
 import { DisplayLines } from '@/components/DisplayLines'
 import { EntryList } from '@/components/EntryList'
@@ -147,19 +146,21 @@ export default async function SectionPage({
           </p>
 
           {/* Same name as the heading on the golden path, so the browser
-              carries it across the navigation instead of cutting. */}
-          <ViewTransition name={`chapter-${def.id}`}>
-            {/* Time-based, not scroll-driven: this sits in the first
-                viewport, so `view()` never sees an `entry` for it — the same
-                reason the hero types on load. */}
-            <h1
-              id="chapter-title"
-              className={cx('h1', 'type', 'beat', 'balance', styles.title)}
-              lang="en"
-              >
-              <DisplayLines lines={def.titleLines} />
-            </h1>
-          </ViewTransition>
+              carries it across the navigation instead of cutting. A style
+              property rather than React's <ViewTransition> — see the note on
+              the matching heading in app/[lang]/page.tsx.
+
+              Time-based typing, not scroll-driven: this sits in the first
+              viewport, so `view()` never sees an `entry` for it — the same
+              reason the hero types on load. */}
+          <h1
+            id="chapter-title"
+            className={cx('h1', 'type', 'beat', 'balance', styles.title)}
+            lang="en"
+            style={{ viewTransitionName: `chapter-${def.id}` }}
+          >
+            <DisplayLines lines={def.titleLines} />
+          </h1>
 
           <p className="lead measure balance trail">{d.sections[def.id].blurb}</p>
         </div>
