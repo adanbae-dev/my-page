@@ -22,9 +22,25 @@ import type { Commit } from '@/lib/git/schema'
  *               visible as ticks. The hero says "in progress" — this is that
  *               sentence as geometry rather than as a word.
  *   NESTS.      Commit 65 does not double the scale and redraw everything.
- *               It opens a second ring INSIDE the first, which is then
- *               closed for good. Growth moves inward; nothing already drawn
- *               ever moves.
+ *               It opens a second ring INSIDE the first, which is then closed
+ *               for good. Growth moves inward.
+ *
+ *               UNTIL CAPACITY, and the first version of this note left that
+ *               out. It claimed "nothing already drawn ever moves", which is
+ *               false at commit 193: the three rings are full, `per` becomes
+ *               2, and every slot is redrawn from pairs. Run against the real
+ *               code at each boundary:
+ *
+ *                  n=64   rings 1  per 1  used  64   ring 0 closes
+ *                  n=65   rings 2  per 1  used  65   ring 1 opens
+ *                  n=129  rings 3  per 1  used 129   ring 2 opens
+ *                  n=193  rings 2  per 2  used  97   EVERYTHING MOVES
+ *                  n=400  rings 3  per 3  used 134
+ *
+ *               So the mark is stable for 192 commits and then reshapes once
+ *               per doubling. That is a real limit, not a detail, and at this
+ *               repository's pace it is roughly a year away. Writing it down
+ *               beats discovering it the morning the mark changes.
  *
  * Straight lines only, no arc commands. At 5.6° a chord is visually
  * indistinguishable from its arc, the path data is roughly half the size,
