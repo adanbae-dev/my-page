@@ -13,9 +13,197 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-08-27",
-  "head": "41d3b58",
+  "generatedAt": "2026-08-28",
+  "head": "7d374d5",
   "commits": [
+    {
+      "sha": "7d374d5",
+      "date": "2026-08-29",
+      "subject": "Fix: 같은 과장이 페이지에도 있었다",
+      "insertions": 139,
+      "deletions": 139,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "c65573e",
+      "date": "2026-08-28",
+      "subject": "Docs: 인장의 NESTS 주장이 과장이었다 — 경계값을 실제로 돌려봤다",
+      "insertions": 126,
+      "deletions": 110,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "22168fd",
+      "date": "2026-08-28",
+      "subject": "Fix: 챕터 헤드라인 모프가 작동한 적이 없었다",
+      "insertions": 99,
+      "deletions": 89,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a3ff57b",
+      "date": "2026-08-28",
+      "subject": "Feel: 편집 시스템을 사이트 전체로 닫는다",
+      "insertions": 222,
+      "deletions": 209,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "1081283",
+      "date": "2026-08-28",
+      "subject": "Refactor: 목소리 토큰을 컴포넌트가 아니라 속성에 건다",
+      "insertions": 256,
+      "deletions": 241,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "f64fecf",
+      "date": "2026-08-28",
+      "subject": "Perf: /build 를 행 캡으로 고정한다 — 예산을 느슨하게 하는 대신",
+      "insertions": 21,
+      "deletions": 3,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "app"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "1e724ea",
+      "date": "2026-08-28",
+      "subject": "Feel: 밀도가 폭과 트래킹까지 연주한다",
+      "insertions": 25,
+      "deletions": 0,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "app",
+        "components"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "344c425",
+      "date": "2026-08-28",
+      "subject": "Feel: 비트를 하나씩 거울로 뒤집는다",
+      "insertions": 207,
+      "deletions": 174,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a095a9e",
+      "date": "2026-08-28",
+      "subject": "Feel: 홈의 끝에 판권면을 놓는다",
+      "insertions": 355,
+      "deletions": 268,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "6e84b83",
+      "date": "2026-08-28",
+      "subject": "Feel: 밀도가 타이포까지 정한다 — 골든패스에 데크레셴도",
+      "insertions": 229,
+      "deletions": 206,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "components",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "25eb0ec",
+      "date": "2026-08-28",
+      "subject": "Feel: 게이지가 도착하면서 실제로 채워진다",
+      "insertions": 255,
+      "deletions": 210,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "71ae9c0",
+      "date": "2026-08-28",
+      "subject": "Feel: 히어로 문구를 게이지로, 챕터 비트를 서로 다르게",
+      "insertions": 287,
+      "deletions": 204,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "451e057",
+      "date": "2026-08-28",
+      "subject": "Weight: 사이트가 자기 무게를 스스로 말한다",
+      "insertions": 1140,
+      "deletions": 124,
+      "generated": 0,
+      "files": 13,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
     {
       "sha": "41d3b58",
       "date": "2026-08-28",

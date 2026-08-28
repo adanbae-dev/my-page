@@ -139,6 +139,14 @@
     letter-spacing: var(--beat-track, var(--tr-display));
   }
 
+  /* A mark set at reading scale rather than as a crest. Global because more
+     than one page now wants the same size, and a third copy of three
+     declarations in a third module is how a design system stops being one. */
+  .beatMark {
+    inline-size: clamp(4.5rem, 12vw, 7rem);
+    color: var(--fg);
+  }
+
   /* --- Rules ---------------------------------------------------------- */
 
   .rule {

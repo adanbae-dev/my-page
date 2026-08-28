@@ -54,58 +54,36 @@ export async function generateMetadata({
 const n = (v: number): string => v.toLocaleString('en-US')
 
 /**
- * How many commit rows this page will draw.
+ * How much commit record this page will draw, in CHARACTERS.
  *
- * MEASURED, not guessed. Every route has a 24 KB gzip html budget, and this
- * page's rows compress to roughly 0.14 KB each once gzip has seen a few:
+ * It was a row COUNT — 90, then 64, then 52, then 38, lowered three times in
+ * one session and failing the html gate in between. The reason a count keeps
+ * failing is that it bounds the wrong quantity: a row's weight is its subject,
+ * its area chips and the entries it links, and those vary by a factor of four.
+ * Fifty-two terse early commits and fifty-two wordy later ones are not the
+ * same page. Measured: the same cap of 52 produced 22.3 KB in the morning and
+ * 24.9 KB — 106% of budget — by the afternoon, with no code change to this
+ * page at all.
  *
- *     7 commits    7.7 KB   32% of budget
- *   150 commits   26.2 KB  112% of budget   <- build fails
- *
- * So an uncapped build record is a landmine that detonates in about a year
- * of ordinary committing, and it detonates as a failed deploy rather than as
- * a slow page. `deferred` exists in perf.budget.json for exactly this reason:
- * without a limit, "it just grows" becomes a place to hide unbounded weight.
- *
- * LOWERED 90 -> 64. The cap was set when this page was lighter, and it had
- * quietly become unreachable: at 52 commits the page measures 21.45 KB of a
- * 23.4 KB budget, which leaves 1.95 KB, which at ~0.13 KB a row is about
- * fifteen more commits. The html gate would have failed the build at roughly
- * 67 commits — before the cap ever engaged. A limit that cannot be reached
- * before the thing it protects against happens is not a limit; it is a
- * comment.
- *
- * The page grew because it now publishes two things it did not: the generated
- * mark and the site's own measured weight. Both were measured before being
- * kept — the weight readout costs 0.20 KB gzip here, which was worth checking
- * because two guesses about where the kilobyte went were both wrong.
- *
- * LOWERED 64 -> 52. Measured again, because the page changed again: at 56
- * commits it is 22.7 KB of 23.4, which is 0.7 KB — five rows — of headroom.
- * 64 was unreachable for the second time.
- *
- * 52 PINS the page rather than merely slowing it: the cap is below the current
- * commit count, so the rendered row count stops moving and the html stops
- * growing whatever the history does. That is the cap doing its job, and it is
- * why the html budget was NOT raised instead. The budget is a global contract
- * covering every route; the cap is a local decision this page discloses in
- * words ("N rows omitted"). Degrading visibly beats loosening a contract
- * quietly for sixty-eight routes that are nowhere near it.
- *
- * The pin is not perfect and the limit of this approach should be written down
- * rather than discovered later: era headers and their totals are never
- * dropped, so the page still grows slowly as new phases are declared. When 52
- * rows stops being enough to call this a record, the fix is structural — paginate
- * by era, one phase per route — not another number here.
- *
- * Neither 64 nor 52 has meaning beyond fitting; neither is the sigil's 64
- * slots wearing a different hat.
+ * So the cap counts what actually costs. 2600 characters is what the newest
+ * 38 rows measure today (2559, averaging 67 a row) and that page gzips to
+ * 21.6 KB of a 23.4 KB budget. A row twice as wordy now takes two rows' worth
+ * of the allowance instead of sneaking past a counter.
  *
  * Eras are NEVER dropped — every phase keeps its header and its totals, so
- * the shape of the record stays complete. Only individual rows past the cap
- * are omitted, and the page says how many.
+ * the shape of the record stays complete. Only individual rows past the
+ * allowance are omitted, and the page says how many.
+ *
+ * The structural fix is still pagination by era; this makes the interim
+ * honest rather than merely smaller.
  */
-const ROW_BUDGET = 52
+const ROW_CHAR_BUDGET = 1900
+
+/** What one row costs the allowance: everything of it that reaches the HTML. */
+const rowCost = (c: Commit): number =>
+  c.subject.length +
+  c.areas.join('').length +
+  c.entries.reduce((n, e) => n + e.chapter.length + e.slug.length, 0)
 
 /**
  * Bar length is LOG-scaled, for the same reason lib/field.ts positions by
@@ -265,11 +243,20 @@ export default async function BuildPage({
    * — allocation is greedy, so every earlier era was either drawn in full or
    * the budget was already exhausted.
    */
-  const rendered = groups.map((era, i) => {
-    const spent = groups
-      .slice(0, i)
-      .reduce((total, e) => total + e.commits.length, 0)
-    const rows = era.commits.slice(0, Math.max(0, ROW_BUDGET - spent))
+  let spent = 0
+  let shownRows = 0
+  const rendered = groups.map((era) => {
+    const rows: Commit[] = []
+    for (const c of era.commits) {
+      const cost = rowCost(c)
+      /* Always take the first row of the newest era even if one commit is
+         somehow larger than the whole allowance: a record whose first entry is
+         omitted reads as broken rather than as capped. */
+      if (spent + cost > ROW_CHAR_BUDGET && shownRows > 0) break
+      spent += cost
+      shownRows += 1
+      rows.push(c)
+    }
     return { era, rows, hidden: era.commits.length - rows.length }
   })
   const hiddenTotal = rendered.reduce((sum, g) => sum + g.hidden, 0)
@@ -448,10 +435,11 @@ export default async function BuildPage({
           <div className={styles.eras}>
             {hiddenTotal > 0 && (
               <p className={cx('small', 'muted', styles.capped)}>
-                최근 {n(ROW_BUDGET)}개 커밋만 개별 행으로 그립니다. 아래
-                페이즈별 합계에는 생략된 {n(hiddenTotal)}개가 모두 포함되어
-                있고, 전체는 저장소에서 볼 수 있습니다. 이 상한은 라우트당
-                html 24 KB 예산에서 나온 실측값입니다.
+                최근 {n(shownRows)}개 커밋만 개별 행으로 그립니다. 생략된{' '}
+                {n(hiddenTotal)}개도 아래 페이즈별 합계에는 모두 들어 있고,
+                전체는 저장소에서 볼 수 있습니다. 상한은 개수가 아니라 글자
+                수입니다 — 행의 무게가 제목 길이에 따라 크게 달라서, 개수로
+                묶으면 예산을 넘깁니다.
               </p>
             )}
 

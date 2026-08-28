@@ -30,7 +30,32 @@ import styles from './page.module.css'
 
 type Params = { lang: string; section: string }
 
-/** Only the four chapters exist. Anything else is a 404, not a blank page. */
+/*
+ * KNOWN DEFECT, measured and left in place because the fix is structural.
+ *
+ * This used to say "Only the four chapters exist. Anything else is a 404, not
+ * a blank page." It was wrong in the one way that mattered: it IS a blank
+ * page. At /ko/does-not-exist the browser gets Next's own fallback — title
+ * "404: This page could not be found.", no nav, no styles, no way back. The
+ * site's own 404, which has the mark, the four chapters as links and a way
+ * home, has never been shown to anyone.
+ *
+ * Setting this to `true` was tried and does NOT fix it. The route then runs
+ * (dev log: generate-params 2ms, application-code 15ms) and notFound() is
+ * called, and Next still serves its own page: app/[lang]/not-found.tsx does
+ * not catch it. That file's own comment explains why it was written the way
+ * it was — it expects to be reached without params, via next/root-params —
+ * and this tree does not reach it.
+ *
+ * The real fix is a root not-found, which needs a root layout, which this
+ * tree does not have because the html/body layout lives under app/[lang] so
+ * that <html lang> can be correct. scripts/check-release.mjs already records
+ * the same constraint from the other side ("/_not-found is emitted by Next
+ * without a layout"). Untangling that is a routing change, not a flag.
+ *
+ * So `false` stays: with `true` the only difference is that garbage URLs cost
+ * a render before producing the identical blank page.
+ */
 export const dynamicParams = false
 
 export function generateStaticParams(): Params[] {
