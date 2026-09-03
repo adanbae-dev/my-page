@@ -170,6 +170,8 @@ export const en = {
     topicTitles: ' — {list}',
     artDirection:
       'Two grounds and one accent, a machine-checked contrast contract, the type scale, the motion vocabulary, and a mark computed from the commit record.',
+    practice:
+      'Front-end practice split into what is claimed and what can be shown — including the claims this site has not proven yet.',
   },
 
   weight: {
@@ -192,6 +194,112 @@ export const en = {
     head: 'Measured at',
     note:
       'Every figure in this block is computed from the repository. None of it is typed by hand, and a build fails when the gate behind any of these numbers disagrees.',
+  },
+
+  /* THE PRACTICE PAGE. See the note in ko.ts — structure lives in
+     lib/practice.data.ts and only sentences are here. */
+  practice: {
+    heading: 'Practice',
+    lead:
+      'A record of working as a front-end engineer. This page splits it into two axes — what is claimed and what can be shown — so it can print the case a résumé is built to hide.',
+    spanLabel: 'Span with dates',
+    spanValue: '{n} years',
+    undatedNote:
+      'The years before May 2020 are summarised without dates in the source, so one era is shown undated. Every other number on this page is computed from the repository, and one unverifiable figure was not going to be slipped in among them.',
+    orgNote:
+      'No employer is named. Three already-published entries open by promising the reader that the organisation, the hosts and the member data are excluded, and they carry aggregate figures on the strength of that promise — naming a company here would revoke it retroactively. The role and the scope are stated in full.',
+
+    erasHeading: 'Where the years went',
+    scopeLabel: 'Owned',
+    changedLabel: 'What this era changed',
+    evidenceLabel: 'What you can read',
+    present: 'present',
+    undated: 'no recorded start',
+
+    eras: {
+      'platform-lead': {
+        role: 'Frontend part lead',
+        org: 'Proptech · internal platform and customer-facing services',
+        scope:
+          'Built and ran the design system — React components and an icon library as packages, automated publishing to a private registry, foundations and tokens designed together with the design team. Stood up a new service on a monorepo, rebuilt the mobile web, and built an external CRM from scratch. The deployment pipeline was set up in this era too.',
+        changed:
+          'The work moved from getting it right alone to keeping several people from getting it wrong. The habit of writing conventions into a document and pinning them with a gate started here — because things that fail silently kept getting through review.',
+      },
+      'tech-lead': {
+        role: 'Tech lead',
+        org: 'Early-stage startup · mobile app and API',
+        scope:
+          'Owned a React Native app from screen design through store release, and built a React admin and a NestJS REST API alongside it. Designed the OAuth flow and JWT authorisation directly, and ran CI/CD and the servers from the same seat.',
+        changed:
+          'Learned that almost no decision ends at the front end. Only after writing the auth flow through to the server did it become clear what token expiry actually costs the screen.',
+      },
+      'it-team-lead': {
+        role: 'IT team lead',
+        org: 'Logistics B2B2C · warehouse management',
+        scope:
+          'Developed a B2B2C platform while analysing the existing warehouse management system and doing the up-front design for its rebuild. The real deliverable was the handover and the technical write-up at an early stage of the service.',
+        changed:
+          'Eight months, and what was left behind was documents rather than code. It was the first time the deliverable in a role built around handover turned out to be a record someone else could read.',
+      },
+      'early-years': {
+        role: 'Frontend · app development',
+        org: 'Agency and early-stage startups (summarised)',
+        scope:
+          'Built a React Native car-sharing service, and maintained admin tools and services on Vue 2 and Angular. Took over and worked in legacy environments across a number of agency projects.',
+        changed:
+          'Most of it was inherited work. The habit of reading someone else\'s code first was formed here, and it is also why the tool being built now is one that reads other people\'s changes.',
+      },
+    },
+
+    capabilitiesHeading: 'What can be shown',
+    capabilitiesNote:
+      'The number is a count of entries you can open on this site, not a rating. The zeros are not hidden — a zero means the CV asserts it and this site has not proven it yet, which also makes it the list of what to write next.',
+    claimedUnproven: 'on the CV, unproven here',
+    unclaimedProven: 'not on the CV, proven here',
+    evidenceCount: '{n} entries',
+    noEvidence: '0 entries',
+
+    groups: {
+      interface: 'Interface',
+      architecture: 'Architecture',
+      verification: 'Verification',
+      platform: 'Platform',
+      knowledge: 'Knowledge',
+    },
+
+    capabilities: {
+      'react-typescript': 'React · TypeScript · Next.js',
+      'css-systems': 'CSS systems and design tokens',
+      'client-state': 'Client state design',
+      accessibility: 'Accessibility — contrast and target contracts',
+      'app-architecture': 'Application architecture',
+      boundaries: 'Trust boundaries',
+      monorepo: 'Monorepo — pnpm · Turborepo',
+      desktop: 'Electron desktop structure',
+      testing: 'Testing — unit and integration',
+      'build-gates': 'Build gates',
+      measurement: 'Deciding by measurement',
+      diagnostics: 'Diagnostic tooling',
+      'release-process': 'Release and branching strategy',
+      'node-tooling': 'Building Node tooling',
+      'ci-cd': 'CI/CD — Jenkins · ArgoCD',
+      cloud: 'AWS — EC2 · ECR · EKS · S3 · RDS',
+      auth: 'OAuth2 · JWT',
+      'llm-engineering': 'LLM engineering',
+      statistics: 'Statistics and notation',
+      'writing-decisions': 'Writing decisions down',
+    },
+
+    studyHeading: 'Study',
+    study: {
+      'cs-statistics': 'Computer science · data statistics, double major — in progress',
+      'engineering-bs': 'BEng — mechatronics',
+    },
+
+    contactHeading: 'Contact',
+    contactNote:
+      'One channel: GitHub. It is the only identity this site publishes. There is deliberately no phone number, address or email address, and a gate fails the build if any of the three appears on this page.',
+    contactGithub: 'GitHub profile →',
   },
 
   notFound: {

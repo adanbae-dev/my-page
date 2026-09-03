@@ -1,0 +1,285 @@
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so a component's own
+   styles can never be overridden by the global reset or utilities,
+   whatever order the bundler happens to emit the files in. */
+
+/* --- Hero ------------------------------------------------------------ */
+.hero {
+  min-block-size: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--section-y);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  inline-size: 100%;
+}
+
+.heroTitle {
+  margin-block: var(--space-xs) var(--space-s);
+}
+
+.heroFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-m);
+  margin-block-start: var(--space-xl);
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.span {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+}
+
+.span dd {
+  color: var(--fg);
+}
+
+/* Sized here rather than by a utility class. `.sigil` sets
+   `inline-size: 100%` from an unlayered module of its own, so a layered
+   utility could never win against it — the reason .beatMark was deleted. An
+   inline width on the instance can. */
+.mark {
+  inline-size: 6rem;
+  max-inline-size: 30vw;
+}
+
+/* The standing notice idiom, shared with the entry page: an accent rule on
+   the inline start, for a sentence about what the page is NOT telling you. */
+.notice {
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+}
+
+/* --- Beats ----------------------------------------------------------- */
+.beat {
+  padding-block: var(--section-y);
+}
+
+.beatTitle {
+  margin-block: var(--space-s) var(--space-m);
+}
+
+.orgNote {
+  margin-block-end: var(--space-xl);
+}
+
+/* --- Eras ------------------------------------------------------------ */
+.eras {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.era {
+  display: grid;
+  gap: var(--space-s);
+  grid-template-columns: 1fr;
+  padding-block-start: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+@media (min-width: 60rem) {
+  .era {
+    /* The period column is wide enough for `no recorded start — 2020.04`,
+       which is the longest thing that can land in it. Sizing it to a dated
+       range instead would wrap the one row the page is being honest about. */
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+.period {
+  color: var(--muted);
+  margin: 0;
+}
+
+.eraBody > * {
+  margin-block: 0;
+}
+
+.eraRole {
+  margin-block-end: var(--space-3xs);
+}
+
+.eraOrg {
+  color: var(--muted);
+  margin-block-end: var(--space-m);
+}
+
+/* A small caps-style label above each field, so scope and what-changed do
+   not read as one continuous paragraph. */
+.fieldLabel {
+  color: var(--muted);
+  margin-block: var(--space-m) var(--space-2xs);
+}
+
+.eraBody > .fieldLabel:first-of-type {
+  margin-block-start: 0;
+}
+
+.changed {
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+}
+
+/* --- Evidence links -------------------------------------------------- */
+.evidence {
+  list-style: none;
+  padding: 0;
+  margin-block: var(--space-2xs) 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-m);
+}
+
+/* SC 2.5.8 — a link in a wrapped inline list is the easiest place on the
+   site to end up with an 18px tap target. Same treatment as the crumb and
+   provenance links on an entry page. */
+.evidence a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+/* --- Capabilities ---------------------------------------------------- */
+.group {
+  margin-block-start: var(--space-xl);
+}
+
+.groupName {
+  color: var(--muted);
+  padding-block-end: var(--space-2xs);
+  border-block-end: var(--rule-w) solid var(--rule);
+}
+
+.caps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-m);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 48rem) {
+  .caps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-m) var(--space-xl);
+  }
+}
+
+.cap {
+  padding-block: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.capHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-s);
+}
+
+.capName {
+  margin: 0;
+}
+
+.capCount {
+  color: var(--muted);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.capNote {
+  color: var(--muted);
+  margin-block: var(--space-3xs) 0;
+}
+
+/* UNPROVEN — claimed on the CV, nothing here to open.
+   The name is dimmed to the same role secondary text uses, and the count is
+   struck. Deliberately not hidden and not moved to the bottom: the row keeps
+   its place in its group, at the same size as the proven ones, because the
+   page's argument is that the reader gets to see the gap, not that the gap
+   gets tidied away. */
+.capUnproven .capName {
+  color: var(--muted);
+}
+
+.capUnproven .capCount {
+  text-decoration: line-through;
+  text-decoration-thickness: from-font;
+}
+
+.capUnproven .capNote {
+  color: var(--accent-text);
+}
+
+/* SURPLUS — evidenced here, never claimed. The accent marks the border
+   rather than the text, so it reads as a flag on the row instead of
+   competing with the accent-text used for the unproven note. */
+.capSurplus {
+  border-block-start-color: var(--accent);
+  border-block-start-width: 2px;
+}
+
+/* --- Closing --------------------------------------------------------- */
+.closing {
+  padding-block: var(--section-y);
+}
+
+.closingGrid {
+  display: grid;
+  gap: var(--space-xl);
+  grid-template-columns: 1fr;
+  margin-block-start: var(--space-l);
+}
+
+@media (min-width: 48rem) {
+  .closingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2xl);
+  }
+}
+
+.closingHead {
+  color: var(--muted);
+  padding-block-end: var(--space-2xs);
+  border-block-end: var(--rule-w) solid var(--rule);
+  margin-block-end: var(--space-m);
+}
+
+.study {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.study p {
+  margin: 0;
+}
+
+.contactNote {
+  margin-block-start: var(--space-s);
+}
+
+.closing a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}

@@ -180,6 +180,7 @@ export default async function GoldenPath({
           </p>
           <p className="label muted">
             {site.title} · {site.name} ·{' '}
+            <Link href={localePath(lang, '/practice')}>{d.practice.heading}</Link> ·{' '}
             <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link>
           </p>
 

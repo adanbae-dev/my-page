@@ -182,6 +182,8 @@ export const ko = {
     topicTitles: ' — {list}',
     artDirection:
       '이 인터페이스의 아트 디렉션. 두 개의 바탕과 하나의 액센트, 대비 계약, 타입 스케일, 모션 어휘, 그리고 저장소의 커밋 기록에서 계산되는 인장.',
+    practice:
+      '프론트엔드로 일해 온 기록을 주장과 증거 두 축으로 갈라 놓은 페이지. 이력서에 있으나 이 사이트에서 아직 증명하지 못한 것까지 그대로 표시합니다.',
   },
 
   weight: {
@@ -204,6 +206,116 @@ export const ko = {
     head: '기준 커밋',
     note:
       '이 블록의 모든 숫자는 저장소에서 계산됩니다. 손으로 적은 것은 하나도 없고, 각 숫자를 만드는 게이트가 어긋나면 빌드가 실패합니다.',
+  },
+
+  /* THE PRACTICE PAGE.
+     Sentences only. Structure, dates and evidence refs live in
+     lib/practice.data.ts — an era's dates are a fact and its scope is a
+     sentence, so they are stored apart for the same reason a chapter's
+     order and its question are. `pnpm check:practice` fails the build if an
+     id here loses its counterpart there, in either direction. */
+  practice: {
+    heading: '실무',
+    lead:
+      '프론트엔드로 일해 온 기록입니다. 이 쪽은 그것을 주장과 증거 두 축으로 갈라 놓은 페이지입니다 — 이력서가 감추도록 만들어진 쪽을 그대로 보여주려고요.',
+    spanLabel: '날짜가 있는 기간',
+    spanValue: '{n}년',
+    undatedNote:
+      '2020년 5월 이전은 요약해 둔 자료에 날짜가 없어서 시기 하나를 날짜 없이 뒀습니다. 이 페이지의 다른 숫자는 모두 저장소에서 계산되므로, 확인할 수 없는 숫자 하나를 끼워 넣지 않았습니다.',
+    orgNote:
+      '회사 이름은 적지 않았습니다. 이미 공개한 글 세 편이 첫 줄에서 조직·호스트·회원 데이터를 뺀다고 약속한 채로 집계 수치를 싣고 있어서, 여기서 이름을 대면 그 약속이 소급해서 깨집니다. 역할과 책임 범위는 그대로 적었습니다.',
+
+    erasHeading: '지나온 시기',
+    scopeLabel: '맡은 것',
+    changedLabel: '이 시기가 바꾼 것',
+    evidenceLabel: '읽을 수 있는 것',
+    present: '현재',
+    undated: '날짜 미기록',
+
+    eras: {
+      'platform-lead': {
+        role: '프론트엔드 파트장',
+        org: '프롭테크 · 사내 플랫폼과 외부 서비스',
+        scope:
+          '디자인 시스템을 세워 운영했습니다 — React 컴포넌트와 아이콘 라이브러리를 패키지로 만들고 사내 레지스트리 배포를 자동화하고, 디자인 팀과 Foundation·토큰을 함께 설계했습니다. 모노레포로 신규 서비스를 올리고, 모바일 웹을 개편하고, 외부 CRM 을 새로 만들었습니다. 배포 파이프라인도 이 시기에 세웠습니다.',
+        changed:
+          '혼자 맞게 만드는 일에서 여럿이 틀리지 않게 만드는 일로 옮겨 왔습니다. 규약을 문서에 적고 게이트로 묶는 습관이 여기서 생겼습니다 — 조용히 틀리는 것은 리뷰로 막히지 않는다는 걸 반복해서 겪었기 때문입니다.',
+      },
+      'tech-lead': {
+        role: '테크리드',
+        org: '초기 스타트업 · 모바일 앱과 API',
+        scope:
+          'React Native 앱을 화면 설계부터 스토어 배포까지 맡았고, React 어드민과 NestJS REST API 를 함께 개발했습니다. OAuth 인증 흐름과 JWT 인가를 직접 설계했고, CI/CD 와 서버 운영도 이 자리에서 했습니다.',
+        changed:
+          '프런트만으로 끝나는 결정이 거의 없다는 것을 배웠습니다. 인증을 서버까지 직접 짜 본 뒤에야 토큰 만료를 화면에서 어떻게 감당해야 하는지 알게 됐습니다.',
+      },
+      'it-team-lead': {
+        role: 'IT 팀리더',
+        org: '물류 B2B2C · 창고 관리 시스템',
+        scope:
+          'B2B2C 플랫폼을 개발하면서 기존 창고 관리 시스템을 분석하고 리뉴얼 사전 설계를 했습니다. 서비스 초기 단계의 인수인계와 기술 정리가 실제 산출물이었습니다.',
+        changed:
+          '여덟 달 있었고 남긴 것은 코드보다 문서였습니다. 인수인계가 목적인 자리에서는 읽을 수 있는 기록이 산출물이라는 것을 처음 겪었습니다.',
+      },
+      'early-years': {
+        role: '프론트엔드 · 앱 개발',
+        org: 'SI · SM 과 초기 스타트업 (요약)',
+        scope:
+          'React Native 차량 공유 서비스를 만들었고, Vue 2 와 Angular 기반 어드민·서비스를 유지보수했습니다. 다수의 SI/SM 프로젝트에서 레거시 환경을 넘겨받아 다뤘습니다.',
+        changed:
+          '넘겨받는 일이 대부분이었습니다. 남이 쓴 코드를 먼저 읽는 습관이 이때 만들어졌고, 지금 남의 변경을 읽어 주는 도구를 만드는 이유이기도 합니다.',
+      },
+    },
+
+    capabilitiesHeading: '무엇을 증명할 수 있나',
+    capabilitiesNote:
+      '숫자는 등급이 아니라 이 사이트에서 열어 볼 수 있는 글의 개수입니다. 0 은 감추지 않았습니다 — 이력서에는 적혀 있지만 여기서 아직 증명하지 못한 것이라는 뜻이고, 다음에 무엇을 써야 하는지이기도 합니다.',
+    claimedUnproven: '이력서에 있으나 여기서 미증명',
+    unclaimedProven: '이력서에 없으나 여기서 증명됨',
+    evidenceCount: '{n}편',
+    noEvidence: '0편',
+
+    groups: {
+      interface: '인터페이스',
+      architecture: '구조',
+      verification: '검증',
+      platform: '플랫폼',
+      knowledge: '지식',
+    },
+
+    capabilities: {
+      'react-typescript': 'React · TypeScript · Next.js',
+      'css-systems': 'CSS 시스템과 디자인 토큰',
+      'client-state': '클라이언트 상태 설계',
+      accessibility: '접근성 — 대비와 타깃 계약',
+      'app-architecture': '애플리케이션 구조',
+      boundaries: '신뢰 경계 설계',
+      monorepo: '모노레포 — pnpm · Turborepo',
+      desktop: 'Electron 데스크톱 구조',
+      testing: '테스트 — 단위와 통합',
+      'build-gates': '빌드 게이트',
+      measurement: '실측으로 정하기',
+      diagnostics: '진단 도구',
+      'release-process': '릴리스와 브랜치 전략',
+      'node-tooling': 'Node 도구 제작',
+      'ci-cd': 'CI/CD — Jenkins · ArgoCD',
+      cloud: 'AWS — EC2 · ECR · EKS · S3 · RDS',
+      auth: 'OAuth2 · JWT',
+      'llm-engineering': 'LLM 엔지니어링',
+      statistics: '통계와 표기',
+      'writing-decisions': '결정을 글로 남기기',
+    },
+
+    studyHeading: '공부',
+    study: {
+      'cs-statistics': '컴퓨터공학 · 데이터통계학 복수전공 — 재학 중',
+      'engineering-bs': '공학 학사 — 메카트로닉스',
+    },
+
+    contactHeading: '연락',
+    contactNote:
+      '연락 창구는 GitHub 하나입니다. 이 사이트가 공개하는 신원이 그것 하나여서요. 전화번호·주소·이메일은 일부러 없고, 게이트가 그 세 가지가 이 페이지에 들어오면 빌드를 실패시킵니다.',
+    contactGithub: 'GitHub 프로필 →',
   },
 
   notFound: {

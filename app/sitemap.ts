@@ -67,6 +67,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.4,
         alternates: { languages: languages('/build') },
       },
+      /* Higher priority than the other two system pages, and deliberately:
+         this is the one a reader is most likely to have been sent the link
+         to, and the only page answering the "should we work together"
+         question the archive otherwise leaves open. */
+      {
+        url: url(localePath(lang, '/practice')),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+        alternates: { languages: languages('/practice') },
+      },
       {
         url: url(localePath(lang, '/art-direction')),
         changeFrequency: 'yearly' as const,
