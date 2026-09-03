@@ -1,0 +1,149 @@
+---
+title: How to read mathematical statistics notation
+date: 2026-08-27
+summary: Fifty symbols with how to say them out loud. A formula does not fail because the idea is unknown — it fails because the symbols cannot be spoken.
+topics: [knowledge]
+tags: [statistics, notation, greek, reference]
+---
+
+A formula usually does not fail to read because the concept is unknown. It fails because
+**the symbols cannot be said out loud.** Skim `∫₀^∞ e^(tx) λe^(−λx) dx` with your eyes and
+it passes; say "the integral from zero to infinity" and the structure appears.
+
+So the readings came first. **Symbol → how to say it → what it means.**
+
+## 1. Greek letters
+
+| Symbol | Say it as | Meaning |
+|:--:|:--|:--|
+| α | alpha | Significance level, a parameter |
+| β | beta | A parameter, Type II error probability |
+| γ | gamma | Parameter of the gamma distribution |
+| Γ | capital gamma | The gamma function |
+| λ | lambda | Parameter of the exponential and Poisson distributions |
+| μ | mu | Population mean |
+| σ | sigma | Population standard deviation |
+| σ² | sigma squared | Population variance |
+| θ | theta | An unknown parameter |
+| ρ | rho | Population correlation coefficient |
+| π | pi | The circle constant, or a probability |
+| φ | phi | Standard normal density |
+| Φ | capital phi | Standard normal cumulative distribution function |
+| ε | epsilon | Error term, a very small quantity |
+| δ | delta | A small change, an error |
+
+## 2. Random variables and probability
+
+| Symbol | Say it as | Meaning |
+|:--:|:--|:--|
+| X | big X | A random variable |
+| x | little x | The value X actually took |
+| Y | big Y | Another random variable |
+| P(X=x) | the probability that X equals x | Discrete probability |
+| P(A) | the probability of A | Probability that event A occurs |
+| E(X) | the expectation of X | The mean |
+| E[g(X)] | the expectation of g of X | Mean of the function g(X) |
+| Var(X) | the variance of X | How much it varies |
+| Cov(X,Y) | the covariance of X and Y | How far two variables move together |
+| Corr(X,Y) | the correlation of X and Y | Linear relationship between two variables |
+
+## 3. Distributions
+
+| Symbol | Say it as | Meaning |
+|:--:|:--|:--|
+| f(x) | f of x | Probability density or mass function |
+| F(x) | capital F of x | Cumulative distribution function |
+| F_X(x) | capital F sub X of x | The CDF of X |
+| f_X(x) | f sub X of x | The density of X |
+| P(X≤x) | the probability that X is at most x | Definition of the CDF |
+| X ~ N(μ, σ²) | X is distributed normal | Mean μ, variance σ² |
+| X ~ Exp(λ) | X is distributed exponential | Parameter λ |
+| X ~ Bin(n, p) | X is distributed binomial | n trials, success probability p |
+| X ~ Pois(λ) | X is distributed Poisson | Parameter λ |
+| X ~ Beta(α, β) | X is distributed beta | Parameters α, β |
+
+> `~` is read **"is distributed"**. `X ~ N(μ, σ²)` is
+> **"the random variable X is distributed normal with mean μ and variance σ²."**
+
+## 4. Sums, products, integrals, derivatives
+
+| Symbol | Say it as | Meaning |
+|:--:|:--|:--|
+| Σ | sigma | A sum |
+| Σᵢ₌₁ⁿ | the sum from i equals one to n | Add from i=1 to n |
+| ∏ | capital pi | A product |
+| ∫ | integral | Summation over a continuous variable |
+| ∫₋∞^∞ | the integral from minus infinity to infinity | Over the whole range |
+| ∞ | infinity | A value growing without bound |
+| ∂ | partial | Derivative with respect to one of several variables |
+
+## 5. Statistical inference
+
+| Symbol | Say it as | Meaning |
+|:--:|:--|:--|
+| X̄ | X bar | Sample mean |
+| S² | S squared | Sample variance |
+| S | S | Sample standard deviation |
+| θ̂ | theta hat | An estimator or estimate of θ |
+| H₀ | H naught | Null hypothesis |
+| H₁ | H one | Alternative hypothesis |
+| p-value | p value | The p value |
+| α | alpha | Significance level |
+
+## The fifteen learned first
+
+Fifty at once was not the plan. These fifteen keep coming back while reading the rest.
+
+`α` alpha · `β` beta · `λ` lambda · `μ` mu · `σ` sigma · `σ²` sigma squared ·
+`θ` theta · `Γ` the gamma function · `f(x)` density · `F(x)` CDF ·
+`E(X)` expectation · `Var(X)` variance · `Σ` sum · `∫` integral · `∞` infinity
+
+## Three that kept getting confused
+
+**σ and Σ.** In Korean both are said "sigma" and the meanings differ. English keeps them
+slightly apart — *sigma* and *capital sigma* — but the shapes are still the reliable
+difference.
+
+- `σ` standard deviation
+- `Σ` a sum
+
+**Γ and γ**
+
+- `Γ` capital gamma — the gamma function
+- `γ` lowercase gamma — a parameter of the gamma distribution
+
+**X and x.** This one took longest.
+
+- `X` the random variable. Nothing has been fixed yet
+- `x` the value that X was actually observed to take
+
+The difference between upper and lower case carries the difference between *possibility* and *result*.
+
+## A formula actually worked through
+
+The moment generating function of the exponential distribution:
+
+```
+M_X(t) = ∫₀^∞ e^(tx) · λe^(−λx) dx
+```
+
+Said aloud — **"M sub X of t is the integral from zero to infinity of e to the t x times
+lambda e to the minus lambda x, d x."**
+
+Simplified:
+
+```
+M_X(t) = λ / (λ − t),    for t < λ
+```
+
+Said aloud — **"M sub X of t is lambda over lambda minus t, for t less than lambda."**
+
+Once it could be read, the reason for the condition `t < λ` came first.
+The integral has to converge, and that follows the moment the symbols are spoken.
+
+---
+
+> Formulas use Unicode symbols rather than LaTeX. This site has no math renderer, and adding
+> KaTeX would blow the per-route budget on CSS and web fonts alone. And since this piece is
+> about **how to read the symbols**, writing them the same way the tables do is the more
+> consistent choice.

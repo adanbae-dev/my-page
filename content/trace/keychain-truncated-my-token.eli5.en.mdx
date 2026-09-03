@@ -1,0 +1,93 @@
+---
+title: I broke the key while trying to fix it
+summary: The key was stored in a strange form, so I put it back in. The tool cut the key in half, and the original was gone.
+authored: false
+---
+
+The program said "who are you — you cannot come in."
+
+I asked why, and nothing came back. An empty answer.
+
+## The key was stored in a strange shape
+
+Computers have a safe for keeping secrets. I had put the key in there.
+
+When I took it out, the key was **not letters but a pile of numbers.**
+Converting the numbers back to letters one at a time gave me the front of the original key.
+
+The cause was that a **single line break** had gone in with it.
+When that happens, this safe hands back a pile of numbers instead of letters.
+
+## Trying to fix it broke it
+
+I turned the numbers back into letters and put it into the safe again.
+I chose the option **"type it in without showing it on screen."** It seemed safer, after all.
+
+That option **cuts off at 128 characters.**
+
+My key was 192 characters. Sixty-four vanished, and the original was overwritten.
+I had to get a brand new key issued.
+
+<figure>
+  <svg viewBox="0 0 640 150" role="img"
+       aria-label="A 192-character key entered with the hidden prompt is cut at 128 characters and the rest disappears; passing the value directly stores all of it"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="16" fontSize="14" fill="currentColor">Typed in hidden — it gets cut</text>
+    <rect x="0" y="28" width="380" height="30" fill="var(--accent)" stroke="none" />
+    <text x="12" y="49" fontSize="14" fill="var(--on-accent)">only 128 characters go in</text>
+    <rect x="380" y="28" width="190" height="30" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" opacity="0.5" />
+    <text x="392" y="49" fontSize="14" fill="currentColor" opacity="0.5">gone</text>
+
+    <text x="0" y="96" fontSize="14" fill="currentColor">Passing the value directly — all of it</text>
+    <rect x="0" y="108" width="570" height="30" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="12" y="129" fontSize="14" fill="currentColor">all 192 characters go in</text>
+  </svg>
+</figure>
+
+I had written in another document that **"typing it in hidden is safer, so I recommend it."**
+That advice had never checked this 128-character limit.
+
+I chose the safer option, and that option **cut the data without saying a word.**
+
+## The real cause was somewhere else
+
+Thinking about it, breaking the key was the result.
+
+The cause was that **nothing told me why it was failing.**
+Four different things can go wrong, and on screen all four looked like the same
+"who are you — you cannot come in."
+
+- the key does not have enough permission
+- the key was cut off at 128 characters
+- a line break got in and turned it into a pile of numbers
+- the "only look at this room" list is empty
+
+When four things wear the same face, the cause becomes **a guess.**
+And the guess turned fixing into breaking.
+
+## So I built a checker
+
+It recognises all four, and tells me **the exact command to run.**
+
+```
+✖ Key shape: looks like a pile of numbers (386 characters)
+   command to fix it: (copy and paste as is)
+✖ Check: could not get in
+```
+
+When permission is missing, it reads **the list the server already gave** while refusing.
+It does not guess from an empty answer.
+
+And the checker **never prints the key in any form.**
+It does not even include the first few characters — it answers only "yes" or "no."
+A test even confirms no piece of the key leaked into the answer.
+
+## What cannot be fixed
+
+At the moment the key goes into the safe, the value can briefly be seen elsewhere.
+The thing that removes that is exactly **the hidden typing** — which cuts at 128 characters.
+
+My key is longer than that. So I took the briefly-visible route, and wrote that fact down.
+
+**The most dangerous moment is the first time you use a repair procedure. Even more so if
+the procedure overwrites the original.**

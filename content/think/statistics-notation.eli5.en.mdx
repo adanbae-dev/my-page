@@ -1,0 +1,78 @@
+---
+title: Formulas are hard to read because you cannot say the symbols out loud
+summary: I learned statistics symbols together with how to pronounce them. Once I could say them, the shape of the formula appeared first.
+authored: false
+---
+
+A formula is usually hard to read not because you do not know the subject.
+It is because **you cannot say the symbols out loud.**
+
+Skim a row of unfamiliar symbols with your eyes and it just goes past you.
+But once you can **say it** — "add everything from zero to infinity" — you can see how the formula is built.
+
+So I learned **how to say them before what they mean.**
+
+## The fifteen I learned first
+
+I did not try to learn fifty at once. These fifteen keep showing up while reading the rest.
+
+| Symbol | Say it as | What it means |
+|:--:|:--|:--|
+| α | alpha | A value used as a cut-off |
+| β | beta | A value, or the chance of missing something |
+| λ | lambda | A value for how often something happens |
+| μ | mu | The average of everything |
+| σ | sigma | How spread out everything is from the average |
+| σ² | sigma squared | That spread, squared |
+| θ | theta | A value we do not know yet |
+| Γ | capital gamma | The gamma function |
+| f(x) | f of x | The shape of how likely each value is |
+| F(x) | capital F of x | The chance of getting that value or less |
+| E(X) | the expectation of X | The average |
+| Var(X) | the variance of X | How spread out it is |
+| Σ | sigma | Add them all up |
+| ∫ | integral | Add them all up, for values with no gaps |
+| ∞ | infinity | A value that grows without end |
+
+## Three that kept confusing me
+
+**σ and Σ** — the same name, completely different meanings.
+
+- small `σ` is **how spread out** things are
+- big `Σ` means **add them all up**
+
+You cannot tell them apart by sound, so you tell them apart **by size.**
+
+**Γ and γ** — the big one is the gamma function; the small one is a value used in the gamma distribution.
+
+**X and x** — this one took me longest.
+
+- big `X` is **something whose value is not decided yet**
+- small `x` is **the value that X actually turned out to be**
+
+The difference between capital and small carries the difference between "possibility" and "result."
+
+## The squiggle means "is distributed"
+
+`X ~ N(μ, σ²)` is read like this —
+**"X is distributed normal, with average mu and spread sigma squared."**
+
+## A formula I actually read out
+
+```
+M_X(t) = ∫₀^∞ e^(tx) · λe^(−λx) dx
+```
+
+Said out loud —
+**"M sub X of t is the integral from zero to infinity of e to the t x times lambda e to the minus lambda x, d x."**
+
+Simplified, it becomes this.
+
+```
+M_X(t) = λ / (λ − t),    for t < λ
+```
+
+**"M sub X of t is lambda over lambda minus t, for t less than lambda."**
+
+Once I could read it, the reason for the condition `t < λ` came first.
+Adding things up must not run off to infinity — and that follows the moment you say the symbols.

@@ -1,0 +1,56 @@
+---
+title: An ML teaching tool aimed at teachers, not students
+date: 2026-06-25
+summary: A teaching tool that lets you touch gradient descent in real time. The target got re-cut twice — to teachers, not students.
+role: Product · development (solo)
+period: 2026 —
+stack: [Next.js, PWA, React, Flutter (comparison prototype)]
+constraint: It had to open in a classroom from a link alone, with no login and no install. That constraint decided the technology.
+tradeoff: A Flutter prototype was built for comparison and then dropped. It suits native distribution, but a no-install classroom tool would still owe a full rewrite.
+outcome: Two prototypes implementing gradient descent from scratch with no external ML library. Not submitted yet, and the largest gap is not a feature but the classroom script.
+topics: [frontend, knowledge, process]
+tags: [education, visualization, nextjs, prototype]
+---
+
+The PRD went from v0.1 to v0.3 in three revisions, and two of them were not about features.
+They were about **re-cutting the target.** §3 and §4 were rewritten whole.
+
+The first target was "people for whom code is the barrier." That is weak. Bind people by
+motivation and the reason to use the thing becomes "because I'm interested" — and interest
+does not get a tool adopted.
+
+Cut sharply, the answer is this: **a teacher who needs a demonstration in the room, now.**
+Teachers do not pick a tool by feature count. They pick by whether friction and risk go down.
+Students are not the primary user; they are the beneficiary.
+
+Gradient descent, over- and underfitting, the bias-variance tradeoff — the intuitions being
+taught are unchanged. What changed is whose hands they are put into.
+
+## Decided and closed
+
+- Primary user = **teachers**, students are beneficiaries
+- **No login, no install** — running in a classroom from a link alone is the core constraint
+- **A demo/projector mode** is a must-have
+- Student management is deferred to a later phase
+- Monetisation comes last — competition entry and portfolio value come first
+- Technical path: **Next.js + PWA** is more practical for a link-only, no-install classroom tool (Flutter was prototyped for comparison only)
+
+## What exists now
+
+- **The PRD** — vision, personas, differentiation, MVP scope, technical architecture, phases. Three revisions from v0.1 to v0.3, with §3 and §4 heavily rewritten while the target definition was challenged twice.
+- **Two prototypes**, both implementing gradient descent from scratch with no external ML library: real-time visualisation, draggable data points, a loss curve, and a rule-based Korean state explainer.
+  - React/JSX on Next.js
+  - Flutter/Dart, for comparison
+
+## Still under review
+
+Technical depth past the basic visualisation is the condition for competing. Candidates:
+
+- Training a model inside the browser (**TensorFlow.js**)
+- **Misconception diagnosis** from learning logs
+- Replacing the rule-based Korean explainer with dynamic feedback from the **Claude API**
+
+## What it taught
+
+- **The Flutter/Next.js tradeoff is real.** Flutter suits native distribution but needs a full rewrite, and a backend proxy for the API is still owed. For a no-install, open-from-a-link classroom tool, Next.js + PWA was the practical answer.
+- **The most valuable thing missing is not a feature. It is the classroom script.**

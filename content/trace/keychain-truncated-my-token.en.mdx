@@ -1,0 +1,102 @@
+---
+title: Trying to recover the token destroyed it
+date: 2026-09-03
+kind: reconsidered
+summary: The keychain handed back hex, so I decoded it and stored it again. security's interactive prompt truncates at 128 characters, and the original was gone.
+topics: [debugging, tooling, process]
+tags: [keychain, macos, diagnostics]
+---
+
+A 401. The response body was empty, so there was nothing to work from.
+
+Probing the shape of the keychain value, the prefix was `41544`.
+
+```
+41 54 41 54 54  =  A  T  A  T  T
+```
+
+**It was stored as hex.** `security find-generic-password -w` prints hex instead of
+plaintext when the stored value contains a newline.
+
+## The recovery was the destruction
+
+I decoded it and stored it again, using `security`'s interactive prompt.
+
+That prompt **truncates at 128 characters.** A 192-character token became 128, and the
+original was overwritten. It had to be reissued.
+
+Measured afterwards.
+
+| How it was stored | 200 characters in → read back |
+|---|---|
+| `-w` with no value (interactive prompt) | **128 characters** |
+| `-w '<VALUE>'` as an argument | 200 characters |
+
+I had written elsewhere that "the interactive prompt keeps the value out of `argv`, so it is
+safer — recommended." That advice had never checked this limit.
+**The safer option was the one that silently truncated the data.**
+
+## The real cause was the absence of a diagnostic
+
+A configuration error showed up as a plain 401. With an empty response body, the trail led
+to picking apart a hex prefix by hand — and that is where the wrong recovery was attempted.
+
+<figure>
+  <svg viewBox="0 0 640 180" role="img"
+       aria-label="Four different configuration errors all appear as the same 401 response, which forces guessing; a diagnostic separates them and prints the command that fixes each"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">No diagnostic</text>
+    <rect x="0" y="26" width="130" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="43" fontSize="12" fill="currentColor">No scope</text>
+    <rect x="0" y="54" width="130" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="71" fontSize="12" fill="currentColor">Cut at 128</text>
+    <rect x="0" y="82" width="130" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="99" fontSize="12" fill="currentColor">Newline → hex</text>
+    <rect x="0" y="110" width="130" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="127" fontSize="12" fill="currentColor">Empty allowlist</text>
+
+    <path d="M130 38 L196 80" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M130 66 L196 80" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M130 94 L196 80" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M130 122 L196 80" stroke="currentColor" strokeWidth="1" fill="none" />
+
+    <rect x="196" y="66" width="100" height="28" fill="var(--accent)" stroke="none" />
+    <text x="208" y="85" fontSize="13" fill="var(--on-accent)">Just a 401</text>
+
+    <text x="356" y="14" fontSize="12" fill="currentColor" opacity="0.55">bb_doctor</text>
+    <rect x="356" y="26" width="284" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="366" y="43" fontSize="12" fill="currentColor">Token shape: looks hex-encoded (386 chars)</text>
+    <rect x="356" y="54" width="284" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="366" y="71" fontSize="12" fill="currentColor">Auth: 401 — credentials rejected</text>
+    <rect x="356" y="82" width="284" height="24" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="366" y="99" fontSize="12" fill="currentColor">fix: hands you the command to run</text>
+
+    <text x="0" y="164" fontSize="13" fill="currentColor">Four causes wearing one face turns diagnosis into guessing. The guess turned recovery into destruction.</text>
+  </svg>
+</figure>
+
+So `bb_doctor` exists. It detects all four traps encountered — a token with no scope, the
+128-character truncation, hex from a newline, an empty allowlist — and hands back **the
+command to run.**
+
+```
+### hex token → ok=false, 4 problems
+  ✖ Token shape: looks hex-encoded (386 chars)
+     fix: security add-generic-password -U -s bb-api-token -a "$USER" -w '<TOKEN>'
+  ✖ Auth: 401 — credentials rejected
+```
+
+The scope list is pulled from the `granted` array in the response body when `/user` returns
+403. Rather than guessing from an empty body, it reads what the server already said.
+
+The token value is never printed in any form. Not even a prefix — the check is a boolean, and
+a test asserts the response does not contain the string `ATATT` at all.
+
+## What is left
+
+Putting a token into the keychain briefly exposes the value in `argv`. That is unavoidable.
+The interactive prompt removes the exposure but truncates at 128, and this token is over 190
+characters. With no alternative, the exposed path was chosen and the fact written down.
+
+> The most dangerous moment for a recovery procedure is the first time it is used.
+> Especially if the command overwrites the original.
