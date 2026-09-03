@@ -1,0 +1,174 @@
+---
+title: The bugs the gates let through
+date: 2026-08-27
+summary: Six checks all green while the share-card image vanished and the home headline was invisible. The gates were not wrong.
+topics: [debugging, process]
+tags: [testing, gates, ci, ai-agent]
+---
+
+> This piece is **the record of one session worked through with an AI agent (Claude)**.
+> Every commit hash and figure below can be verified in this repository. It is not a
+> human-written retrospective; it is a human write-up of work done together.
+
+This site has six checks. `check:contrast` measures colour contrast, `check:content` watches
+content invariants, `check:layers` confirms cascade order, `check:motion` inspects the gating
+on scroll animations, `check:budget` measures per-route transfer size, and `check:release`
+asks whether the thing is fit to publish.
+
+In one session, multilingual support, SEO structure, topic classification and fourteen
+interaction effects went in.
+**All six were green while three things were broken.**
+
+## 1. The share-card image vanished from every page
+
+After the routes moved under `app/[lang]/` (`7c554fa`), an audit measured it.
+
+```
+og:image    home ✓   chapter ✗   entry ✗   build ✗   art-direction ✗
+```
+
+The cause was two-layered. `app/opengraph-image.tsx` stayed at the root, separated from the
+pages — and the more important half is this: **the OG image is a file convention, and Next
+injects it into the `openGraph` object of that segment; a page that returns its own
+`openGraph` from `generateMetadata` overwrites that object wholesale, image included.**
+
+Only the home page survived, because only the home page takes its metadata from the layout.
+Every other page defines its own title and description, therefore has its own `openGraph`,
+and therefore lost the card.
+
+No error, no warning. Every shared link had no image. Fixed in `010baa4`.
+
+**No gate could have caught this.** `check:release` inspects `<title>`, the meta description
+and the canonical on every page. `og:image` was not on the list. What is not on the list is
+not checked.
+
+## 2. The home headline was invisible
+
+An effect called `sweep` went in — a band of accent colour passing through the display type,
+built with `background-clip: text`. After deploying, word came back that **the title at the
+top of the screen was not showing.**
+
+`background-clip: text` paints the element's **own** background through the shape of its own
+glyphs, and seeing it requires `color: transparent`. But in the same session, to make each
+line arrive on its own beat, `DisplayLines` was changed to wrap every line in a span.
+
+A span **inherits** the transparent colour and **does not inherit** the background —
+background is not an inherited property. With no background to clip, nothing was visible.
+
+Measured before removal:
+
+```
+h1     color rgba(0,0,0,0)   backgroundClip text   backgroundImage present
+spans  color rgba(0,0,0,0)   backgroundImage none
+```
+
+Only `.accentBlock` survived, because it carries its own background and colour. So one of the
+three headline lines remained — the failure was **partially visible**, which is why it took
+longer to notice than a total disappearance would have. Removed in `2361a68`.
+
+**The important part here is that the gates were not wrong.**
+
+`check:motion` passed throughout. The question that gate asks is *"is this scroll-driven rule
+gated appropriately for what it does?"* `sweep` was correctly gated.
+**It does not ask whether the result is visible.**
+
+`check:contrast` parses the palette in `styles/tokens.css`, measures the real contrast, and
+fails when it disagrees with the recorded figures. It does not look at computed text colour.
+A transparent headline is outside its scope.
+
+Both did exactly what they promised.
+
+## 3. Clicking a bar in the graph gave a 404
+
+TRACE's WebGL scene draws one bar per record, and clicking one navigates to that entry.
+`lib/field.ts` was building the address as `/{chapter}/{slug}`.
+
+After the routes moved under `/[lang]`, that address does not exist.
+
+```
+/think/crm-sidebar-vanished       404
+/ko/think/crm-sidebar-vanished    200
+```
+
+**The scene rendered correctly and the data was right.** What broke was the single action a
+visitor takes inside it. Nothing on the page was wrong; only *what happens next* was. So the
+i18n work and the gates all went past it. Fixed in `6ae09ad`, and at the same time `toField`'s
+`locale` became a **required parameter** rather than an option with a default — so the next
+caller cannot omit it and get a plausible wrong answer.
+
+## The gates themselves were giving stale answers
+
+The route move silently broke three gates, and one of them was **actively giving a wrong
+answer.**
+
+| Gate | What broke |
+|---|---|
+| `check:layers` · `check:motion` | Read `app/index.html`, a file that no longer existed |
+| `check:release` (feed) | Looked for one `feed.xml` at the root — there are two, one per locale |
+| `check:release` (images) | Read only the app root and reported `no opengraph-image in the build` — **while every page had one** |
+
+That last row is closest to the point of this piece. The gate was not green; it was **issuing
+a warning, and the warning was not true.** A wrong warning is worse than no warning, because
+the next real warning in that same place gets ignored too.
+
+All three were fixed by replacing a hand-written path with discovery — the same reason
+`check:budget` discovers routes from the build output. A hand-written path eventually goes
+stale.
+
+## The other direction
+
+In the same session the gates caught me three times.
+
+**`check:motion` refused.** Building the typing effect, `animation-timeline: auto` was used to
+neutralise the scroll timeline on `.lineIn`. The gate blocked it: an `animation-timeline`
+mention outside `@supports` in a rule that hides content.
+
+The refusal was right. Outside the rule the exception is invisible. **And the declaration was
+unnecessary in the first place** — the `animation` shorthand already resets
+`animation-timeline`. That was confirmed by measuring in the browser rather than reading the
+spec and moving on. Removed; gate passed; behaviour identical.
+
+**The React Compiler caught two.** Row allocation on the `/build` page and the cumulative
+offsets in `DisplayLines` both reassigned a variable captured during render. Both were
+rewritten as pure functions.
+
+## And I ignored a gate
+
+`759e01b` went up carrying a lint error. `pnpm verify` had already failed and the commit
+happened anyway. The reason is simple: the command that ran that work grepped the verify
+output for a few patterns and then ran `git commit` **regardless of the exit status.** The
+error lines that did not match simply scrolled past.
+
+Fixed in `d4cf6fe`, and after that verify's exit code was checked.
+
+Proceeding as though a gate passed when it failed is worse than having no gate. Without one
+you check by hand; with one you believe you checked.
+
+## What is left
+
+The three bugs were each found differently.
+
+- **The card image** — while building a matrix by page type in order to audit
+- **The headline** — by a person using the site
+- **The bar click** — by a person using the site, clicking
+
+None of the three was caught by a gate, and **none of the three was the kind a gate could
+catch.** A gate answers only the question it asks. `check:motion` asks whether an animation
+is gated, not whether it is visible. `check:release` inspects the tags on its list and not the
+tags off it.
+
+So one line gets added to the principle in this repository's existing THINK entry,
+**a check that never fails is not a check.** That piece says **every guard gets deliberately
+broken.** What this session taught comes after that —
+
+**A guard passing is only the answer to the question that guard asks, and what that question
+is has to be managed from outside the guard.**
+
+The gate checks added in this session were chosen on that basis. Missing `hreflang`
+alternates is a blocker — the moment it went in, `/build` and `/art-direction` were caught.
+An email address in the snapshot is a blocker. A topic with zero entries is a blocker. A
+localhost URL is a blocker, with an exception only **on proof** that `noindex` is present —
+the page's name is not trusted.
+
+All four were negative-tested to confirm they actually fire. A guard confirmed only by
+passing still guarantees nothing.

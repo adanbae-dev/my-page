@@ -1,0 +1,115 @@
+---
+title: Most of the case studies were me
+date: 2026-08-30
+summary: Charlie Munger recommended it, so I finally read it. Checking the principles one by one, I found I was not the one reading the case studies — I was inside them.
+topics: [knowledge, process]
+tags: [reading, psychology, decision-making, bias]
+---
+
+This sentence is already published in this repository.
+
+> The latest in the registry was TypeScript **7.0.2**. Native port, far faster type checking.
+> In it went.
+
+There is no reason behind "in it went." Measured in that same piece, type checking in the
+build took **872ms**. It was not the bottleneck. It did not go in because it was fast; it went
+in because it was newest, and the whole lint pipeline died.
+
+At the time I wrote only that I had been hasty. I did not know the reaction had a name.
+
+## I finally read it
+
+I read *Influence*. It is listed as recommended reading in Charlie Munger's
+*Poor Charlie's Almanack*, so I picked it up.
+
+It is a book that organises, from behavioural experiments, when people skip judgement.
+I found it remarkable the whole way through — and the remarkable part was not the experiments.
+It was that I am one of their samples.
+
+## The six principles
+
+| Principle | When it fires |
+|:--|:--|
+| Reciprocity | Receiving something makes you feel you owe |
+| Consistency | You avoid contradicting what you once said |
+| Social proof | If everyone does it, it must be right |
+| Liking | You inspect the words of people you like less closely |
+| Authority | An expert marker makes you skip the judgement |
+| Scarcity | Something running out looks more valuable |
+
+What kept catching me while reading was not the principles but the cases.
+**I thought I was on the reading side of the case studies. I was inside them.** Most of the time.
+
+The TypeScript item above is authority. I did not judge; I reacted to a marker reading "latest."
+And that is an item I had already written up and published.
+There is no way to count how many went unwritten.
+
+## Knowing does not switch it off
+
+The most uncomfortable passage in the book is this. **Knowing the principle does not stop the
+reaction.** What changes after reading is only that you can name it afterwards.
+
+But this repository had already reached the same conclusion in a different domain.
+
+**A check that never fails is not a check** says that every guard gets deliberately broken.
+**The bugs the gates let through** says this — without a gate you check by hand; with one you
+believe you checked.
+
+Both rest on the same premise. **Do not trust your own judgement in the moment.**
+So machines were put in place instead.
+
+<figure>
+  <svg viewBox="0 0 640 190" role="img"
+       aria-label="Six checkers stand guard over judgements about code, while no device at all has been put in place for judgements a person makes"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">Judgements about code</text>
+    <rect x="0" y="26" width="290" height="86" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <rect x="18" y="46" width="32" height="38" fill="var(--accent)" />
+    <rect x="62" y="46" width="32" height="38" fill="var(--accent)" />
+    <rect x="106" y="46" width="32" height="38" fill="var(--accent)" />
+    <rect x="150" y="46" width="32" height="38" fill="var(--accent)" />
+    <rect x="194" y="46" width="32" height="38" fill="var(--accent)" />
+    <rect x="238" y="46" width="32" height="38" fill="var(--accent)" />
+    <text x="18" y="102" fontSize="12" fill="currentColor" opacity="0.6">six checkers</text>
+
+    <text x="350" y="14" fontSize="12" fill="currentColor" opacity="0.55">Judgements a person makes</text>
+    <rect x="350" y="26" width="290" height="86" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <rect x="368" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <rect x="412" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <rect x="456" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <rect x="500" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <rect x="544" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <rect x="588" y="46" width="32" height="38" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <text x="368" y="102" fontSize="12" fill="currentColor" opacity="0.6">none</text>
+
+    <text x="0" y="142" fontSize="13" fill="currentColor">The same person makes both, and only one side has a device.</text>
+    <text x="0" y="164" fontSize="13" fill="currentColor" opacity="0.6">And the side without one is the harder to undo.</text>
+  </svg>
+</figure>
+
+A checker measures colour contrast. Another measures cascade order, another content rules,
+another per-route transfer size. Six of them stand there, and the build breaks when one disagrees.
+
+For judgements a person makes, there are none.
+
+## I widened one existing rule
+
+No new rule. One existing rule got wider.
+
+From **I cut the list short, judged from it, and pushed to the wrong remote** —
+anything hard to undo gets confirmed from the whole list. No `head`, no `grep`.
+
+That rule was hung on git remotes only. It now covers every decision that is hard to undo.
+**If a decision arrives with a feeling of "this has to be decided now" attached, that is
+scarcity, and that is when the whole list has to be read.**
+
+Whether that is enough, I do not know. A guard has to be deliberately broken to be trusted,
+and I have not yet found how to deliberately break a guard aimed at a person.
+Until then this piece is a memo, not a guard.
+
+---
+
+> The names and definitions of the principles come from the book. The experiments themselves
+> were not re-verified. Every case matched against them above is already published in this
+> repository; none was invented. I understand the count of principles differs between
+> editions, and having been unable to confirm that, I write six.

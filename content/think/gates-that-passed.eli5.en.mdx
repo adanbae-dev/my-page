@@ -1,0 +1,106 @@
+---
+title: Six checkers were all green and three things were broken
+summary: The checkers were not wrong. They answered only the question they ask, and the things that broke were not in that question.
+authored: false
+---
+
+> This piece is **the record of one session worked through with an AI.** Every number below can be verified in this repository.
+
+This site has six automatic checkers.
+They check whether the colours are easy to see, whether the writing rules hold, whether the
+styling order is right, whether the motion is safe, whether a page is too heavy, and whether
+it is fit to publish.
+
+In one session I added support for several languages and several new effects.
+**All six were green while three things were broken.**
+
+## 1. The preview picture for shared links vanished
+
+Paste an address into a messenger and a preview picture appears. It disappeared on every page.
+
+That picture works by **putting a file in a fixed place so it gets attached automatically.**
+But if a page **sets its own title and description**, it overwrites the picture setting too.
+
+Only the first screen survived, because only the first screen does not set its own title.
+
+There was no error and no warning. Every shared link was missing its picture.
+
+**No checker could have caught this.**
+The publishing checker confirms titles and descriptions, but the preview picture was not on
+its list. **What is not on the list is not checked.**
+
+## 2. The big title on the first screen was invisible
+
+I added an effect where a band of orange passes through the letters.
+It works by **making the letters transparent so the background behind them shows through.**
+
+In the same session, to make each line appear on its own beat, I wrapped every line in one more box.
+But that box **inherits the transparent letter colour and does not inherit the background.**
+With no background to show through, nothing was visible.
+
+The important part here is that **the checkers were not wrong.**
+
+The question the motion checker asks is "is this effect safely gated?"
+The effect was correctly gated. **It does not ask whether the result is visible.**
+
+The colour checker is the same. It is a tool that measures the colours on a fixed list;
+letters that became transparent are outside its scope.
+
+Both did exactly what they promised.
+
+## 3. Clicking a bar in the graph led to a missing page
+
+There is a screen that shows records as bars, and clicking a bar should take you to that entry.
+The code that builds the address was building it in the old shape.
+
+**The picture was drawn correctly and the data was right.**
+What broke was the single action a visitor takes inside it.
+Nothing on the page was wrong; only *what happens next* was.
+
+## The checkers themselves were giving stale answers
+
+Changing the address structure quietly broke three checkers,
+and one of them was **actively giving a wrong answer** —
+it reported "there is no preview picture anywhere," when in fact every page had one.
+
+**A wrong warning is worse than no warning.**
+The next real warning in that same place gets ignored too.
+
+All three were fixed by replacing hand-written paths with **finding them directly.**
+A hand-written path eventually goes stale.
+
+## The checkers also caught me
+
+In the same session I was blocked three times, and all three times the checker was right.
+The code it blocked either did not need to exist or needed to be written differently.
+
+## And I ignored a checker
+
+Once, the check had already failed and I shipped anyway.
+
+The command that ran the check skimmed the output for a few words
+and **never looked at whether it succeeded or failed** before moving on.
+The error lines that did not match simply scrolled past.
+
+**Going on as though a checker passed when it failed is worse than having no checker at all.**
+Without one you check by hand; with one you believe you checked.
+
+## What is left
+
+All three problems were found differently.
+
+- **The shared picture** — while building a table to measure things myself
+- **The big title** — by a person using the site
+- **The bar click** — by a person using the site, clicking
+
+None of the three was the kind a checker could catch.
+**A checker answers only the question it asks.**
+
+So I got one more line out of it —
+
+**A checker passing is only the answer to the question that checker asks,
+and what that question is has to be managed from outside the checker.**
+
+Every check added this time was **deliberately broken first**,
+confirmed to actually fire, and only then kept.
+A check confirmed only by passing still guarantees nothing.
