@@ -79,7 +79,11 @@ export type EntryRef = `${SectionId}/${string}`
 
 export type Era = {
   readonly id: string
-  /** `yyyy-mm`. Null only for the summarised early years, which have no recorded start. */
+  /**
+   * `yyyy-mm`. Nullable because an era can arrive before its start month is
+   * confirmed — none currently is, and the page renders the undated case
+   * rather than hiding it, so the type stays open.
+   */
   readonly from: string | null
   /** `yyyy-mm`, or null for the current one. */
   readonly to: string | null
@@ -90,11 +94,18 @@ export type Era = {
 /**
  * Newest first, the way every other list on this site is ordered.
  *
- * `from: null` on the earliest era is not missing data being tolerated. The
- * source it was compiled from summarises those years without dates, and
- * inventing a start month to make the timeline tidy would be the one kind of
- * error this site cannot afford: a number nobody can check, sitting next to
- * numbers that all have gates behind them.
+ * `early-years` carried `from: null` for its first day here. The source this
+ * was compiled from summarises those years without dates, and inventing a
+ * start month to make the timeline tidy would have been the one kind of error
+ * this site cannot afford: a number nobody can check, sitting next to numbers
+ * that all have gates behind them. So it rendered as "no recorded start" and
+ * the page said why.
+ *
+ * The month was then confirmed as 2013-01 and is recorded here — on the era
+ * itself, not as a separate constant. A `PRACTICE_START` export existed for
+ * exactly one commit and was deleted the moment this field could hold the
+ * same fact: two places holding one date is the drift this file's own
+ * doctrine forbids everywhere else.
  */
 export const ERAS: readonly Era[] = [
   {
@@ -123,7 +134,7 @@ export const ERAS: readonly Era[] = [
   },
   {
     id: 'early-years',
-    from: null,
+    from: '2013-01',
     to: '2020-04',
     evidence: [],
   },
@@ -369,24 +380,24 @@ export function allRefs(): readonly EntryRef[] {
 }
 
 /**
- * The span the timeline can actually account for.
+ * The span the timeline accounts for, floored, from the earliest dated era.
  *
- * Named for what it measures, not for what the source CV asserts. That CV
- * says ten years; the years before 2020-05 are summarised there with no
- * dates, so ten is a figure this file cannot derive and will not print. What
- * it can print is the span it holds dates for, labelled as exactly that,
- * with the undated era shown beside it rather than folded into it.
+ * Derived rather than written down, because a hand-written figure starts
+ * being wrong the day after it is written and this is the number a reader is
+ * most likely to check against the timeline directly below it.
  *
- * Set PRACTICE_START to the first job's start month to make the fuller
- * figure derivable. Until someone confirms that month it stays null, because
- * the one number a reader is most likely to check against the timeline
- * directly below it is the worst possible place to guess.
+ * WORTH KNOWING: the source CV describes its author as `10년차` — in their
+ * tenth year. Measured from 2013-01 the span is longer than that. Both can be
+ * true at once, since `N년차` is commonly counted over the relevant
+ * discipline rather than over every year employed, and this function makes no
+ * claim about which years were front-end years. It measures the span, the
+ * label says span, and the eras below it show what filled that span. If the
+ * intent was to publish the narrower figure, the fix is an era boundary here
+ * — not a literal in the dictionary, which no gate could check.
  */
-export const PRACTICE_START: string | null = null
-
 export function datedSpanYears(now = new Date()): number {
   const dated = ERAS.map((e) => e.from).filter((f): f is string => f !== null)
-  const earliest = (PRACTICE_START ? [PRACTICE_START, ...dated] : dated).sort()[0]
+  const earliest = dated.sort()[0]
   if (!earliest) return 0
   const [y, m] = earliest.split('-').map(Number)
   const months = (now.getFullYear() - y!) * 12 + (now.getMonth() + 1 - m!)

@@ -202,7 +202,7 @@ export const en = {
     heading: 'Practice',
     lead:
       'A record of working as a front-end engineer. This page splits it into two axes — what is claimed and what can be shown — so it can print the case a résumé is built to hide.',
-    spanLabel: 'Span with dates',
+    spanLabel: 'In practice',
     spanValue: '{n} years',
     undatedNote:
       'The years before May 2020 are summarised without dates in the source, so one era is shown undated. Every other number on this page is computed from the repository, and one unverifiable figure was not going to be slipped in among them.',
