@@ -1,0 +1,177 @@
+---
+title: Building another tab browser inside a browser
+summary: Agents do not use one screen at a time. That single request decided the whole structure of a 62-page admin screen.
+authored: false
+---
+
+> The company name, server addresses and member information are left out.
+> The structure and the code approach are exactly as they are.
+
+An admin screen the staff use inside the company.
+62 pages, 721 files, about 75,000 lines of code.
+
+## Agents do not use one screen at a time
+
+One request decided what this program is.
+
+**An agent keeps the member list open, checks a contract, and inspects a
+listing in between.**
+
+Not several browser tabs — **the tabs have to be inside the program.**
+And each tab has to **remember its own** search settings and scroll position,
+separately.
+
+That means building another tab browser inside a browser, and it is not simple.
+
+### The screen flickered once on every tab switch
+
+The symptom was "a blank screen flashes past when you switch tabs".
+
+The cause was **the moment the tab's name tag changes and the moment the
+address changes being out of step.**
+
+Click a tab and the name tag changes instantly, but the address changes a
+little later.
+In that one moment, **the screen you are leaving gets rebuilt wearing the name
+tag of the tab you are going to, and then thrown away.**
+
+When it is rebuilt, everything that screen does starts over from the beginning.
+It asks the server for the data again, and what it had just received is
+discarded.
+
+The fix was **holding the name tag back until the address catches up.**
+Three lines of code, and the repeat requests were gone.
+
+If you do not write down the reason for something like this, the next person
+deletes it asking "why is it done this way?".
+
+## What each tab remembers was split into two places
+
+At first all the per-tab state was kept in one place.
+It became clear quickly that two kinds must not be mixed.
+
+- **Things that must survive a refresh** — search settings and the like. These go in the browser's storage.
+- **Things that must disappear on a refresh** — results fetched from the server and the like. These stay in memory only.
+
+Draw the boundary wrong and it **breaks silently.**
+
+Store a server response on the long-lived side, and if you have already moved
+to another tab by the time the response arrives, **the result gets written into
+someone else's tab slot.**
+Another tab's data appears on screen, and it is hard to reproduce.
+
+Then a second trap came from the memory side.
+
+The tool being used **keeps every storage slot it has ever made.**
+Close a tab and the data that tab was looking at stays in memory.
+
+In an ordinary program that is just waste. But **what is held here is members'
+personal information.**
+So there is a separate ledger recording which slots to clear, and closing a tab
+clears them directly.
+
+## Permissions had three axes
+
+It is an admin screen, so permissions are half the screen. And there was not
+one axis.
+
+| Axis | What it decides |
+|---|---|
+| Menu permission | can you read, create, edit, delete and download in this menu |
+| General permission | is a feature that spans several menus allowed |
+| Top administrator | can you get into the management screens |
+
+When the same feature appears under several menus, a menu permission alone
+cannot express it.
+Contract approval is on this screen and on that screen too, and granting it
+per menu creates **an odd state where only one of them is open.**
+
+The places that check permission are split across four spots —
+the door you come in through, whether it shows in the left menu, the buttons
+inside the screen, and whether you are a department head.
+**All four have to read the same rule.** If it is hidden from the menu but
+opens by address, the rule becomes unreadable.
+
+The part that decides whether you may enter was pulled out into **a function
+you can test on its own.**
+Scattered through the screen code, you cannot build a table of the cases and
+run it.
+
+### The defects that kept coming back had one shape
+
+Collecting the permission problems together, they were all variations of one
+thing: **if you cannot get the basis for the decision, let it through.**
+
+- **Cannot get the value, so allow** — with the default set to 'allow', the screen looks fine even when the wiring is missing.
+  So the permission value is **required to be passed.**
+  A default of 'deny' is banned too — a missing one then looks like a legitimate denial, and is found even later.
+- **Locked the door but not the place that writes** — blocking only the button is correct today.
+  The moment another route to the same thing appears, it is open.
+  On one screen, creating checked permission and editing did not.
+- **Cannot get the code, so pass** — when fetching the menu list failed, the check itself was skipped.
+  It now decides by address as well.
+
+And this is nailed to the top of the document:
+**this check exists to make things easy to use, not for security.**
+All of it can be bypassed in the browser, and the real defence is the server.
+Without that one line, a design arrives that mistakes the front-end check for a
+defence line.
+
+## The conventions go in a document
+
+Each program carries a document stating its conventions.
+People and the AI that helps with coding read the same file.
+
+What is written there —
+keep server addresses in one place only, make list screens fetch the same way,
+always check whether a response actually succeeded, fix the skeleton of a list
+screen, and stop windows closing by accident mid-form.
+
+The rule for documenting is one line. **Only what has bitten once gets written
+down.**
+General advice only adds length and does not get read.
+
+## Traps that came only from this program
+
+- **An alert window makes a server request repeat forever.**
+  An alert redraws the whole screen, the redraw sends the query again, and a
+  failure raises another alert. The loop closes.
+- **Raising an alert inside a popup closes the parent popup too.**
+  Trying to report a save failure throws away what the user typed.
+- **Inside a box that scrolls sideways, a fixed header silently stops working.** No error, no warning.
+- **A default set per screen size cannot just be overridden.** The size condition has to be written alongside.
+- **If the inside of a box is set to "fill the width", a width given from outside loses.**
+
+They have something in common. **All of them are silently wrong, with no error.**
+The code compiles and the console is clean.
+So the record of someone who got bitten once is the only defence.
+
+## An honest assessment at this point
+
+**What went well** — the tab system. Especially handling the data left in
+memory as a personal-information question.
+Making the permission decision something you can pull out and test.
+Forcing the permission value to be required.
+Recording traps only after reproducing them.
+
+**What is not done** — when a query fails, it **swallows the failure quietly and
+records "everything loaded".**
+So an outage and a lack of permission look the same on screen, and neither
+recovers before a refresh.
+And some view-only screens have create, edit and delete permissions registered
+beyond what they need.
+
+**If I did it again** — building the tab system first and laying the screens on
+top was the right order.
+Trying to lay it on afterwards would have meant fixing the state management of
+all 41 screens.
+
+Instead, **success / failure / not done yet should have been three branches from
+the start.**
+Store a failure as a success and every decision after it runs on a false premise.
+
+## Three rules to keep
+
+1. **What is silently wrong is stopped only by a record.** What the tools catch is already not the problem.
+2. **Make the permission decision something you can pull out and test.**
+3. **Never store a failure as a success.** Check that it succeeded before writing down "everything loaded".

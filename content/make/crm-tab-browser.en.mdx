@@ -1,0 +1,243 @@
+---
+title: Building a tab browser inside a browser
+date: 2026-08-26
+summary: Agents do not use one screen at a time. That single requirement decided the architecture of a 62-route admin.
+role: Frontend architecture · implementation
+period: 2026.08 —
+stack: [Next.js 15, App Router, Turbopack, TypeScript, Jotai, Radix UI, Tailwind CSS]
+constraint: An agent checks a contract while a member list stays open, and inspects a listing in between. It had to be tabs inside the app rather than browser tabs, and each tab had to remember its own filters and scroll position.
+tradeoff: Gave up the simplicity of holding tab state in one store. Without splitting it into localStorage and memory, an async response lands in another tab's slot the moment it arrives.
+outcome: Three lines of remount key removed the repeat query calls on tab switch, and pulling the access decision out as a pure function made it verifiable with a truth table.
+topics: [architecture, frontend]
+tags: [nextjs, architecture, admin, state-management]
+---
+
+> Organisation identifiers, hosts and accounts, member data and security
+> review results are all excluded. The structure and the code patterns are
+> exactly as they are.
+
+An internal operations admin. Next 15 App Router + Turbopack. 62 routes,
+41 view slices, 721 files, 75,402 lines.
+
+## The operations team does not use one screen at a time
+
+One requirement decided what this app is. **An agent checks a contract while
+the member list stays open, and inspects a listing in between.** Not several
+browser tabs — tabs inside the app. Each tab has to remember its own filters
+and its own scroll position.
+
+That means building a tab browser inside an SPA, and in the App Router this
+is not simple.
+
+This comment in `MainLayout.tsx` holds the whole difficulty.
+
+```tsx
+/**
+ * children remount key — moves to the active tab **only after the route has
+ * actually changed.**
+ *
+ * Why a key is needed: several tabs can be open on the same URL, so the route
+ * alone cannot tell them apart, and without a key two tabs share component
+ * state.
+ *
+ * But using `key={activeTabId}` directly replaces the subtree the **instant**
+ * a tab is clicked, and at that moment children is still the tree of the
+ * screen being LEFT (router.replace commits later, in an effect, inside
+ * startTransition). So the departing screen got mounted once more under the
+ * arriving tab's id and then thrown away — every mount effect re-ran, the
+ * query calls went out again, and because the tab session cache is split per
+ * tab it was always a miss at that moment.
+ */
+const routeSettled = !activeTab || tabBasePath(activeTab.pathname) === tabBasePath(pathname);
+const renderKeyRef = useRef<string | null>(activeTabId);
+if (routeSettled) renderKeyRef.current = activeTabId;
+```
+
+The symptom was "a skeleton flashes once when you switch tabs". The cause was
+**a mismatch between the React key and the router's commit timing.** `key`
+changes immediately; `pathname` changes after the transition. In the frame
+between them, the departing screen remounts wearing the arriving tab's
+identity.
+
+The fix is to hold the key back until the route catches up. Keep the previous
+key in a `useRef` and only update it when `routeSettled`.
+
+**Those three lines removed the repeat API calls.** And without the comment,
+the next person deletes it asking "why a ref?".
+
+## The tab-scoped store had to be two stores
+
+The first version held per-tab state in one place. It became clear quickly
+that two kinds of value must not mix.
+
+```
+tabStates  (localStorage) — values that must survive a refresh, like filters
+tabSession (memory)       — values that must reset on refresh, like query results and open popups
+```
+
+Draw the boundary wrong and it breaks silently. **An API response must not go
+in the localStorage side** — if the active tab has already changed by the time
+the async response arrives, the result is written into a different tab's slot.
+Someone else's tab data appears on screen, and it is hard to reproduce.
+
+The memory side was built with `atomFamily`, and the second trap came from
+there.
+
+```ts
+/** atomFamily param — an object creates a new atom per call through reference equality, so serialise to a string. */
+const paramOf = (tabId: TabId, key: string) => `${tabId}::${key}`;
+
+/**
+ * A ledger of the keys actually used, per tab.
+ *
+ * atomFamily keeps param→atom in an internal Map **permanently**. Without an
+ * explicit `remove()`, contract lists and personal data stay on the heap after
+ * a tab is closed.
+ */
+```
+
+`atomFamily` holds every atom it creates in an internal Map. Close a tab and
+that tab's query results stay in memory. In an ordinary app that is a leak; in
+this one **what is being held is members' personal data.** So there is a
+separate ledger that knows which keys to clear, and closing a tab calls
+`remove()` explicitly.
+
+The ledger is not used in render, so it is not reactive state but a module
+Map. As state, every ledger change would re-render everything.
+
+The tab store is 12 atoms — `tabsAtom`, `activeTabIdAtom`, `tabStatesAtom`,
+and action atoms like `addTab`/`openTab`/`closeTab`/`activateTab`/`reorderTabs`.
+Actions as atoms mean a component never has to know the store's internals.
+
+## Permissions have three axes
+
+This is an admin, so permissions are half the screen. And there was not one
+axis.
+
+| Axis | What it decides | Where it is read |
+|---|---|---|
+| Menu permission | `menu_code` + READ/CREATE/UPDATE/DELETE/EXPORT | `usePermission(code)` |
+| General permission | features spanning several menus (contract actions, etc.) | `useGeneralPermission(code)` |
+| Super admin | entry to the management screens | `useSuperAdminOnly()` |
+
+The general axis exists for a reason. When the same feature is exposed under
+several menus, a menu permission cannot express it. Contract approval appears
+both on the agency screen and on the all-contracts screen. Granting permission
+per menu creates a state where only one of them is open.
+
+The gates are split across four places — route entry, sidebar visibility,
+in-screen CRUD, and the department-head decision. **All four have to read the
+same rule.** If something is hidden from the sidebar but opens by URL, the
+permission model becomes unreadable.
+
+The access decision was pulled out as a pure function.
+
+```ts
+export function decideAccess({ pathname, menuCode, menusEmpty, isSuperAdmin, canAccess }) {
+  if (isAdminPath(pathname) || (menuCode && isAdminMenuCode(menuCode))) {
+    return isSuperAdmin ? 'allow' : 'deny';
+  }
+  if (!menuCode) return menusEmpty ? 'allow' : 'deny-unregistered';
+  return canAccess ? 'allow' : 'deny';
+}
+```
+
+Scattered across JSX branches, it cannot be checked by running it. As a pure
+function you can build a truth table and run it, and delete one condition to
+see which case flips.
+
+### The defects that recurred had one shape
+
+Collecting the permission defects together, they were variations of one thing:
+**if the basis for the decision cannot be obtained, pass.**
+
+- **Cannot get the value, so allow** — `canUpdate?: boolean` with a `= true` default. The compiler cannot catch a caller that omits it. The screen looks correct, so review does not reveal it either. So a permission prop is **required**, whatever it is named. A `= false` default is banned too — missing wiring then looks like a legitimate denial, which is discovered even later
+- **Gated the entry but not the write** — gating only the button that opens the dialog is correct today. The moment a second path to that same state appears, it is open. On one screen the create Enter checked permission and the edit Enter did not
+- **Cannot get the code, so pass** — when the menu-tree query failed the code became `undefined` and the decision was skipped. It now also decides by path
+
+And this is nailed to the top of the document: **these gates are UX, not
+security.** All of them are bypassable in the browser and the real defence is
+the server. Without that one line, a design arrives that mistakes a frontend
+gate for a defence line.
+
+## The conventions go in the app's own document
+
+Every app carries a `CLAUDE.md` stating its conventions. People and coding
+agents read the same file.
+
+What is written there:
+
+- **Single source of truth for endpoints** — `API.<group>.<key>` in `shared/config/endPoints.ts`. 48 groups, 753 lines. Scatter path strings through the screens and a server-side path change cannot be found by grep
+- **Pagination query standard** — `offset / limit / order / sort`. Different per screen means the list hook cannot be shared
+- **Response check** — always call `assertCrmSuccess(res.data)` after a call. There are responses that are HTTP 200 with `success: false`
+- **Card panel + sort select standard** — the container structure of a list screen, fixed at the markup level. It stops 41 slices from each looking slightly different
+- **Dialog standard** — block both outside click and ESC. Closing by accident mid-form throws the input away
+- **Never set the `Content-Type` header for a FormData upload** — the browser has to attach the boundary. Set it yourself and the server cannot parse it
+
+The documentation rule is one line. **Only what has actually bitten once gets
+written down.** General advice only adds length and does not get read.
+
+## Traps that came only from this app
+
+Things that bit twice in the same place while building 41 slices. All
+reproduced and confirmed before being recorded.
+
+**An alert popup re-calls the list API forever.** `alert()` in the shared
+`useConfirm()` changes Provider state and therefore **re-renders every
+consumer.** On a screen that passed an inline object as a prop and put it in an
+effect's dependencies: the query fails → alert → re-render → new object →
+effect re-runs → query fails → alert. The loop closes.
+
+**Raising an alert inside a popup closes the parent popup too.** When two
+copies of the radix layer exist, an alert closing the top layer takes the
+dialog beneath it down as well. Trying to report a save failure throws away
+the form the user typed.
+
+**An `overflow-x-auto` wrapper silently voids `sticky`.** Add a fixed header to
+a wide table that needs horizontal scroll and it does not work. No error, no
+warning.
+
+**A shadcn default class cannot be overridden if it is a responsive variant.**
+When the component default is `md:text-sm`, overriding with `text-[13px]` is
+void above 768px. tailwind-merge does not treat different breakpoints as a
+conflict. `md:text-[13px]` has to be attached alongside.
+
+**A width in `className` loses to an internal `w-full`.** Giving `w-32` to the
+shared select component does nothing. It only holds with `min-w`/`max-w`
+alongside.
+
+They have something in common. **All of them are silently wrong, with no
+error.** It compiles and the console is clean. So the record of someone who
+got bitten is the only defence.
+
+## An honest assessment at this point
+
+**What went well**
+
+- The tab system. The requirement itself was awkward, and the remount key plus two separate stores resolved it. Especially handling the `atomFamily` leak as a personal-data question rather than a memory one
+- Pulling the access decision out as a pure function. A security decision inside a JSX branch cannot be verified
+- Forcing permission props to be required. The compiler catches missing wiring
+- Recording traps only after reproducing them. 41 slices did not repeat the same mistake
+
+**What is not done**
+
+- The FSD layers are only `views`/`entities`/`shared`. There is no `widgets`/`features`. This is a list–detail–dialog admin so it is enough for now, but `views` will bloat as composite UI blocks grow
+- Failure handling in the store is silent. On a failed query the `catch` swallows the error and nails the state to "query complete", so an outage and a lack of permission are indistinguishable on screen and neither recovers before a refresh
+- Some read-only screens have CREATE/UPDATE/DELETE permissions over-registered. The permission-granting screen can hand out features that do not exist
+
+**If I did it again**
+
+The tab system was built first and the screens laid on top, and that order was
+right. Laying it on afterwards would have meant rewriting state management
+across 41 slices.
+
+The other way round, **the store's error state should have had three branches
+from the start.** Starting with two booleans instead of distinguishing
+*success / failure / not yet queried* is the debt that remains. Store a failure
+as a success and every decision after it runs on a false premise.
+
+## Three rules to keep
+
+1. **What is silently wrong is stopped only by a record.** What the compiler and the console catch is already not the problem
+2. **Separate security and permission decisions into something runnable.** Inside JSX, no truth table can be built
+3. **Never store a failure as a success.** Check that it succeeded before nailing `fetched: true`

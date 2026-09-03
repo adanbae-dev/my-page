@@ -1,0 +1,265 @@
+---
+title: There was no need to cut the release branch late
+date: 2026-08-27
+summary: '"It worked in QA but broke on deploy" is not an accident once it repeats. The combination verified is not the combination shipped.'
+topics: [process, tooling]
+tags: [git, branching, release, verification]
+---
+
+"It worked in QA but broke on deploy."
+
+On a team where that sentence repeats, people usually go looking for the
+accident — who left something out, why the tests failed to catch it. But
+depending on the branch layout, this is **the outcome the design schedules.**
+
+<figure>
+  <svg viewBox="0 0 640 210" role="img"
+       aria-label="A, B and C are verified together on the integration branch, but only A and B are reassembled onto the release branch, so the combination that was verified is never the one deployed"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">What gets verified</text>
+    <rect x="0" y="26" width="62" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="0" y="60" width="62" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="0" y="94" width="62" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="26" y="43" fontSize="13" fill="currentColor">A</text>
+    <text x="26" y="77" fontSize="13" fill="currentColor">B</text>
+    <text x="26" y="111" fontSize="13" fill="currentColor">C</text>
+    <path d="M62 39 H150 M62 73 H150 M62 107 H150" stroke="currentColor" strokeWidth="1" opacity="0.5" />
+    <rect x="150" y="26" width="150" height="94" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="164" y="66" fontSize="13" fill="currentColor">Testing</text>
+    <text x="164" y="86" fontSize="13" fill="currentColor">A+B+C</text>
+
+    <text x="380" y="14" fontSize="12" fill="currentColor" opacity="0.55">What gets deployed</text>
+    <rect x="380" y="26" width="62" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="380" y="60" width="62" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="406" y="43" fontSize="13" fill="currentColor">A</text>
+    <text x="406" y="77" fontSize="13" fill="currentColor">B</text>
+    <path d="M442 39 H520 M442 73 H520" stroke="currentColor" strokeWidth="1" opacity="0.5" />
+    <rect x="520" y="26" width="118" height="60" fill="none" stroke="var(--accent)" strokeWidth="2" />
+    <text x="534" y="52" fontSize="13" fill="currentColor">Reassemble</text>
+    <text x="534" y="72" fontSize="13" fill="currentColor">A+B</text>
+
+    <path d="M300 150 H520" stroke="var(--accent)" strokeWidth="2" strokeDasharray="5 5" />
+    <path d="M300 73 V150 M520 86 V150" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <text x="300" y="176" fontSize="12" fill="var(--accent-text)">This combination is never deployed</text>
+    <text x="300" y="196" fontSize="12" fill="currentColor" opacity="0.55">
+      A+B+C was verified, but what ships is A+B
+    </text>
+  </svg>
+</figure>
+
+A, B and C are verified together on the integration branch. Deployment picks A
+and B and reassembles them on the release branch. **A+B+C was verified and is
+not deployed; A+B is deployed and was never verified.**
+
+A large share of defects come not from an individual feature but from the
+combination. Change the combination and the verification result is void along
+with it. So "but it worked in QA" is not a people problem.
+
+## Why lay it out that way
+
+Going from here to "so let us get rid of the release branch" is wrong. That
+layout exists for a reason.
+
+Cut the release branch **as late as possible** and, at the moment you cut it,
+what can actually ship is already settled. You pick only what is going out.
+If one feature drops, you simply do not include it — no git to touch.
+
+In an organisation on a fixed release cadence this is a sound design. It is a
+capability with no reason to give up, and that capability is exactly why the
+layout is used.
+
+So the question is not "is this structure wrong".
+It is **can the verified commit be the deployed commit while keeping the late
+decision?**
+
+## The flexibility did not come from when you cut
+
+I thought cutting late was what let you choose late. I was treating the two as
+one thing.
+
+> **Late binding does not come from "cutting the branch late". It comes from
+> "merging only what is ready".**
+
+It does not. The reason you can still choose is that **you have not merged
+yet.** When you cut is irrelevant.
+
+So the release branch can be created at the start of the sprint and features
+merged into it one at a time as each passes QA. The choice is still made late.
+Exactly one thing changes — **QA happens on the branch that actually ships.**
+The block you verified and the block you deploy become the same block.
+
+That is the route that fixes the structure without losing the capability.
+
+## When a feature drops
+
+**When you create it and what you put in it are separate decisions.** So all
+four of these still work with the release branch created first.
+
+| | Method | Cost | When |
+|:--|:--|:--|:--|
+| ① | **Fill late** — leave it out | git 0 · infra 0 | the default. Always, if it is not merged yet |
+| ② | **Flag** — put it in, switched off | flag infrastructure | when several features share common code |
+| ③ | **Revert** — put it in, take it back | conflicts once entangled | already merged, cancelled just before deploy |
+| ④ | **Next release** | waiting | when the schedule has definitely slipped |
+
+Two combinations are dangerous. For features sharing a common refactor, ③
+reverts the other features too. And in the other direction, **a DB schema
+change cannot be hidden behind ②** — a schema does not sit behind a flag. Either
+leave it out, or ship the schema alone, compatibly, first.
+
+## Revert does not behave the way you think
+
+Before using ③ there was something to check, so I ran it myself in a scratch
+repository. The result was not what I expected.
+
+```
+merge featC → revert → new commit on featC (a different file) → merge again
+
+core.txt   absent
+ui.txt     absent
+memo.txt   present   ← only the new commit made after the revert
+```
+
+**Re-merging a reverted merge does not bring the code back.** git skips commits
+it has already merged. What comes back is only what was created after the
+revert, and with no new commits at all you get `Already up to date.`
+
+The most dangerous part is that **there is no conflict.** It succeeds quietly.
+The owner thinks "but I merged it", and QA tests a feature that is not there.
+
+One more thing came out of this. If the new commit **overwrites the same file
+wholesale, the code sometimes comes back by accident.** Which means the result
+is unpredictable, and that is worse than "it never comes back". Succeed by
+accident once and you learn the rule wrong.
+
+The fix is to revert the revert: `git revert <the revert commit>`.
+Everything was restored exactly, in the experiment.
+
+Two rules to set. A revert used for postponement **records the commit hash** —
+that is not information a person can hold in their head. And when cancellations
+are frequent, do not stack reverts: **reassemble the release.** Past two or
+three reverts the history stops being readable.
+
+## For an external integration, the above only half works
+
+Because the decision is not ours.
+
+The schedule is in someone else's hands. The partner's development, review,
+contract and launch date move independently of our sprint. Without notice. The
+call comes after QA is done and just before deploy. And because it is a
+postponement rather than a cancellation, the code cannot be thrown away either.
+
+**Shortening the release cycle changes none of those three.**
+
+What can be changed is putting deploy and launch on different days. The waiting
+state moves from "unfinished, stuck on a branch" to "in production, switched
+off". A postponement notice then has nothing to roll back. You only push the
+switch-on date.
+
+And **for external integrations specifically, this is nearly free even with no
+flag infrastructure.** An external integration needs configuration anyway — an
+endpoint, an API key, a partner identifier. Write it so that **without the
+configuration the integration path never starts**, and that is the switch.
+
+- No configuration = **inactive**, not an error. But log "integration inactive".
+  Otherwise nobody knows it never came on
+- **Tie the UI visibility to the same switch.** Block only the call and leave the button visible, and to a user it looks broken
+- Switched off, **fall back to the pre-integration behaviour.** The same switch serves during a partner outage
+
+Skip it and this happens. The integration code waits two sprints on a branch
+while `main` moves hundreds of commits ahead. When the partner is finally ready
+and you merge, **you start not with the integration logic but with the conflicts
+piled up since**, and that code is not the code you first QA'd, so QA has to run
+again. **The feature that waited longest ships in the most dangerous state.**
+
+## What the four standards actually agreed on
+
+That was one layout, taken apart. The standards each handle this problem
+differently.
+
+| Strategy | Long-lived | Disposable | Branch lifetime | Deploy point |
+|:--|:--|:--|:--|:--|
+| **Git Flow** (2010) | `main`, `develop` | `release/*` `hotfix/*` `feature/*` | days–weeks | when release stabilisation ends |
+| **GitHub Flow** | `main` | `feature/*` | hours–2 days | the moment it merges to main |
+| **GitLab Flow** | `main`, environment branches | `feature/*` `release/*` | hours–days | when flowing downstream |
+| **Trunk-Based** | `main` | short-lived feature | under a day | continuously (exposure via flags) |
+
+All four share one invariant — **deploy the commit you tested.** What differs is
+only how short the branches are cut and how many long-lived branches there are.
+
+**Git Flow's author annotated his own post in 2020**, saying teams that deploy
+continuously should use a simpler workflow like GitHub Flow, and that it is
+still valid only where explicit versioning is needed or several versions are
+supported at once. A 15-year-old standard whose author narrowed its own scope.
+
+**GitLab's own documentation no longer leads with the name "GitLab Flow".** It
+only advises matching the level you need. The core of that strategy is that
+things flow one way — an environment branch never flows back up.
+
+**Trunk-Based presupposes feature flags.** Do it without flag infrastructure and
+the unfinished work ships as it is.
+
+### Do not mix long-lived and disposable
+
+There is one more shared premise. Even the original Git Flow post calls only
+`master` and `develop` main branches, and marks `release`/`hotfix`/`feature` as
+*"supporting branches — branches with a limited life time, that will be removed
+eventually"*.
+
+| | Long-lived branch | Disposable branch |
+|:--|:--|:--|
+| e.g. | `main`, `develop` | `feature/*`, `release/*`, `hotfix/*` |
+| Lifetime | as long as the repository exists | its reason to exist ends the moment it merges |
+| Rule | one role each | delete it once merged |
+
+Blur that distinction and the branch list loses its signal. You can no longer
+tell by eye what is alive, and you commit to a dead branch by mistake.
+
+## Structure and procedure have to be told apart
+
+They cost completely different amounts to fix.
+
+| | Risk | How to tell |
+|:--|:--|:--|
+| **Structure** | if the verification point and the deploy point differ, QA results do not transfer | it only goes away by changing the branch layout |
+| **Structure** | a long-lived branch that only flows one way cannot be a terminus of trust | **is there an arrow leaving this branch** |
+| Procedure | a rollback procedure without tags is not a procedure | can you point at the last deploy with a single tag |
+| Procedure | cutting a branch off an old base accumulates conflicts | a conflict-specific rule appeared = conflicts have become routine |
+| Procedure | not deleting disposable branches costs the list its signal | auto-delete on merge |
+| Procedure | a branch named in the docs that does not exist discredits every rule | the long-lived branch list lives in exactly one document |
+
+The test on the second row turned out to be especially useful. **A branch with
+no outgoing arrow is not a main line, it is a puddle.** A long-lived branch with
+only incoming arrows drifts further from what actually deploys as time passes,
+and verification on a branch unrelated to deployment is no grounds for
+deploying.
+
+## Do the procedure first
+
+The procedure side can be done today without touching code.
+
+- **Tag automatically** on every deploy, with a prefix distinct from package tags
+  (`deploy/<date>-<n>`)
+- **Practise a rollback once, in calm conditions.** A procedure that exists only in a document gets run for the first time during an incident
+- Turn on **auto-delete** of merged branches
+- Write the long-lived branch list in **exactly one document**
+
+Structure comes after, and the smallest change is **creating the release branch
+first and running QA there.** Merge only what is ready and the late decision
+survives, while the commit you tested becomes the commit you deployed.
+
+Whichever you pick, **write the branch-lifetime target as a number.** "Short" is
+not a target.
+
+---
+
+> The four standards were checked against their official documentation. The
+> frequently quoted DORA deployment-frequency figures are second-hand citations
+> and I could not verify the original report, so they are left out. Only the
+> revert behaviour was reproduced directly, in a scratch repository.
+>
+> The diagram is inline SVG. mermaid bundles d3 and dagre and exceeds 500KB
+> gzipped; even the lightweight alternatives are around 30KB, which does not fit
+> the per-route budget. Hand-written SVG is a few hundred bytes, and because it
+> uses `currentColor` and `var(--accent)` it follows this site's inversion
+> automatically.

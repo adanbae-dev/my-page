@@ -1,0 +1,143 @@
+---
+title: Seven people's deploy schedule on one screen
+summary: I measured the real data before building, and what I thought was a task manager turned out to be a deploy manager.
+authored: false
+---
+
+> Company and colleague names, internal addresses and anything key-like are all removed or
+> replaced with pseudonyms. But **the numbers the decisions rested on stay as they are** —
+> without them there is no way to know why anything was built the way it was.
+
+A tool for seeing seven teammates' **tasks and deploy schedule** on one screen. It runs on my Mac.
+"Deploy" means putting what you built onto the real service.
+
+- Built with only the basic tools, nothing borrowed from outside
+- The data is one file inside my Mac. Anyone connecting from far away can only look
+- Every change is recorded, and can be undone in batches
+
+## Two principles that kept paying off
+
+1. **Measure the real data before building.** Do not attach features by feel.
+2. **Confirm on screen.** Several times the code was right and the screen was wrong.
+
+## Measured, and it was a different tool
+
+I counted the real data. **18 deploys, 11 tasks.**
+I thought it was a task manager, and **it was actually a deploy manager.**
+
+But the signals needed to judge a deploy were missing.
+
+| What I found | What I added |
+|---|---|
+| A deploy **27 days unfinished** with no marker on screen | A `N days late` marker, at the top |
+| A day with **7 deploys** stacked on it, invisible in the calendar | `deploys N` beside the date, emphasised past three |
+| No way to see how much of a linked worksheet was done | A `2/5` progress figure |
+
+At first I searched for lateness only in the current month,
+and **found it disappearing when the month changed, by looking at a screenshot.**
+A warning that vanishes when last month scrolls away means nothing.
+
+Progress needed care too. With no linked worksheet, drawing `0/0` as 0%
+becomes a false signal reading "not even started." So it draws nothing.
+
+## Trying to open it up from outside, I found a hole
+
+Trying to attach a path so I could see it from outside the house,
+I found **a hole that collapses the permission check.**
+
+- It was judging "is this me or someone else" from the connecting address alone.
+  But when a request comes through a path, **they all look like the same machine's address.**
+  Everyone from outside becomes "me": edit and delete, of course,
+  and even **downloading the whole dataset.** The look-only marker does not even appear.
+  → **I cut a separate door entirely.** Requests arriving by that door are treated as outsiders regardless of address.
+  The server itself applies the marker, so it cannot be forged.
+- **Another website could send commands to my tool.**
+  Leave any site open and that page could quietly send requests.
+  → Blocked three ways.
+- The settings file holding a key **could be read by another account on the same computer.** → Narrowed the permission.
+
+## Having no backup was the biggest risk
+
+The data itself was 270 KB, and **the part not yet merged into it was 4.1 MB.**
+Copy only the main file and **the recent data goes missing wholesale.**
+
+- It now makes one complete copy with both parts merged
+- After making it, **it opens that copy and counts the rows** — a backup that will not open is not a backup
+- It runs automatically at 9 a.m. every day. If the server dies it restarts itself
+- **The key does not go in the auto-start settings file.** Other accounts can read that file
+
+## A green test that was checking nothing
+
+I corrected two checks.
+
+One was **my own expected value being wrong** — I had left out a substitute holiday.
+
+The other had a symbol in the test code **misread as a plain character, so the value always came out as 1.**
+Fixing it revealed the true value —
+**a check that had been convincingly green was confirming nothing.**
+
+## The screen was fixed by measuring, not by feel
+
+**Colour was not the problem.** Body text and secondary text both passed.
+The problem was space.
+
+| Item | Before | After |
+|---|---|---|
+| Calendar | 1114px of content in 470px of space (over half cut off) | Nothing cut off |
+| Area above the calendar | 34% of the screen | Halved |
+| Top bar | 162px · two rows · 23 buttons | **97px · one row** |
+| Height per week | 90–316px, uneven | Uniform |
+| Very small text | 50 instances | 1 |
+
+**It was a screen you open to see the month, on which you could not see the month.**
+
+Six weeks now divide the height equally,
+and an overflowing week folds into `+N more`, expanding on click.
+
+Along the way **I realised I had not looked at the light theme once all day.**
+Checking it, the secondary text was only scraping through, so I made it darker.
+
+## If it cannot be undone, people will not touch it
+
+Of 18 deploys only **3** had a worksheet linked, while **46** worksheets were unlinked.
+Build the progress figure and it is a blank screen with no links.
+
+I found one of the reasons. **There was no way to unlink.**
+Link the wrong one and there was no option but editing the data by hand.
+**When something cannot be undone, people hesitate to do it.**
+
+I built unlinking, and made linking work right inside the item's own view.
+Candidates now show **that item's owner's worksheets first.**
+
+Linking and unlinking are recorded, but **they are not undoable** —
+undoing would not change the link on the real worksheet side,
+so pretending it can be undone would be a lie.
+
+## Nothing gets drawn on days off
+
+The rule of drawing nothing on weekends and public holidays was extended **to leave as well.**
+Writing "on leave" on a day off tells nobody anything.
+
+But leave containing no working day at all — a single Saturday, say — is still drawn,
+because hiding it makes it data nobody can touch.
+
+## How I decided to reach it from outside
+
+No login built inside this tool.
+A user list, staying signed in, storing passwords and limiting attempts all follow,
+and the current permission structure would have to be replaced wholesale.
+
+**Login goes to the path in front, and the tool itself stays simple.**
+
+- If only my own devices will see it — a service that connects devices directly
+- If teammates will see it too — a path service with login layered on top
+- **Opening a port on the router is not an option** — this tool has no login at all
+
+And **the real bottleneck for "manage it while away" is not login. It is the computer being on.**
+Carry the laptop out and no path helps.
+
+## Where it stands
+
+- **153** unit checks and **18** screen checks, all passing
+- The server is always on, and backs up at 9 a.m. every day
+- **Highest-value next step**: linking worksheets to the remaining deploy items

@@ -1,0 +1,109 @@
+---
+title: Building a personal wiki an AI reads first
+summary: Notes written to be easy for a person are hard for an AI. Written for the AI, both can read them. The difference, and the order to build it in.
+authored: false
+---
+
+If you write notes only to be easy for a person, an AI reads them badly.
+Write them for the AI instead, and both can read them.
+
+The difference is one thing.
+
+A person can skim a long document and stop where they need to.
+An AI knows **only what you handed it all at once.** It cannot skim and stop.
+
+So you split them up.
+
+- **A small bundle you always hand over** — a few pages: who I am, what I am doing now
+- **Loose single notes that come along by link only when needed** — everything else
+
+And at the top of each note you put **a box saying what kind of note it is.**
+That is the only place a machine can find out.
+
+## What you need
+
+| Tool | What it is for |
+|---|---|
+| Obsidian | the notes app. The files stay on your own computer |
+| Claude | the AI that reads and writes the notes |
+| git | saves things so you can undo |
+| iCloud | seeing the same notes on a phone or tablet |
+
+## Folders go by 'kind', not by 'topic'
+
+You do not make folders for topics like work, study or reading.
+One note often belongs to several topics at once.
+
+You make folders for **the kind of note** instead.
+
+| Folder | What goes in |
+|---|---|
+| Core | the few pages always handed to the AI |
+| Identity | things about me |
+| Work | projects I am doing |
+| History | things that happened |
+| People | people I know |
+| Environment | organisations and places |
+| Thinking | principles and views |
+| Assets | what I own |
+| Knowledge | things I read and wrote up |
+| Inbox | notes not sorted yet |
+
+Topics cut across the folders using **tags and guide notes** instead of folders.
+
+## What goes at the top of a note
+
+Every note gets this information at the top —
+kind, other names, tags, date made, date changed, status.
+
+Status has three steps. **Seed → growing → settled.**
+Every time you change a note, you update the "date changed".
+
+The body is written in Korean; tags and folder names are in English.
+
+## The four pages you always hand over
+
+| Note | Role |
+|---|---|
+| Index | the map of everything |
+| Me | "the one page you paste into any AI" |
+| Now | what I am focused on lately (changed often) |
+| Principles | the core principles |
+
+The AI reads **these four first**, then reads only the notes related to the
+question. It does not read everything. That is the whole point.
+
+## How to write and keep them
+
+1. **One idea per note.** Split it when it gets long.
+2. **Link.** A new note gets links to the existing notes it relates to.
+3. **Write fast, move later.** An urgent note goes in the Inbox folder, then moves where it belongs once it settles.
+4. **Update the date every time you change it.**
+
+## You write the AI its reading rules
+
+You put a file called `CLAUDE.md` at the top of the notes and write the rules in it.
+
+- When asked "about me", treat **these notes as the first source**
+- Read **the four core pages first** before answering
+- Notes marked private **do not go into anything that leaves**
+
+## Things to watch out for
+
+- Turning on the AI connection means **the whole set of notes is visible.** Private notes included.
+- iCloud is sync, not backup. **What you delete gets deleted everywhere too.**
+  Getting it back needs the git copy.
+- The git copy **does not go on the internet.** That is what keeps the private notes from leaving.
+
+## The order, start to finish
+
+- [ ] Install the notes app, make the notes folder
+- [ ] Make the folders by kind, and the templates
+- [ ] Write the four core pages — Index / Me / Now / Principles
+- [ ] Set up the topic tags and guide notes
+- [ ] Install the automatic-list plugin
+- [ ] Write the file with the AI's reading rules
+- [ ] Connect the AI
+- [ ] Sync with your other devices
+- [ ] git backup (not on the internet)
+- [ ] Check the private rules

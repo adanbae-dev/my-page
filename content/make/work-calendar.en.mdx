@@ -1,0 +1,171 @@
+---
+title: Seven people's deploy schedule on one screen
+date: 2026-08-26
+summary: Measuring the real data before building showed that what I thought was a task manager was actually a deploy manager.
+role: Product · development · operations (solo)
+period: 2026.08 —
+stack: [Node 24, node:sqlite, launchd, Playwright, static files]
+constraint: Zero dependencies, no build step. The data is one SQLite file on a Mac, and every change had to land in an append-only history that can be undone in batches.
+tradeoff: No login was built into the app. A user table, sessions, hashing and attempt limits all follow, and the permission model would have to be replaced wholesale. Authentication was left to the front layer and the app stayed simple.
+outcome: A measurement of 18 deploys against 11 tasks inverted the feature priorities. A deploy 27 days overdue turned out to carry no marker on screen at all, so a lateness signal was added.
+topics: [architecture, debugging, tooling]
+tags: [nodejs, sqlite, tooling, measurement]
+---
+
+> **Conventions for this note**
+> Company, service and colleague names, internal Slack/Jira addresses, tokens and internal IPs
+> are **all excluded or replaced with pseudonyms**. Team members appear as `member A–G`, the
+> Jira project as `PROJ`, tickets as `PROJ-1234`.
+> The **aggregate figures behind the decisions stay as they are** — without them there is no
+> way to know why anything was built the way it was.
+
+## What and why
+
+A local tool for seeing and managing seven people's **tasks and deploy schedule** on one
+screen. It pulls internal Slack mentions and internal Jira tickets in and links them to
+calendar items.
+
+- Zero dependencies. Node 24 + `node:sqlite` + static files. No build step
+- The data is one SQLite file on my Mac. Remote visitors are read-only
+- Every change lands in an append-only history and can be undone in batches
+
+## My role
+
+Product through implementation, verification and operations, alone. Two working principles
+kept paying off.
+
+1. **Measure the real data before building.** Do not attach features by feel
+2. **Confirm on screen.** Several times the code was right and the screen was wrong
+
+## The day's work, in order
+
+### 1. Widened the change-history window, hid its scrollbar
+
+At 560px even a one-line change wrapped and was hard to scan. Widened to 880px, list height
+up to 66vh. The scrollbar was hidden **in this window only** — removing the bar also removes
+the "there is more" signal, so it was not applied app-wide.
+
+- Writing the regression test revealed that `.history-body`, despite its name, is **a class shared by six dialogs.** The selector was scoped inside the history window.
+
+### 2. Access control ahead of external exposure (important)
+
+Attaching a tunnel to view it from outside revealed **a hole that collapses the permission
+check.**
+
+- Permission was judged only from the request socket address, and a proxy connects from `127.0.0.1` on the same machine.
+  → Everyone from outside becomes "me": edit, delete, and **a full DB export** all open up. The read-only badge does not even appear.
+  → **The paths were split.** A request arriving on the separate port the tunnel points at is treated as remote regardless of address. The server itself applies the marker, so it cannot be forged the way a header can.
+- **CSRF was genuinely open.** The body parser did not check `content-type` and there was no `Origin` check, so any website left open could POST to `localhost` (`text/plain` passes with no preflight — the response cannot be read, but the write still happens).
+  → Blocked three ways: `Sec-Fetch-Site`, `Origin`, `content-type`. A POST with no body still passes.
+- `.env` was **644** → `600`. Another account on the same Mac could read the token.
+
+### 3. Always-on and a daily backup (launchd)
+
+Having no backup was the largest real risk. **The DB itself is 270 KB and the WAL is 4.1 MB** —
+copy only the `.db` file and the recent data goes missing wholesale.
+
+- `VACUUM INTO` produces a consistent copy including the WAL, as a single file. After making it, **the copy is opened and its rows counted** — a backup that does not open is not a backup
+- Two launchd jobs: the server always on (KeepAlive, restarted if it dies) and a daily 09:00 backup
+- **The token does not go in the plist.** A plist is plaintext and other accounts read it
+- Writing the test revealed that `VACUUM INTO` **fails when the target file exists** → find an unused name
+
+### 4. Three signals for team and deploy management
+
+The real data was measured first. **This was effectively a deploy management tool
+(18 deploys vs 11 tasks).** And three signals needed for deploy decisions were missing.
+
+| Found | Added |
+|---|---|
+| A deploy **27 days overdue** with no marker on screen | Lateness — `N days late` on the chip, ahead of "due soon" at the top |
+| A day with **7 deploys** stacked on it, invisible in the calendar | `deploys N` beside the date, emphasised at three or more |
+| 24 linked tickets with no way to see how many were done | Subtask progress, `2/5` |
+
+- Lateness was first searched within the current month, and **a screenshot revealed it disappearing when the month changed.** The server now selects regardless of the visible range — a warning that vanishes when last month scrolls away means nothing
+- Progress renders nothing when there are no tickets. Drawing `0/0` as 0% would be a false signal reading "not even started"
+
+### 5. A deploys-only toggle
+
+Deploys are the main use, and there was no way to scan the pipeline without tasks and leave
+mixed in. The same filter now applies to the calendar, the status board and the per-person
+board. **Leave stays visible** — who is away is needed for a deploy decision.
+
+### 6–7. Two defects cleared
+
+- The status board explained its emptiness wrongly: it was the `deploys only` filter, and the message said "owner filter" → sends people hunting for the wrong control
+- The per-person board's layout check **failed once in 18 consecutive runs.** The values were `8,8,8`, so it had measured the pre-layout state. Fixed wait → conditional wait
+
+### 8. Attaching and detaching Jira tickets
+
+Of 18 deploys, only **3** had a ticket attached, while **46** tickets were unattached. Build
+the progress indicator and it is a blank screen with no links. The friction was removed.
+
+- Attach directly from the Jira tab in an item's detail view. Candidates are tickets not yet attached, **with that item's assignee's tickets first**
+- **Detaching did not exist at all.** A wrong attachment left no option but editing the DB by hand. When something cannot be undone, people hesitate to do it — likely one reason the link rate was low
+- Detaching leaves the ticket itself. That is a fact on Jira's side, not something I made
+- Attach and detach both land in the history but **are not undoable with ⌘Z** — undoing would not change the Jira link, and pretending it can be undone would be a lie
+
+### 9. Leave is also not drawn on non-working days
+
+The rule of drawing nothing on Saturdays, Sundays, public holidays and substitute holidays
+was extended **to leave as well.** Writing "on leave" on a day off tells nobody anything. A
+span crossing a long weekend now splits into pieces. Leave containing no working day at all —
+a single Saturday — is still drawn, because hiding it makes it data nobody can touch.
+
+> Two tests were corrected. ① My expected value was wrong — I had left out a substitute
+> holiday. ② A `\d` in an E2E regex died to template-literal escaping, so the value always
+> read as 1. Changing it to `[0-9]` revealed the true value — **a plausible-looking green
+> test had been verifying nothing.**
+
+### 10. UI/UX — fixed by measuring
+
+Measured, not guessed. **Colour was not the problem** — body text 14.8, secondary 6.8, both
+passing WCAG AA.
+
+| Item | Before | After |
+|---|---|---|
+| Calendar | **1114px of content in 470px of space** (over half cut off) | Nothing cut off |
+| Area above the calendar | 279px (34% of the screen) | 141px |
+| Top bar | 162px · 2 rows · 23 buttons | **97px · 1 row** |
+| Next 7 days | 13 chips over **3 rows** | 1 row + a fade on the right |
+| Week height / items shown | 90–316px, uneven | **Uniform · 4 items** |
+| 10px text | 50 instances | 1 |
+
+**It was a screen you open to see the month, on which you could not see the month.** Six weeks
+now divide the height equally, and an overflowing week folds into `+N more`, expanding on click.
+The per-person view does not fold — it also has band headers, and folding would hide most of
+it and disable dragging.
+
+Caught along the way:
+
+- `repeat(6, 1fr)` grows rows because of the auto minimum → `minmax(0, 1fr)`
+- The container sat at its `min-height`, so **it folded while space remained** → `height: 100%`
+- A folded element reads as zero height, so measuring with `offsetTop` miscalculates how much to fold → count by rows
+- Fixing the row height stretched the chips and made leave's short pill (17px) disappear → `align-self: start`
+- **I realised I had not looked at the light theme once all day.** Checking it, secondary text was scraping through at 4.52 → raised to 5.57
+
+## The day's decisions (not code)
+
+### How to reach it from outside
+
+No login built into the app. A user table, sessions, hashing and attempt limits all follow,
+and the current permission model would have to be replaced wholesale.
+**Authentication goes to the front layer (the tunnel) and the app stays simple.**
+
+- My devices only → Tailscale (no domain needed, the address survives a WiFi change)
+- Team members too → Cloudflare Tunnel + Access (nothing to install, a domain needed)
+- **Router port forwarding is not an option** — this app has no authentication at all
+
+### Sleep and staying up
+
+Entering sleep stops the process and drops the tunnel. Power Nap and Wake on LAN do not wake
+this app. On waking, the process continues and Slack reconnects on its own. What launchd is
+for is not sleep but **reboots and crashes.**
+
+**The real bottleneck for "manage it while away" is not authentication. It is staying up.**
+Carry the laptop out and no tunnel helps.
+
+## Where it stands
+
+- 12 commits. **153** unit tests and **18** E2E suites, all passing
+- The server runs always via launchd, with a daily 09:00 backup
+- **Highest-value next step**: attaching tickets to the remaining deploy items. Opening an item and picking from the tab is now the whole flow, and completion auto-checks when every subtask is done

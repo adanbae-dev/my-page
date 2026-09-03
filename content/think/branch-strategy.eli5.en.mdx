@@ -1,0 +1,194 @@
+---
+title: What we checked was not what we shipped
+summary: 'Why "it worked in testing but broke on release" keeps happening. Not human error — the bundle checked and the bundle shipped were different all along.'
+authored: false
+---
+
+"It worked fine when we tested it, but it broke once we actually shipped it."
+
+On a team where that comes up often, people usually go looking for who made
+the mistake.
+But depending on how the work is organised, sometimes this is **a structure
+that could not have turned out any other way.**
+
+## Words to know first
+
+- **Branch** — splitting the same code into several lines so people can work
+  separately. Everyone builds on their own line, then they are gathered back
+  into one.
+- **Merging** — gathering the split lines back into one.
+- **Release** — putting the finished code onto the real service.
+
+## What was out of step
+
+Say you are building features A, B and C.
+
+You gather all three onto one line and check "do A and B and C run well
+together".
+But when it is time to ship, you make a **different line** and pick out only A
+and B.
+
+So this happens.
+
+- A+B+C was checked, but **is not shipped.**
+- A+B is shipped, but **was never checked.**
+
+Breakages come more often from **several things mixed together** than from any
+one feature.
+Change which things are mixed and the earlier check becomes useless along with
+it.
+
+So "it worked when we tested it" is not anyone's fault.
+
+## So is that way of working bad
+
+No. There is a reason for doing it that way.
+
+Make the shipping line **as late as possible** and, at that moment, what can go
+out is already decided.
+You pick only what is going out, and if one feature drops you simply leave it
+out.
+
+For an organisation that ships on a regular schedule, this is sensible. It is
+an ability with no reason to give up.
+
+So the question is not "is this way wrong".
+It is **can we keep the convenience of choosing late, and still ship exactly
+what we checked?**
+
+## Where I had it wrong
+
+I thought you could choose late because you made the line late. That was wrong.
+
+The real reason you can still choose is that **you have not merged yet.**
+When the line was made does not matter.
+
+So you can make the shipping line right at the start,
+and merge each feature in as it passes its check.
+
+The choosing still happens late. Exactly one thing changes —
+**the checking now happens on the very line that will ship.**
+
+That is the route that fixes the structure without losing the ability.
+
+## When one feature has to come out
+
+There are four ways, and all of them still work even with the line made first.
+
+| | Method | What it costs | When |
+|:--|:--|:--|:--|
+| ① | If not merged yet, just do not merge it | nothing | the default |
+| ② | Put it in but switch it off | you need a switch mechanism | when several features share code |
+| ③ | Put it in, then take it back | a headache once entangled | already merged, then cancelled |
+| ④ | Put it in next time | waiting | when the schedule has clearly slipped |
+
+Two things to watch.
+If several features share the same code, using ③ **takes someone else's feature
+back too.**
+And **a database structure change cannot be hidden with ②.** It is not the kind
+of thing that can hide behind a switch.
+
+## Taking it back does not work the way you think
+
+I tried it myself before using ③, and the result was not what I expected.
+
+I merged a feature, took it back, added a little new content to that feature,
+and merged again.
+**The code I put in originally did not come back.** Only what was made after
+taking it back came back.
+
+Because the management tool skips over "things it has merged before".
+
+The most dangerous part is that **not one warning appears.** It ends looking as
+though it quietly succeeded.
+The owner thinks "but I merged it", and the person checking checks a feature
+that is not there.
+
+On top of that, if the new content overwrites the same file wholesale, it
+**sometimes comes back by accident.**
+Which means the result cannot be predicted, and that is worse than "it never
+comes back".
+Succeed by accident once and you learn the rule wrong.
+
+The fix is **taking back the taking-back.** Trying it, everything was restored
+exactly.
+
+## Work with an outside company only half works
+
+Because we do not get to set the dates.
+The other company's development, review, contract and launch dates move with no
+regard for our schedule, and there is no advance notice.
+And because it is a postponement rather than a cancellation, the code cannot be
+thrown away either.
+
+One thing can be changed. **Put the day the code goes up and the day the feature
+turns on on different dates.**
+
+Then the waiting state changes from 'unfinished, stuck on a line' to 'already up
+there, switched off'.
+A postponement notice has nothing to take back. You just push the switch-on
+date.
+
+And an outside connection gets this almost free, even with no switch mechanism.
+It needs settings like an address or a key to work at all,
+so if you write it so that **without the settings it never starts**, that is
+already the switch.
+
+- With no settings, leave it **switched off**, not broken.
+  But keep a record saying "this is off right now". Otherwise nobody knows it never came on.
+- **Tie the button on screen to the same switch.** A visible button that does nothing reads as broken to a user.
+- Switched off, **go back to how it worked before the connection.** The same switch is used when the other company has an outage.
+
+Skip that and this happens.
+While the connection code sits on a line for weeks, the main body moves hundreds
+of steps ahead.
+When you try to merge it later, **you start not with the connection work but
+with the conflicts piled up since**,
+and that code is not the code you checked at the start, so it has to be checked
+again.
+**The feature that waited longest goes out in the most dangerous state.**
+
+## The four widely used approaches
+
+| Approach | Lines kept permanently | Branch lifetime |
+|:--|:--|:--|
+| Git Flow | `main`, `develop` | days to weeks |
+| GitHub Flow | `main` | hours to two days |
+| GitLab Flow | `main` + one per environment | hours to days |
+| Trunk-Based | `main` | under a day |
+
+All four keep one thing in common — **ship exactly the code you checked.**
+What differs is only how short the lines are kept and how many are kept
+permanently.
+
+The person who made Git Flow annotated his own post in 2020,
+saying that a team shipping continuously should use something simpler.
+He considers it still worthwhile only when several versions have to be supported
+at once.
+
+Trunk-Based only holds up with a switch mechanism. Without one, unfinished work
+goes out as it is.
+
+### Do not mix permanent lines with use-once lines
+
+A line kept permanently, like `main`, and a line deleted once merged, like a
+feature line, are different in nature.
+
+Blur that distinction and the list of lines loses its signal.
+You can no longer tell by eye what is alive, and you put code on a dead line by
+mistake.
+
+## What can be done today
+
+- Leave **an automatic marker** on every release. You need to be able to point at the place to go back to with one thing.
+- **Try taking something back while things are calm.** A procedure that only exists in a document gets tried for the first time during an accident.
+- **Delete merged lines automatically.**
+- Write the list of permanent lines in **exactly one document.**
+
+The smallest way to change the structure is **making the shipping line first and
+checking on it.**
+Merge only what is ready and the convenience of choosing late stays,
+while the code you checked becomes the code you shipped.
+
+Whichever you pick, **write the branch-lifetime target as a number.** "Short" is
+not a target.

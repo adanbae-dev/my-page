@@ -1,0 +1,181 @@
+---
+title: A personal wiki an LLM reads as a primary source
+date: 2026-06-25
+updated: 2026-06-25
+summary: What changes when a wiki is built for an LLM to read rather than for a person. The procedure, written so it reproduces from zero.
+topics: [knowledge, process]
+tags: [obsidian, knowledge-management, llm]
+---
+
+Write a wiki so a person reads it well and an LLM reads it badly. Write it
+the other way round and both read it.
+
+The difference is one structural choice. A person skims a long document and
+stops where they need to; an LLM knows only what arrived in the context
+whole. So it splits into a **small kernel that is always injected** and
+**atomic notes that come along by link only when needed**. Frontmatter is
+the only place a note can tell a machine what type it is.
+
+<figure>
+  <svg viewBox="0 0 640 200" role="img"
+       aria-label="A small kernel is always injected into the context, and typed atomic notes follow their links only when needed. Contrasted with feeding one long document whole"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">For humans — one long document</text>
+    <rect x="0" y="26" width="240" height="70" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+    <text x="14" y="52" fontSize="13" fill="currentColor" opacity="0.6">You skim and stop where needed</text>
+    <text x="14" y="76" fontSize="13" fill="currentColor" opacity="0.6">An LLM cannot stop</text>
+
+    <text x="330" y="14" fontSize="12" fill="currentColor" opacity="0.55">For an LLM — kernel + atomic notes</text>
+    <rect x="330" y="26" width="120" height="34" fill="var(--accent)" stroke="none" />
+    <text x="344" y="48" fontSize="13" fill="var(--on-accent)">Kernel (always)</text>
+
+    <path d="M390 60 L390 78" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L470 78 L470 96" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L330 78 L330 96" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M390 78 L390 96" stroke="currentColor" strokeWidth="1" fill="none" />
+
+    <rect x="300" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="368" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <rect x="436" y="96" width="60" height="28" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="300" y="142" fontSize="12" fill="currentColor" opacity="0.55">Followed only when needed</text>
+
+    <text x="0" y="180" fontSize="13" fill="currentColor">Keep the kernel small. It is a cost paid on every call.</text>
+  </svg>
+</figure>
+
+What follows is written so that rebuilding this vault from zero reproduces
+from this one document.
+
+## 0. What you need
+| Item                             | Purpose                          | Note                          |
+| -------------------------------- | -------------------------------- | ----------------------------- |
+| **Obsidian**                     | the vault itself (local Markdown) | free                          |
+| **Claude Desktop / Claude Code** | the LLM that reads and writes it | see MCP setup                 |
+| **Node/npx**                     | runs the MCP server              | check with `node -v`          |
+| **git**                          | local backup                     | no remote push (privacy)      |
+| iCloud (Apple)                   | multi-device sync                | see sync setup                |
+
+## 1. Create the vault, and where
+- To share with iOS, create it **inside Obsidian's iCloud container**:
+  `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/my-wiki`
+- For convenience in the Mac terminal and Claude Code, **symlink** `~/Dev/my-wiki` to the real path.
+- Sync and conflict details: → sync setup
+
+## 2. Folder structure (by type)
+Folders divide by **note type**. Areas of life — work, study, reading — cut
+across folders as MOCs plus tags rather than as folders of their own (→ §5).
+
+| Folder | Role | Main types |
+|---|---|---|
+| `00_Core/` | kernel (always loaded) | identity / idea / moc |
+| `10_Identity/` | identity | identity |
+| `15_Work/` | what I do, projects | project |
+| `20_History/` | background, history | event |
+| `30_People/` | people | person |
+| `40_Environment/` | environment (orgs, places) | org / place |
+| `50_Philosophy/` | thinking, philosophy | idea |
+| `60_Assets/` | assets | asset |
+| `70_Knowledge/` | knowledge, reference | reference |
+| `80_Inbox/` | unfiled notes | memo |
+| `_templates/` | note templates per type | — |
+
+> One exception: work gets both a folder (`15_Work`) and a type (`project`),
+> because an in-progress project needs a type to live in.
+
+## 3. The type system and the frontmatter contract
+**Every note requires frontmatter**: `type / aliases / tags / created /
+updated / status`, plus the fields for its type. Editing a note updates
+`updated`. Body text is in Korean; keys, tags and folder names are in English.
+
+`status` values: `seed` → `growing` → `evergreen`. A MOC is usually
+`evergreen`.
+
+Extra fields per type (templates live in `_templates/`):
+| type | folder | type fields |
+|---|---|---|
+| `identity` | 00/10 | — (`tags: [core]` is kernel-only) |
+| `project` | 15_Work | `state`(active/paused/done) · `role` · `org` · `period` / `tags: [area/work]` |
+| `event` | 20_History | `date` · `period` |
+| `person` | 30_People | `relationship` · `org` · `met` · `importance` |
+| `idea` | 50_Philosophy | `confidence`(high/medium/low) |
+| `asset` | 60_Assets | `category` · `value` · `location` / `tags: [private]` by default |
+| `reference` | 70_Knowledge | `source` · `author` · `url` · (for books) `read` · `rating` |
+| `memo` | 80_Inbox | — / `tags: [inbox]` |
+| `moc` | each domain | — / `tags: [moc]`, `status: evergreen` |
+
+## 4. Build the kernel (`00_Core/`) — always injected
+Keep the kernel **short and dense**. Everything specific goes out by link
+(context engineering).
+
+| Note | Role |
+|---|---|
+| `Index.md` (moc) | top-level map. Every domain MOC plus the entrances to system docs |
+| `Me.md` (identity) | "the one page you paste into any LLM" — who I am |
+| `Now.md` (identity) | current focus and work in progress (Derek Sivers `/now` style, updated often) |
+| `Principles.md` (idea) | core principles. Each unfolds into the Philosophy MOC |
+
+→ Claude reads **these four first**, then reads only the domain notes the
+question touches. Not everything.
+
+## 5. MOCs plus area tags
+- **Domain MOC**: a hub per folder (per type). `Identity / Work / History / People / Environment / Philosophy / Assets / Knowledge / Inbox MOC`.
+- **Area**: a theme like work, study or reading that cuts across folders. Grouped by **MOC plus tag, not folder**:
+  - `#area/work` → Work MOC
+  - `#area/study` → Study MOC
+  - `#area/reading` → Reading MOC
+- A MOC collects its notes automatically with a Dataview query — the Inbox MOC gathers `type=memo`, for instance.
+
+## 6. Plugins
+| Plugin | Why | How necessary |
+|---|---|---|
+| **Templates** (core) or **Templater** | substitutes `{{title}}` and `{{date}}`, new notes per type | recommended |
+| **Dataview** | the automatic lists and recently-updated tables in Index and MOCs | recommended (required once you write queries) |
+| **Local REST API** | the foundation of the Claude MCP connection | required for the LLM link → MCP setup |
+
+## 7. Writing and maintenance workflow
+1. **Atomicity**: one note = one concept or entity. Split it when it grows. (A runbook like this guide is the exception — it is one procedure.)
+2. **Linking**: a new note gets a `wikilink` to the existing notes it relates to, and a link from its domain MOC.
+3. **Capture fast, promote later**: an off-hand note goes to `80_Inbox/` (memo), then moves to its domain folder as a properly typed note once it settles.
+4. **Update**: refresh `updated` in the frontmatter whenever a note changes. `Now` especially often.
+
+## 8. CLAUDE.md — the rules by which an LLM reads the wiki
+A `CLAUDE.md` at the vault root governs how Claude Code behaves. The core of it:
+- When asked about me, my wiki, or my information, treat **this wiki as the primary source**.
+- Read **the four kernel notes first**, then only the domains the question touches (context engineering).
+- State the folder map, the types, the frontmatter contract and the area rules.
+- **Privacy**: `#private` notes are excluded from anything shared outward (→ §12).
+
+## 9. Connecting Claude (MCP)
+- **Foundation**: the Local REST API plugin → **server**: `obsidian-mcp-server` (cyanheads) over STDIO, connected to both Desktop and Code.
+- Full commands, JSON and caveats: → **MCP setup**
+- The caveat that matters: Obsidian has to be running for anything to answer, and **the whole vault — `#private` included — is exposed**.
+
+## 10. Sync (iCloud)
+- iCloud Drive syncs Mac ↔ iPhone/iPad. Watch for simultaneous-edit conflicts.
+- Full detail: → **sync setup**
+
+## 11. Backup and git
+- **Local git backup**: the working tree is the vault, the git directory lives outside iCloud (`--separate-git-dir`). **No remote push** — so `#private` never leaves.
+- iCloud is sync, not backup: a deletion propagates too. Recovery comes from the git snapshot.
+- Detail: → sync setup
+
+## 12. Privacy (important)
+- A note with `private` in its `tags` — asset details and the like — is **sensitive**.
+- Anything shared outward (a public bio, text sent to someone else) **does not carry `#private` content**.
+- If stronger isolation is needed: iOS Advanced Data Protection, or a separate vault for the sensitive notes.
+
+## 13. Start-to-finish checklist
+- [ ] Install Obsidian, create the vault in the iCloud path (1)
+- [ ] Create the typed folders and `_templates/` (2, 3)
+- [ ] Write the four kernel notes: Index / Me / Now / Principles (4)
+- [ ] Set up domain MOCs and area tags (`#area/*`) (5)
+- [ ] Install Templates/Templater and Dataview (6)
+- [ ] Write `CLAUDE.md` (8)
+- [ ] Connect Claude via Local REST API and obsidian-mcp-server (9)
+- [ ] Set up iCloud sync, add the other devices (10)
+- [ ] Local git backup — no remote push (11)
+- [ ] Audit the `#private` rules (12)
+
+## Related
+- Index · 00_Core/Me · Now · Principles
+- MCP setup · sync setup
