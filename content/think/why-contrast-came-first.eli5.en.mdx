@@ -1,0 +1,53 @@
+---
+title: I calculated the colour instead of choosing it by eye
+summary: I picked one orange and it was hard to see on the light background. Instead of changing the colour, I made the background brighter.
+authored: false
+---
+
+Usually you pick a colour first and check later whether it is easy to see. I reversed the order.
+
+## What to know first
+
+For text to be readable, **the text colour and the background colour have to be different enough.**
+That difference, measured as a number, is called **contrast**, written as a ratio like `3.05 to 1`.
+A bigger number means easier to see.
+
+- Small body text needs **4.5 or more**.
+- Large text only needs **3 or more**.
+
+## What happened
+
+I set the orange `#FF4D00` as the main colour.
+Measured on the light paper background, it came out at **2.92**.
+That fails even the large-text bar, never mind body text.
+
+There were two options.
+
+1. Make the orange darker — the colour I chose changes
+2. Make the background brighter — the orange stays
+
+I raised the background slightly. **3.05.** Pass.
+**I moved the floor to keep the colour.**
+
+## Then something interesting happened
+
+The same orange can do different things depending on the background.
+
+- **On a light background it is 3.05** — it cannot be text, only **a painted block.**
+- **On a dark background it is 5.91** — it **can be text.**
+
+So on the light side the orange shows up as a rectangular block,
+and on the dark side it shows up as letters.
+
+This is not sneaking around the rule. The rule created a rhythm.
+
+> A good constraint does not reduce your options. It makes the ones you have left clearer.
+
+## The rules left over
+
+- Text placed on an orange block is **black on both the light and the dark side.**
+  Paper-coloured text is 2.92 and does not pass.
+- The outline that appears when you move around with the keyboard passes on both sides with one colour.
+
+A checker recalculates these numbers every time the site is built.
+If a number in the documentation disagrees with the real one, the build stops.

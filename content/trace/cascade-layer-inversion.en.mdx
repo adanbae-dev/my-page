@@ -1,0 +1,73 @@
+---
+title: The layer order had quietly inverted
+date: 2026-08-24
+kind: reconsidered
+summary: No error, no warning — a handful of declarations stopped applying. CSS layer order comes from first appearance, not from the source list.
+topics: [debugging, frontend]
+tags: [css, debugging]
+---
+
+The hero's spacing was wrong. A margin was set and it sat flush.
+
+```js
+getComputedStyle(h1).marginBottom  // "0px"
+```
+
+The class was attached, and no matching rule existed.
+
+## Cause
+
+Put plainly: layers are **an order to stand in**, and whoever stands later wins.
+But the thing deciding that order was not the list I wrote — it was **arrival order**.
+
+<figure>
+  <svg viewBox="0 0 640 200" role="img"
+       aria-label="The declared order is reset, tokens, base, components, but when the bundler emits components first, components moves ahead of reset and the later-standing reset wins"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">The list I wrote (layers.css)</text>
+    <rect x="0" y="26" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="43" fontSize="13" fill="currentColor">reset</text>
+    <rect x="120" y="26" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="130" y="43" fontSize="13" fill="currentColor">tokens</text>
+    <rect x="240" y="26" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="250" y="43" fontSize="13" fill="currentColor">base</text>
+    <rect x="360" y="26" width="140" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="370" y="43" fontSize="13" fill="currentColor">components</text>
+    <text x="510" y="43" fontSize="12" fill="currentColor" opacity="0.55">← should win</text>
+
+    <text x="0" y="96" fontSize="12" fill="currentColor" opacity="0.55">The order the bundler actually emitted</text>
+    <rect x="0" y="108" width="140" height="26" fill="var(--accent)" stroke="none" />
+    <text x="10" y="125" fontSize="13" fill="var(--on-accent)">components</text>
+    <rect x="148" y="108" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="158" y="125" fontSize="13" fill="currentColor">reset</text>
+    <rect x="268" y="108" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="278" y="125" fontSize="13" fill="currentColor">tokens</text>
+    <rect x="388" y="108" width="112" height="26" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="398" y="125" fontSize="13" fill="currentColor">base</text>
+
+    <text x="0" y="168" fontSize="13" fill="currentColor">components got pushed to the front, so reset — standing later —</text>
+    <text x="0" y="188" fontSize="13" fill="currentColor">won, and its global margin-zero rule beat the component styles.</text>
+  </svg>
+</figure>
+
+CSS layer order is set by **first appearance**, not by the `@layer a, b, c;` statement.
+If the bundler emits an `@layer components { … }` block before `styles/layers.css`,
+the declared order is discarded and rebuilt from appearance order.
+
+The result was that `components` landed **below** `reset`.
+`* { margin: 0 }` was beating the component styles.
+
+The Phase 0 page was in the same state. I looked at a screenshot and approved it
+while the spacing was already dead.
+
+## What changed
+
+CSS Modules came out of the layers entirely. They are already scoped,
+and an unlayered rule takes precedence over every layered one.
+Whatever order the bundler emits stops mattering.
+
+And `pnpm check:layers` was added. It reads the actual built CSS to confirm that
+the first `@layer` token is the order statement, that the order matches the source,
+and that no module has re-entered a layer.
+
+**A failure that is silent stays silent forever without a guard.**

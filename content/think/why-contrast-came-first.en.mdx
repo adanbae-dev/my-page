@@ -1,0 +1,63 @@
+---
+title: The colour was calculated, not chosen
+date: 2026-08-24
+summary: Instead of picking the accent by eye, it was worked backwards from a contrast target — and the constraint became the art direction itself.
+topics: [design, process]
+tags: [design-system, accessibility, color]
+---
+
+Art direction usually picks a palette first and checks accessibility later.
+That order got reversed.
+
+With `#FF4D00` set as the accent, measuring it on the paper ground gave **2.92:1**.
+Not body text, and not even the 3:1 large-text threshold.
+
+There were two options.
+
+1. Darken the accent — the chosen colour changes
+2. Lighten the ground — the accent stays
+
+The ground went from `#F2F0EB` to `#F7F5F0`. 3.05:1. Pass.
+**The floor moved so the colour could stay.**
+
+## Where the constraint became the direction
+
+Something interesting happens here. The accent is 3.05:1 on the light ground, so it can
+only be used as a *field*; on the dark ground it is 5.91:1, so it can be *type*.
+
+Same orange, different jobs depending on the ground.
+On paper it can only be **painted**; on ink it can also **become a letter**.
+
+<figure>
+  <svg viewBox="0 0 640 190" role="img"
+       aria-label="The same accent colour is 3.05 to 1 on the paper ground, usable only as a field, and 5.91 to 1 on the ink ground, where it can also be type"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">Paper ground · 3.05:1</text>
+    <rect x="0" y="26" width="300" height="90" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.35" />
+    <rect x="20" y="50" width="170" height="34" fill="var(--accent)" stroke="none" />
+    <text x="32" y="73" fontSize="15" fill="var(--on-accent)">A field works</text>
+    <text x="20" y="106" fontSize="13" fill="var(--accent)" opacity="0.45">Type does not</text>
+
+    <text x="340" y="14" fontSize="12" fill="currentColor" opacity="0.55">Ink ground · 5.91:1</text>
+    <rect x="340" y="26" width="300" height="90" fill="currentColor" stroke="none" />
+    <text x="360" y="63" fontSize="15" fill="var(--accent)">Type works too</text>
+    <rect x="360" y="78" width="140" height="22" fill="var(--accent)" stroke="none" />
+    <text x="370" y="94" fontSize="13" fill="var(--on-accent)">And a field</text>
+
+    <text x="0" y="150" fontSize="13" fill="currentColor">One colour. Invert the ground and what that colour can do changes.</text>
+    <text x="0" y="172" fontSize="13" fill="currentColor" opacity="0.6">That is how the inversion becomes a rhythm — not a workaround, but what the constraint gave.</text>
+  </svg>
+</figure>
+
+So the same colour appears as a slab on the light side and as a letterform on the dark side.
+This is not a way around the contrast constraint; the constraint produced the inversion rhythm.
+
+> A good constraint does not reduce the options. It makes the remaining ones clearer.
+
+## The rules that came out of it
+
+- Type on an accent field is **ink in both tones**. The paper colour fails at 2.92:1.
+- The focus ring is one value, `#CC3E00` — 4.53:1 on paper, 3.99:1 on ink. The inversion does not touch it.
+
+`pnpm check:contrast` recalculates these numbers on every run.
+If a value written in the docs disagrees with the real one, the build breaks.

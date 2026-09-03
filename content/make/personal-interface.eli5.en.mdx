@@ -1,0 +1,40 @@
+---
+title: This site itself
+summary: A site that moves one person's thinking and life onto a screen, and shows at the same time that they can build it.
+authored: false
+---
+
+This is the site you are looking at.
+
+## The limit I set first
+
+There is a **limit set in advance** on how much the browser has to download to open a page.
+I set it while the page was still nearly empty.
+Set it later and the already-heavy state becomes the yardstick.
+
+When I measured, **93% of the limit was already used with nothing built** —
+just the basic tools used to make a site.
+
+That left me **12 KB** to build features in.
+
+## What I gave up
+
+That number decided the direction of the next stage.
+
+The bundle of tools for drawing in 3D is about 150 KB on its own.
+**It cannot come down with the first load.**
+
+So 3D now works differently: **the browser is asked whether it can draw it, and only then is it downloaded separately.**
+
+My plan already said "handle the case where 3D does not work."
+Only after measuring did I see that this was **not optional but unavoidable.**
+
+## What is left
+
+The whole menu — the colours flipping, showing which part you are looking at, knowing the address —
+costs **5.1 KB** of code.
+Everything else is screens built ahead of time on the server.
+
+I also checked with JavaScript turned off in the browser.
+The menu bar, the four links to each section, the four links going deeper,
+the jump-to-content link, and the heading were all still there.

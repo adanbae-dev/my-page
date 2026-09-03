@@ -1,0 +1,44 @@
+---
+title: The styling order had flipped without my noticing
+summary: I added spacing and it never showed up. The thing deciding the order was not the list I wrote but which file arrived first.
+authored: false
+---
+
+I added spacing under a large heading, and on screen there was no spacing.
+I asked the browser and it said the spacing was `0`.
+
+The rules for styling the screen were clearly attached, and not one of them was actually being used.
+
+## What happened
+
+On the web, several rules often try to style the same thing at once.
+When that happens, they **stand in a line, and whoever stands later wins.**
+
+I had written the order of that line like this.
+
+```
+basic reset → colour and size values → base styles → component styles
+```
+
+But this order **is not decided by the list I wrote.**
+It is actually decided by **which one appears first in the file.**
+
+The tool that bundles all the code together emitted the component styles before my list.
+So components moved to the front of the line, and "basic reset", now standing later, won.
+
+"Basic reset" contains a rule that says `remove the spacing on every element`.
+So the spacing I added was being wiped every time.
+
+There was no error and no warning. It just quietly did not work.
+A page I had looked at in a screenshot and approved was already in the same state.
+
+## How I fixed it
+
+I **took the component styles out of the line entirely.**
+A rule that does not stand in line beats every rule that does.
+That way it no longer matters what order the tool emits things in.
+
+And I built a checker so I would notice if it happened again.
+It opens the finished file and confirms the line order matches the list I wrote.
+
+**A problem that goes wrong quietly stays quiet forever unless something is watching.**

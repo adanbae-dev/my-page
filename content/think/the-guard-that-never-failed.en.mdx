@@ -1,0 +1,48 @@
+---
+title: A check that never fails is not a check
+date: 2026-08-24
+summary: Every guard gets deliberately broken. A guard confirmed only by passing guarantees nothing.
+topics: [debugging, tooling]
+tags: [testing, tooling]
+---
+
+I built the contrast guard and it passed immediately. Green light.
+
+But one green light cannot tell two things apart.
+
+<figure>
+  <svg viewBox="0 0 640 170" role="img"
+       aria-label="One passing signal from the guard splits into two meanings — the values are correct, or the guard checks nothing — and passing alone cannot distinguish them"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <rect x="0" y="52" width="150" height="34" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="14" y="74" fontSize="14" fill="currentColor">Guard passes</text>
+
+    <path d="M150 62 L250 30" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M150 76 L250 108" stroke="currentColor" strokeWidth="1" fill="none" />
+
+    <rect x="250" y="14" width="300" height="34" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="264" y="36" fontSize="14" fill="currentColor">The values are correct</text>
+
+    <rect x="250" y="92" width="300" height="34" fill="var(--accent)" stroke="none" />
+    <text x="264" y="114" fontSize="14" fill="var(--on-accent)">It checks nothing at all</text>
+
+    <text x="0" y="158" fontSize="13" fill="currentColor" opacity="0.6">Both branches emit the same signal. So it gets broken on purpose, every time.</text>
+  </svg>
+</figure>
+
+```bash
+# Threshold violation
+sed -i '' "s/--muted: #70706e;/--muted: #b0b0ae;/" styles/tokens.css
+node scripts/check-contrast.mjs   # must exit 1
+
+# Drift from the published figures
+sed -i '' "s/--muted: #70706e;/--muted: #5f5f5d;/" styles/tokens.css
+node scripts/check-contrast.mjs   # valid value, disagrees with the docs -> exit 1
+```
+
+The point is that the two failure modes are different. The first is *accessibility broken*;
+the second is *accessibility fine, documentation lying*.
+A design system that shows visitors its numbers has to know the moment those numbers stop being true.
+
+The cascade-layer guard was verified the same way. Putting a module back inside a layer
+and building caught it exactly.

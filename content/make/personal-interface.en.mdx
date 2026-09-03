@@ -1,0 +1,40 @@
+---
+title: PERSONAL INTERFACE
+date: 2026-08-24
+summary: A personal web product that translates one person's thinking and life into an interface, and proves the ability to build that interface at the same time.
+role: Product · design · front end, all of it
+period: 2026.08 —
+stack: [Next.js 16, React 19, TypeScript, MDX, modern CSS, View Transition API]
+constraint: Of a 180.7 KB JS budget, the framework baseline alone took 168.6 KB. That left 12 KB for feature code.
+tradeoff: Scroll-driven animation and WebGL came out of the initial bundle. First load was protected ahead of spectacle.
+outcome: Every route statically prerendered, JS at 173.7 KB, navigation and the whole structure working with JavaScript off.
+topics: [architecture, design, frontend, process]
+tags: [nextjs, design-system, portfolio]
+---
+
+This site.
+
+## The constraint
+
+The performance budget was fixed **while the page was still nearly empty**.
+Set it later and the already-heavy state becomes the baseline.
+
+Measured: the Next 16 + React 19 baseline alone came to 168.6 KB.
+93% of a 180.7 KB budget. Before a single line of feature code.
+
+## What was given up
+
+That number decided the direction of Phase 3. Three.js + React Three Fiber + drei
+is roughly 150 KB gzipped. **It cannot go in the initial bundle.**
+
+So WebGL loads dynamically, behind a capability check.
+The brief already said "handle WebGL failure" — but only after measuring the budget
+did it become clear that this was a structural requirement rather than a choice.
+
+## What remains
+
+The entire navigation — tone mirroring, scroll spy, route awareness — costs
+**5.1 KB** of JS. Everything else is HTML rendered on the server.
+
+Checked with JavaScript switched off: the index bar, four anchors, four depth links,
+the skip link, and an `<h1>` with its accessible name intact. All of it was there.

@@ -1,0 +1,38 @@
+---
+title: A check that never fails is not a check
+summary: Every time I build a checker I break it on purpose. A green light alone cannot tell you whether it works or whether it is looking at nothing.
+authored: false
+---
+
+I built a device that checks whether colours are easy to see, and ran it. A green light came on.
+
+But one green light cannot tell two things apart.
+
+1. The values really are correct
+2. The checker is **looking at nothing**
+
+Both show up as a green light.
+
+## So I break it on purpose, every time
+
+I deliberately make a colour too faint, then run the checker
+to see whether **it fails when it should fail.**
+
+```bash
+# 1. Set a colour below the threshold, then
+node scripts/check-contrast.mjs   # failing is correct
+
+# 2. Set a colour that is fine but different from the documented number
+node scripts/check-contrast.mjs   # this must fail too
+```
+
+The key is that the two failures are different from each other.
+
+The first is a case where things **really did become hard to see.**
+The second is a case where **they are easy to see but the documentation is lying.**
+
+If a site shows its numbers to visitors as they are,
+it also has to know the moment those numbers stop being true.
+
+I checked the device that keeps the styling order the same way.
+I deliberately reversed the order, ran it, and it caught it exactly.
