@@ -1,0 +1,108 @@
+---
+title: The sidebar vanished on exactly one screen
+date: 2026-08-26
+summary: Five hypotheses, all disproved, and only then the cause. CSS specificity colliding with route chunk load order.
+topics: [architecture, debugging, frontend]
+tags: [debugging, css, nextjs, rsc]
+---
+
+> **On sensitive material** — this note came from an iCloud-synced vault. Credentials, tokens,
+> production host addresses, repository URLs, member names and emails, and **the details of the
+> security review are deliberately excluded**. Hosts appear as `<production CRM>` / `<production API>`,
+> the repository as `<monorepo>`, and the internal design-system package as `<internal UI package>`.
+
+The work: an internal operations admin, Next 15 App Router.
+
+## Symptom
+
+Enter one particular management screen in the production CRM and **the entire side menu
+disappears.** No console error. Only on that screen.
+
+### Five hypotheses, all disproved
+
+There was little to go on, so it was hypothesis and refutation, repeatedly. Every one was wrong.
+
+| Hypothesis | How it was disproved |
+|---|---|
+| A compile error from a missing client directive | Mutation test — the response was identical with and without it |
+| The menu tree arrives as an empty array | The real API response contained it correctly |
+| Flex overflow crushed the sidebar to zero width | No horizontal overflow at any width |
+| Permission logic hid it | The permission guard sits inside the content area; the sidebar is its sibling — structurally impossible |
+| The deployment is running old code | The account held every permission record needed, so it would have shown even on old code |
+
+### The actual cause — a specificity collision
+
+The sidebar wrapper class was `hidden md:block`. `.hidden` and `.md\:block` have **equal
+specificity, so document order decides the winner.**
+
+The `<internal UI package>` stylesheet **re-emits the default Tailwind utilities** —
+`.hidden`, `.block`, `.absolute` and so on. What it does not re-emit is the responsive
+variants like `md:block`. On any route where that sheet loads **after** the app's own,
+`.hidden{display:none}` wins and the sidebar becomes `display:none`.
+
+### Why only that one screen — this was the crux
+
+Nine files use the same package and exactly one broke. It only happens when **three
+conditions hold at once.**
+
+1. The route's `page.tsx` is a **server component**
+2. **A slice barrel re-exports the file that consumes the package** ← the only one of the nine
+3. That consuming file has **no client directive**
+
+Together, the module enters the **server component graph**, and its CSS is **split into a
+route-specific chunk**. Route chunks load **after** shared chunks. The other eight are only
+reachable through a client component, so their CSS folds into the earlier shared chunk.
+
+Measurement showed it directly — the broken route alone had one extra stylesheet, and the
+final `.hidden` declaration lived in that extra sheet.
+
+**And condition 2 was mine.** A refactor a few days earlier re-exported the file through the
+barrel so a sibling slice could use it, and that created the path into the server graph.
+A change made to honour an architectural rule — never import a slice's internals directly —
+created a problem one layer down.
+
+### A two-part fix
+
+- **Remove the cause** — add the client directive to that file. It enters the client graph and
+  its CSS folds into the shared chunk. The nine structurally identical files were tidied too.
+- **A second line** — change the wrapper from `hidden md:block` to `max-md:hidden md:block`.
+  That moves the rule inside a media query and **removes the bare `hidden` class from the
+  element.** There is nothing left for the external `.hidden` to match, so load order stops
+  mattering.
+
+**Do not try to win the specificity contest. Remove the contest.** That was the right shape.
+
+Re-measured after deployment: the sheet count dropped, the final `.hidden` came back to the
+app's own sheet, and the sidebar renders.
+
+## What the day taught
+
+**1. Some bugs only exist in production.** The dev server serves CSS as one bundle; only
+production splits it per route. Several rounds ran locally in an environment where the bug
+could not have reproduced in the first place.
+
+**2. Reproduce on the URL the user actually uses.** "The dev environment" was assumed to mean
+local, and it was verified repeatedly against the wrong target. The URL should have been the
+first question.
+
+**3. A mutation test needs its measure decided first.** The first hypothesis had **the right
+location.** It was discarded because the response was identical when only "does it produce a
+compile error" was checked. The real effect was not an error but **where the CSS chunk
+landed** — that was the moment to look at the stylesheet list. **Run a mutation without
+deciding what should change and you throw away correct hypotheses.**
+
+**4. There is a repeating pattern of types that lie.** Fields the response never sends
+declared non-optional, fields that arrive null declared non-null — three instances in this
+one API. **Confirm with a real call before declaring a new field non-optional.** Fix the type
+to match reality and the compiler finds the remaining gaps; that is how one more turned up.
+
+**5. Do not judge from a truncated list.** `head -2` is how a push went to the wrong remote.
+
+**6. A convenience mapping can quietly widen its own scope.** Filling defaults into legacy
+rows looks like a UX improvement, but it changes what the rows mean. Leaving a person to
+choose explicitly is safer.
+
+## What is left
+
+- The internal UI package's build is broken, so a production build cannot be verified locally. Deployments go through, so it appears to pass in CI.
+- The auth and menu stores **swallow failures silently** and pin them as success. Nothing recovers until a refresh. It was not the cause here, but it remains another route by which the sidebar can disappear.

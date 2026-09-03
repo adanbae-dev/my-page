@@ -1,0 +1,84 @@
+---
+title: The side menu vanished on one screen only
+summary: I made five guesses, confirmed all of them wrong, and only then found the cause. Two styling rules fought, and arrival order decided the winner.
+authored: false
+---
+
+This is about an admin screen used inside a company.
+
+On one particular page, **the whole left-hand menu disappeared.**
+No error message, and every other page was fine.
+
+## Five wrong guesses
+
+There were few clues, so I made guesses and checked them one by one. All of them were wrong.
+
+| What I guessed | What I found |
+|---|---|
+| A required marker was missing from the code | The result was the same whether it was there or not |
+| The menu list arrives empty | The server response contained it properly |
+| The menu's space got squashed to zero | It did not, at any screen size |
+| It was hidden because of permissions | The permission check only covers a different area |
+| Old code is on the server | The account had every permission it needed |
+
+## The real cause
+
+The box wrapping the menu had two rules on it at once: **"hide this"** and **"show this if the screen is wide."**
+
+Those two rules have **exactly the same strength.** When strength is equal, **whichever arrives later wins.**
+
+A shared design bundle used across the company was also writing the "hide this" rule into its own file.
+On pages where that file arrives **later** than ours, "hide this" won and the menu disappeared.
+
+## Why only that one page — this was the crux
+
+Nine files use the same bundle and only one broke.
+It only happened when **three conditions lined up at once.**
+
+1. That page is the kind built on the server
+2. That file is passed along and re-exported through another file ← only this one of the nine
+3. That file has no marker saying "this runs in the browser"
+
+When all three overlap, the styling file **splits off into a bundle just for that page**,
+and a page-specific bundle arrives **later** than the shared one.
+
+When I measured, the broken page alone had one extra styling file,
+and the last "hide this" was inside that extra file.
+
+**And condition 2 was something I created.**
+Tidying code a few days earlier, I passed the file outward so other places could use it — and that became the path.
+A change I made to honour a rule created a problem one layer down.
+
+## I fixed it in two layers
+
+- **Remove the cause** — I added the "this runs in the browser" marker to that file.
+  Then its styling goes into the shared bundle. I tidied the nine identical files too.
+- **Stop it recurring** — I moved the "hide this" rule inside the screen-size condition.
+  Then the bare "hide this" disappears from the box, and the outside rule has nothing left to fight.
+
+**Do not try to win the strength contest. Remove the contest.** That was the right shape.
+
+After deploying I measured again. The file count dropped and the menu shows correctly.
+
+## What it taught me
+
+**1. Some problems only appear on the real service.**
+The development server hands over styling as one lump; only the real server splits it per page.
+No matter how many times I ran it on my own computer, it was an environment where the bug could not appear.
+
+**2. You have to reproduce it at the address the user actually uses.**
+I assumed "the development environment" meant my computer and checked repeatedly — against the wrong target.
+
+**3. Decide first what should change.**
+My first guess had **the right location.** But I threw it away after checking only "does it error."
+The real effect was not an error; it was where the styling file got loaded.
+If you do not decide what to look at, you throw away correct guesses.
+
+**4. Do not write "this always arrives" for a value the server does not send.**
+Three places in this one response were written that way.
+Fix it to match reality and the tools find the rest of the gaps for you.
+
+**5. Do not judge from a list you cut short.**
+
+**6. A value filled in automatically for convenience can quietly change the meaning.**
+Leaving a person to choose it is safer.

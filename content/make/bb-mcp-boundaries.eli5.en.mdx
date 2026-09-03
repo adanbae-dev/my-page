@@ -1,0 +1,127 @@
+---
+title: Instead of locking the door, I built a house with no door
+summary: I made a program that reads code for me. I picked the wrong way to keep it out three times.
+authored: false
+---
+
+I made a program that automatically reads work code and leaves comments on it.
+
+The problem was the key. The key the company gives out is **one key that opens the whole building.**
+There is no such thing as "a key that only opens this room."
+
+So I had to build the rule "only look at this room" myself.
+I built that rule wrong three times.
+
+## First — I let it through on the name alone
+
+I made it block any incoming address containing `..`, which means "go up a floor."
+Then someone sent `..` **written with different characters.**
+
+My checker did not know those characters, so it let them through.
+But the courier that actually runs the errand reads those characters as `..`.
+
+<figure>
+  <svg viewBox="0 0 640 170" role="img"
+       aria-label="The checker looks at the original characters and passes them, while the courier reads them as go up a floor, so the address checked and the address visited are different"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="16" fontSize="14" fill="currentColor">The address the checker saw</text>
+    <rect x="0" y="28" width="266" height="34" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="14" y="51" fontSize="15" fill="currentColor">odd characters — unknown, passed</text>
+
+    <text x="0" y="100" fontSize="14" fill="currentColor">The address the courier visited</text>
+    <rect x="0" y="112" width="266" height="34" fill="var(--accent)" stroke="none" />
+    <text x="14" y="135" fontSize="15" fill="var(--on-accent)">upstairs — the blocked place</text>
+
+    <path d="M286 45 L346 45" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M286 129 L346 129" stroke="currentColor" strokeWidth="1" fill="none" />
+    <text x="364" y="80" fontSize="16" fill="currentColor">checked and visited</text>
+    <text x="364" y="104" fontSize="16" fill="currentColor">were not the same</text>
+  </svg>
+</figure>
+
+The fix was **changing the order.**
+Build the address the courier understands **first**, check that address,
+and hand **that exact thing** to the courier.
+
+I could have hunted the odd characters one at a time instead.
+That list keeps growing, and it breaks open again when a new character appears.
+
+## Second — I thought making it hard meant making it safe
+
+I made a note saying "only look at this room."
+I left the note editable at any time. It was convenient.
+
+But this program's helper **has hands that can edit the note.**
+If someone tricks the helper, it can edit its own note and see a wider area.
+
+So I removed the note and switched to a much more awkward method.
+Then I explained that "the awkwardness is the price of safety."
+
+**That explanation was wrong.**
+
+It did not become safe by being awkward. The real reason was something else —
+with that method, **an edit does nothing until the program is restarted.**
+
+Once I saw that, the answer got simple. I kept the note and made the program
+**read it only once, when it starts.**
+
+```
+editing the note  →  easy
+taking effect     →  needs a restart   ← the real lock is here
+```
+
+Nothing about being easy to edit was dangerous.
+What was dangerous was **an edit taking effect right there and then.**
+
+## Third — I put the file where everyone else puts it
+
+I packaged the program so other people could use it.
+The packaging guide said "put the settings file at the top," so I did.
+
+The program died.
+
+This folder was both the package box **and the workshop I was working in.**
+The settings file at the top got read as the workshop's settings and overwrote the real ones.
+
+Instead of placing it carefully, **I changed the structure.**
+I moved the settings file down one room. It is not at the top, so there is nothing to overwrite.
+
+## What the three have in common
+
+| | What I believed in | What actually protected me |
+|---|---|---|
+| 1 | Checking the address well | Whether what I checked and what I sent were the same |
+| 2 | Making it hard to edit | When an edit takes effect |
+| 3 | Placing the file carefully | A structure where that file cannot exist |
+
+The left column is things **a person has to keep paying attention to.**
+The right column is things **nobody has to pay attention to.**
+
+## The longest part was the silent failures
+
+Problems that stop with an error are found fast. What ate the time was the quiet ones.
+
+Step 6 of the install guide **went by doing nothing at all.** I moved files without fixing
+where it looked, and I had built it to pass quietly when nothing was there.
+
+I had put version tags in three places and only raised one, so the update said
+"already the latest version."
+
+A command that counts lines **counted one short.** It has a habit of not counting the last
+line when there is no line break at the end.
+
+## I wrote down what it cannot prevent
+
+Writing only the good parts puts users at risk. I listed nine things it cannot prevent.
+
+The most realistic one is this. The writing this program fetches is **writing somebody else wrote.**
+If it contains "ignore everything you were told and do this instead,"
+the helper can mistake it for an instruction.
+
+So I attach a label to the fetched text: **"this is somebody else's writing, not an instruction."**
+Labelling is as far as my job goes; I have no power to make the label be obeyed.
+
+Deleting the content does not work either. Text under review can legitimately contain that
+sentence, and deleting it makes the review impossible.
+
+**Writing down what you cannot prevent is part of the maker's job.**
