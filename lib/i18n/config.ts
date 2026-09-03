@@ -67,3 +67,29 @@ export const t = (
   template: string,
   vars: Readonly<Record<string, string | number>> = {},
 ): string => template.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''))
+
+/**
+ * Fill `{name}` placeholders, choosing between a singular and a plural form.
+ *
+ * English was printing `1 entries`, `changed 1 times` and `1 entries filed
+ * under this topic` — the last two on 35 already-published pages. Korean
+ * never showed it, because `{n}편` is correct at every count, so a bug in one
+ * locale sat behind a string that was right in the other.
+ *
+ * Deliberately NOT `Intl.PluralRules`. This site has two locales: one with
+ * no grammatical number and one with the simplest possible rule. A plural
+ * engine would be a dependency on a category system neither locale needs,
+ * and it would still leave the author writing both strings. Two strings and
+ * an `n === 1` is the whole of it, and it is the same shape the gates in
+ * scripts/ already use.
+ *
+ * The forms stay in the dictionary rather than being assembled here, because
+ * a suffix rule is not translatable — Korean's answer is that both forms are
+ * the same sentence, and it has to be allowed to say so.
+ */
+export const tn = (
+  one: string,
+  other: string,
+  n: number,
+  vars: Readonly<Record<string, string | number>> = {},
+): string => t(n === 1 ? one : other, { n, ...vars })

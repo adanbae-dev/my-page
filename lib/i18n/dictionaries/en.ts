@@ -84,6 +84,7 @@ export const en = {
     bornAt: 'First committed {date},',
     untouched: 'and untouched since.',
     touchedAgain: 'and changed {n} times since.',
+    touchedAgainOne: 'and changed once since.',
     fullBuildRecord: 'The full build record →',
     untranslated: 'This entry exists only in Korean.',
 
@@ -168,6 +169,7 @@ export const en = {
 
   seo: {
     topicDescription: '{blurb} {n} entries filed under this topic{titles}.',
+    topicDescriptionOne: '{blurb} {n} entry filed under this topic{titles}.',
     topicTitles: ' — {list}',
     artDirection:
       'Two grounds and one accent, a machine-checked contrast contract, the type scale, the motion vocabulary, and a mark computed from the commit record.',
@@ -258,6 +260,7 @@ export const en = {
     claimedUnproven: 'on the CV, unproven here',
     unclaimedProven: 'not on the CV, proven here',
     evidenceCount: '{n} entries',
+    evidenceCountOne: '{n} entry',
     noEvidence: '0 entries',
 
     groups: {

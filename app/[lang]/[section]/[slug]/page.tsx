@@ -12,7 +12,7 @@ import { commits as allCommits, historyFor } from '@/lib/git/load'
 import { type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
 import { formatDate } from '@/lib/format'
-import { isLocale, localePath, LOCALE_META, t, type Locale } from '@/lib/i18n/config'
+import { isLocale, localePath, LOCALE_META, t, tn, type Locale } from '@/lib/i18n/config'
 import { dict, type Dictionary } from '@/lib/i18n/dictionary'
 import { breadcrumbSchema, countWords, pageMetadata } from '@/lib/seo'
 import { getSection, isSectionId } from '@/lib/sections'
@@ -277,7 +277,7 @@ export default async function EntryPage({
               {t(d.entry.bornAt, { date: formatDate(born.date) })}{' '}
               {history.length === 1
                 ? d.entry.untouched
-                : t(d.entry.touchedAgain, { n: history.length - 1 })}
+                : tn(d.entry.touchedAgainOne, d.entry.touchedAgain, history.length - 1)}
             </p>
 
             <ul className={styles.commits}>

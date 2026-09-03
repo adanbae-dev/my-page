@@ -9,7 +9,7 @@ import { cx } from '@/lib/cx'
 import { getEntry } from '@/lib/content/load'
 import { commits as allCommits, historyFor } from '@/lib/git/load'
 import type { Commit } from '@/lib/git/schema'
-import { isLocale, localePath, type Locale } from '@/lib/i18n/config'
+import { isLocale, localePath, tn, type Locale } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import {
   allRefs,
@@ -398,7 +398,7 @@ function CapabilityRow({ c, locale }: { c: Capability; locale: Locale }) {
         <p className={cx('label', styles.capCount)}>
           {n === 0
             ? d.practice.noEvidence
-            : d.practice.evidenceCount.replace('{n}', String(n))}
+            : tn(d.practice.evidenceCountOne, d.practice.evidenceCount, n)}
         </p>
       </div>
 

@@ -10,7 +10,7 @@ import { TopicFilter } from '@/components/TopicFilter'
 import { allTopicParams, entriesForTopic, topicCounts } from '@/lib/content/load'
 import { cx } from '@/lib/cx'
 import { FIELD_MIN_LANES, laneCount, toField } from '@/lib/field'
-import { isLocale, localePath, t } from '@/lib/i18n/config'
+import { isLocale, localePath, t, tn } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { breadcrumbSchema, collectionPageSchema, pageMetadata } from '@/lib/seo'
 import { site } from '@/lib/site.config'
@@ -58,9 +58,8 @@ export async function generateMetadata({
    * truncated one in the other. So the limit is the length, not the count.
    */
   const compose = (titles: readonly string[]): string =>
-    t(d.seo.topicDescription, {
+    tn(d.seo.topicDescriptionOne, d.seo.topicDescription, entries.length, {
       blurb: meta.blurb,
-      n: entries.length,
       titles: titles.length > 0 ? t(d.seo.topicTitles, { list: titles.join(', ') }) : '',
     })
 

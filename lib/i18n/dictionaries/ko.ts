@@ -90,6 +90,7 @@ export const ko = {
     bornAt: '{date}에 처음 커밋됐고,',
     untouched: '이후 손대지 않았습니다.',
     touchedAgain: '이후 {n}번 더 손댔습니다.',
+    touchedAgainOne: '이후 한 번 더 손댔습니다.',
     fullBuildRecord: '전체 빌드 기록 →',
     /** Shown on an entry that exists only in another language. */
     untranslated: '이 글은 한국어로만 있습니다.',
@@ -180,6 +181,7 @@ export const ko = {
        short to tell a searcher, or an answer engine, whether the page holds
        anything. Composed from what the page actually contains instead. */
     topicDescription: '{blurb} 이 주제로 분류된 글 {n}편{titles}.',
+    topicDescriptionOne: '{blurb} 이 주제로 분류된 글 {n}편{titles}.',
     topicTitles: ' — {list}',
     artDirection:
       '이 인터페이스의 아트 디렉션. 두 개의 바탕과 하나의 액센트, 대비 계약, 타입 스케일, 모션 어휘, 그리고 저장소의 커밋 기록에서 계산되는 인장.',
@@ -274,6 +276,7 @@ export const ko = {
     claimedUnproven: '이력서에 있으나 여기서 미증명',
     unclaimedProven: '이력서에 없으나 여기서 증명됨',
     evidenceCount: '{n}편',
+    evidenceCountOne: '{n}편',
     noEvidence: '0편',
 
     groups: {
