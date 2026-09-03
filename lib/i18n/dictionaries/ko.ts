@@ -93,6 +93,16 @@ export const ko = {
     fullBuildRecord: '전체 빌드 기록 →',
     /** Shown on an entry that exists only in another language. */
     untranslated: '이 글은 한국어로만 있습니다.',
+
+    /* The plain register. `registerFull` names the entry as its author wrote
+       it, not "the original" — the retelling is not a translation of it, and
+       calling it an original invites the reader to read the pair as one. */
+    registerLabel: '읽는 방식',
+    registerFull: '원문',
+    registerPlain: '쉽게',
+    plainNotice: '이 쪽은 원문을 쉬운 말로 다시 쓴 판입니다. 저자가 쓴 문장은 원문 쪽에 있습니다.',
+    plainMachine: '이 판의 문장은 사람이 쓰지 않았습니다.',
+    plainReadingMinutes: '쉬운 판 약 {n}분',
   },
 
   topics: {

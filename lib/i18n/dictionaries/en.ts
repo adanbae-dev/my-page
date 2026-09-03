@@ -86,6 +86,14 @@ export const en = {
     touchedAgain: 'and changed {n} times since.',
     fullBuildRecord: 'The full build record →',
     untranslated: 'This entry exists only in Korean.',
+
+    registerLabel: 'How to read this',
+    registerFull: 'As written',
+    registerPlain: 'In plain words',
+    plainNotice:
+      'This is the entry retold in plain words. The sentences the author wrote are on the other side of the switch.',
+    plainMachine: 'Nobody wrote the sentences on this page by hand.',
+    plainReadingMinutes: '~{n} min plain',
   },
 
   topics: {

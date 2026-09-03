@@ -197,6 +197,7 @@
    overlap the next link when rows sit closer than 24px, and an ambiguous tap
    is a worse bug than a small one. Growing the box cannot do that. */
 .crumb a,
+.facts a,
 .provenance a {
   display: inline-flex;
   align-items: center;
@@ -213,4 +214,14 @@
   display: inline-flex;
   align-items: center;
   min-block-size: 24px;
+}
+
+/* The standing disclosure on a plain retelling. Accent rule like the
+   untranslated notice beside it — both say the same KIND of thing: what you
+   are about to read is not quite what you asked for, and here is how. */
+.notice {
+  margin-block-start: var(--space-xs);
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+  max-inline-size: var(--measure);
 }

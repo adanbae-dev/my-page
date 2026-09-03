@@ -250,3 +250,60 @@ export function toEntry(args: {
     }
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* The plain register                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * An entry retold in plain language — the `.eli5.mdx` sibling.
+ *
+ * It carries ONLY what the register changes: the title, the summary and the
+ * prose. Date, topics, tags and MAKE's decision fields are facts about the
+ * entry, and a fact does not get a second copy because the sentences around
+ * it got shorter — two copies is two things to keep in step, and one of them
+ * would eventually be wrong. The loader reads those from the original.
+ *
+ * `authored` is required and has no default. This site's claim is that the
+ * prose is the evidence, so a retelling nobody wrote by hand has to say so
+ * on the page; a default would let an unlabelled one through, which is the
+ * one failure this field exists to prevent.
+ */
+export type Eli5 = {
+  readonly chapter: SectionId
+  readonly slug: string
+  readonly title: string
+  readonly summary: string
+  readonly body: string
+  readonly readingMinutes: number
+  readonly authored: boolean
+}
+
+/** Parse and validate one `.eli5.mdx` file. */
+export function toEli5(args: {
+  file: string
+  chapter: SectionId
+  slug: string
+  data: Record<string, unknown>
+  body: string
+}): Eli5 {
+  const { file, chapter, slug, data, body } = args
+
+  const authored = data['authored']
+  if (typeof authored !== 'boolean') {
+    throw new ContentError(
+      file,
+      'frontmatter "authored" must be true or false — a plain retelling states who wrote it',
+    )
+  }
+
+  return {
+    chapter,
+    slug,
+    title: requireString(file, data, 'title'),
+    summary: requireString(file, data, 'summary'),
+    body,
+    readingMinutes: estimateReadingMinutes(body),
+    authored,
+  }
+}

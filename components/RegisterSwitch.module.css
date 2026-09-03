@@ -1,0 +1,41 @@
+/* Unlayered on purpose — see any *.module.css header. */
+
+.switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+  margin-block-end: var(--space-m);
+}
+
+/* WCAG 2.2 SC 2.5.8 (AA) — 24x24 CSS px, met with a real box rather than an
+   invisible overlay, the same way the crumb and chip targets are. */
+.option {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+  padding-inline: 0.6em;
+  padding-block: 0.15em;
+  border: var(--rule-w) solid var(--rule);
+  text-decoration: none;
+  color: var(--muted);
+}
+
+/* The one you are reading. Filled rather than merely bolder: at label size
+   weight alone is not a reliable difference, and this is the only thing on
+   the page telling you which of two nearly identical addresses you are at. */
+.current {
+  background-color: var(--figure);
+  color: var(--ground);
+  border-color: var(--figure);
+}
+
+a.option {
+  transition: background-color var(--dur-quick) var(--ease-standard),
+    color var(--dur-quick) var(--ease-standard);
+}
+
+a.option:hover {
+  background-color: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}

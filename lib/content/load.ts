@@ -6,7 +6,15 @@ import { DEFAULT_LOCALE, isLocale, type Locale } from '@/lib/i18n/config'
 import { memoStatic } from '@/lib/memo'
 import { SECTION_IDS, type SectionId } from '@/lib/sections'
 import { TOPIC_IDS, type TopicId } from '@/lib/topics'
-import { ContentError, toEntry, type Entry, type Log, type Work } from './schema'
+import {
+  ContentError,
+  toEli5,
+  toEntry,
+  type Eli5,
+  type Entry,
+  type Log,
+  type Work,
+} from './schema'
 
 /**
  * Content loader. Server-only: it touches the filesystem, so importing it
@@ -37,15 +45,43 @@ const CONTENT_DIR = join(process.cwd(), 'content')
  */
 const LOCALE_SUFFIX = /\.([a-z]{2})$/
 
-/** `foo.en` -> { slug: 'foo', locale: 'en' } · `foo` -> { slug: 'foo', locale: default } */
-function splitName(base: string): { slug: string; locale: Locale } | null {
-  const m = LOCALE_SUFFIX.exec(base)
-  if (!m) return { slug: base, locale: DEFAULT_LOCALE }
-  const tag = m[1]!
-  // A slug may legitimately end in a two-letter segment that is not a locale
-  // (`.js`, `.io`). Only a known locale counts as a translation marker.
-  if (!isLocale(tag)) return { slug: base, locale: DEFAULT_LOCALE }
-  return { slug: base.slice(0, -m[0].length), locale: tag }
+/**
+ * The plain retelling is a SIBLING too, for the same reason a translation is.
+ *
+ *   content/think/why-contrast-came-first.mdx           the entry
+ *   content/think/why-contrast-came-first.eli5.mdx      the same entry, retold plainly
+ *   content/think/why-contrast-came-first.eli5.en.mdx   that retelling in English
+ *
+ * The locale stays OUTERMOST so the rule already in place — the last segment,
+ * if it is a known locale, is the language — keeps working untouched, and one
+ * `ls` still sorts every version of an entry together. Partial coverage is
+ * the expected steady state here as well: some entries are already plain and
+ * do not need a second telling.
+ */
+const ELI5_SUFFIX = /\.eli5$/
+
+/** Which telling of an entry a file holds. */
+export type Register = 'full' | 'eli5'
+
+/** `foo.eli5.en` -> { slug: 'foo', locale: 'en', register: 'eli5' } */
+function splitName(base: string): { slug: string; locale: Locale; register: Register } {
+  let rest = base
+  let locale: Locale = DEFAULT_LOCALE
+
+  const m = LOCALE_SUFFIX.exec(rest)
+  if (m) {
+    const tag = m[1]!
+    // A slug may legitimately end in a two-letter segment that is not a locale
+    // (`.js`, `.io`). Only a known locale counts as a translation marker.
+    if (isLocale(tag)) {
+      locale = tag
+      rest = rest.slice(0, -m[0].length)
+    }
+  }
+
+  const e = ELI5_SUFFIX.exec(rest)
+  if (e) return { slug: rest.slice(0, -e[0].length), locale, register: 'eli5' }
+  return { slug: rest, locale, register: 'full' }
 }
 
 /** One entry plus the language its text is actually in. */
@@ -55,39 +91,51 @@ export type LocalisedEntry = Entry & {
   readonly translated: boolean
 }
 
+/** A plain retelling plus the language its text is actually in. */
+export type Eli5Entry = Eli5 & {
+  readonly locale: Locale
+  /** False when this is the Korean retelling standing in for a missing one. */
+  readonly translated: boolean
+}
+
 type Loaded = { entry: Entry; locale: Locale }
+type LoadedEli5 = { eli5: Eli5; locale: Locale }
 
-function readChapter(chapter: SectionId): Loaded[] {
+function readChapter(chapter: SectionId): { entries: Loaded[]; eli5: LoadedEli5[] } {
   const dir = join(CONTENT_DIR, chapter)
-  if (!existsSync(dir)) return []
+  if (!existsSync(dir)) return { entries: [], eli5: [] }
 
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.mdx'))
-    .map((f) => {
-      const base = f.replace(/\.mdx$/, '')
-      const parsed = splitName(base)
-      if (!parsed) throw new ContentError(`content/${chapter}/${f}`, 'unreadable filename')
-      const raw = readFileSync(join(dir, f), 'utf8')
-      const { data, content } = matter(raw)
-      return {
-        locale: parsed.locale,
-        entry: toEntry({
-          file: `content/${chapter}/${f}`,
-          chapter,
-          slug: parsed.slug,
-          data: data as Record<string, unknown>,
-          body: content.trim(),
-        }),
-      }
-    })
+  const entries: Loaded[] = []
+  const eli5: LoadedEli5[] = []
+
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.mdx')) continue
+    const { slug, locale, register } = splitName(f.replace(/\.mdx$/, ''))
+    const { data, content } = matter(readFileSync(join(dir, f), 'utf8'))
+    const args = {
+      file: `content/${chapter}/${f}`,
+      chapter,
+      slug,
+      data: data as Record<string, unknown>,
+      body: content.trim(),
+    }
+    if (register === 'eli5') eli5.push({ eli5: toEli5(args), locale })
+    else entries.push({ entry: toEntry(args), locale })
+  }
+
+  return { entries, eli5 }
 }
 
 /** Newest first. Ties broken by slug so the order is stable across builds. */
 const byDateDesc = (a: Entry, b: Entry): number =>
   b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)
 
-const allLoaded = memoStatic((): readonly Loaded[] => {
-  const loaded = SECTION_IDS.flatMap(readChapter)
+type Library = { entries: readonly Loaded[]; eli5: readonly LoadedEli5[] }
+
+const library = memoStatic((): Library => {
+  const read = SECTION_IDS.map(readChapter)
+  const loaded = read.flatMap((r) => r.entries)
+  const plain = read.flatMap((r) => r.eli5)
 
   // A collision would make one entry unreachable and the other ambiguous.
   // The key includes the locale now: `foo.mdx` and `foo.en.mdx` are the same
@@ -119,8 +167,46 @@ const allLoaded = memoStatic((): readonly Loaded[] => {
     }
   }
 
-  return loaded.sort((a, b) => byDateDesc(a.entry, b.entry))
+  /* The retellings answer to the same two rules, for the same reasons: a
+     second one in a locale would be an ambiguous route, and one with no
+     entry behind it would be a page claiming to simplify something that
+     does not exist. The English retelling additionally needs the Korean
+     one, so the fallback below always has somewhere to land. */
+  const plainOriginals = new Set(
+    plain
+      .filter((l) => l.locale === DEFAULT_LOCALE)
+      .map((l) => `${l.eli5.chapter}/${l.eli5.slug}`),
+  )
+  const plainSeen = new Set<string>()
+  for (const { eli5, locale } of plain) {
+    const behind = `${eli5.chapter}/${eli5.slug}`
+    const key = `${locale}:${behind}`
+    if (plainSeen.has(key)) {
+      throw new ContentError(key, 'duplicate eli5 slug for this locale')
+    }
+    plainSeen.add(key)
+
+    if (!originals.has(behind)) {
+      throw new ContentError(
+        `content/${behind}.eli5.mdx`,
+        `a retelling with no entry behind it — ${behind}.mdx does not exist`,
+      )
+    }
+    /* Checked against the whole set rather than what the loop has passed:
+       readdir hands back `foo.eli5.en.mdx` before `foo.eli5.mdx`, so a
+       progressive check would fail on a pair that is complete. */
+    if (locale !== DEFAULT_LOCALE && !plainOriginals.has(behind)) {
+      throw new ContentError(
+        `content/${behind}.eli5.${locale}.mdx`,
+        `a translated retelling with no ${DEFAULT_LOCALE} retelling to fall back to`,
+      )
+    }
+  }
+
+  return { entries: loaded.sort((a, b) => byDateDesc(a.entry, b.entry)), eli5: plain }
 })
+
+const allLoaded = (): readonly Loaded[] => library().entries
 
 /** Drafts are authored freely and never published. */
 const isPublished = (e: Entry): boolean =>
@@ -182,6 +268,67 @@ export function getEntry(
 
 export function publishedEntries(locale: Locale = DEFAULT_LOCALE): readonly LocalisedEntry[] {
   return resolvedAll(locale)
+}
+
+/* ------------------------------------------------------------------ */
+/* The plain register                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The plain retelling of one entry, resolved for one locale.
+ *
+ * `undefined` is the ordinary answer, not a failure: most entries have no
+ * retelling, and the toggle on the entry page appears only where this
+ * returns something. The locale fallback is the entry's own — the Korean
+ * retelling stands in for a missing English one and says so — because a
+ * reader who asked for plain language is worse served by a 404 than by the
+ * wrong language with a notice on it.
+ */
+export function getEli5(
+  chapter: SectionId,
+  slug: string,
+  locale: Locale,
+): Eli5Entry | undefined {
+  // Gated on the entry, so a draft cannot be published through its retelling.
+  if (!getEntry(chapter, slug, locale)) return undefined
+
+  const all = library().eli5
+  const wanted = all.find(
+    (l) => l.locale === locale && l.eli5.chapter === chapter && l.eli5.slug === slug,
+  )
+  if (wanted) return { ...wanted.eli5, locale, translated: true }
+
+  const original = all.find(
+    (l) =>
+      l.locale === DEFAULT_LOCALE && l.eli5.chapter === chapter && l.eli5.slug === slug,
+  )
+  if (!original) return undefined
+  return {
+    ...original.eli5,
+    locale: DEFAULT_LOCALE,
+    translated: locale === DEFAULT_LOCALE,
+  }
+}
+
+/** Whether the entry page should offer the choice at all. */
+export function hasEli5(chapter: SectionId, slug: string, locale: Locale): boolean {
+  return getEli5(chapter, slug, locale) !== undefined
+}
+
+/**
+ * Every (locale, chapter, slug) that has a retelling to prerender.
+ *
+ * The cross product, for the same reason `allParams` takes it: an entry
+ * retold only in Korean still has an English route rather than a 404 on a
+ * page a reader can see linked.
+ */
+export function allEli5Params(): { lang: Locale; section: SectionId; slug: string }[] {
+  const locales = ['ko', 'en'] as const
+  return locales.flatMap((lang) =>
+    publishedEntries(lang)
+      .filter((e) => hasEli5(e.chapter, e.slug, lang))
+      .map((e) => ({ lang, section: e.chapter, slug: e.slug })),
+  )
 }
 
 /** How much of the archive exists in each locale — reported by the gate. */

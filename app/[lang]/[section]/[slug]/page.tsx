@@ -4,9 +4,10 @@ import { notFound } from 'next/navigation'
 
 import { JsonLd } from '@/components/JsonLd'
 import { Prose } from '@/components/Prose'
+import { RegisterSwitch } from '@/components/RegisterSwitch'
 import { Section } from '@/components/Section'
 import { Sigil } from '@/components/Sigil'
-import { allParams, entryNeighbours, getEntry, isWork } from '@/lib/content/load'
+import { allParams, entryNeighbours, getEntry, hasEli5, isWork } from '@/lib/content/load'
 import { commits as allCommits, historyFor } from '@/lib/git/load'
 import { type Entry } from '@/lib/content/schema'
 import { cx } from '@/lib/cx'
@@ -95,6 +96,11 @@ export default async function EntryPage({
 
   const { newer, older } = entryNeighbours(section, slug, locale)
 
+  /* Offered only where a retelling exists. A switch with one working half is
+     a promise the archive cannot keep — most entries have no plain version
+     and some never will. */
+  const plain = hasEli5(section, slug, locale)
+
   /*
    * Provenance, from the repository.
    *
@@ -148,6 +154,17 @@ export default async function EntryPage({
             </Link>
             <span>{d.sections[chapter.id].question}</span>
           </p>
+
+          {plain && (
+            <RegisterSwitch
+              locale={locale}
+              path={`/${entry.chapter}/${entry.slug}`}
+              current="full"
+              full={d.entry.registerFull}
+              plain={d.entry.registerPlain}
+              label={d.entry.registerLabel}
+            />
+          )}
 
           {/* Paired with the same title in the list it was clicked from. */}
           <h1

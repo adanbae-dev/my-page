@@ -54,6 +54,24 @@ const LOCALES = [
 ].map((m) => m[1])
 const DEFAULT_LOCALE = /export const DEFAULT_LOCALE: Locale = '([a-z-]+)'/.exec(i18nSrc)?.[1]
 const translations = Object.fromEntries(LOCALES.map((l) => [l, 0]))
+
+/* A filename carries three things: the slug, optionally the language, and
+   optionally the register. Split it the same way lib/content/load.ts does —
+   locale outermost — so this gate does not read `foo.eli5` as a slug and
+   reject an entry the build is perfectly happy with. */
+function splitName(base) {
+  let rest = base
+  let locale = DEFAULT_LOCALE
+  const m = /\.([a-z]{2})$/.exec(rest)
+  if (m && LOCALES.includes(m[1])) {
+    locale = m[1]
+    rest = rest.slice(0, -m[0].length)
+  }
+  if (rest.endsWith('.eli5')) return { slug: rest.slice(0, -'.eli5'.length), locale, register: 'eli5' }
+  return { slug: rest, locale, register: 'full' }
+}
+
+let retellings = 0
 const MAX_SUMMARY = 160
 const today = new Date().toISOString().slice(0, 10)
 
@@ -105,19 +123,36 @@ for (const chapter of CHAPTERS) {
       continue
     }
 
-    count++
-    const slug = f.replace(/\.mdx$/, '')
+    const { slug, locale, register } = splitName(f.replace(/\.mdx$/, ''))
 
     // 2. Slugs must survive being a URL and stay stable across filesystems.
     if (!SLUG.test(slug)) {
       problems.push(`${rel} — slug must be lowercase-kebab-case`)
     }
-    if (seen.has(slug.toLowerCase())) {
+    /* Keyed by every axis that makes a file distinct. Keyed by slug alone,
+       an entry and its own translation would report as a collision. */
+    const key = `${register}:${locale}:${slug.toLowerCase()}`
+    if (seen.has(key)) {
       problems.push(`${rel} — duplicate slug (case-insensitive) in this chapter`)
     }
-    seen.add(slug.toLowerCase())
+    seen.add(key)
 
     const { data } = matter(readFileSync(join(dir, f), 'utf8'))
+
+    /* A retelling is not an entry. It carries only the title, the summary
+       and the prose — everything else is read from the entry behind it — so
+       the checks below, which are all about entry frontmatter, would be
+       asking it for fields it is defined not to have. */
+    if (register === 'eli5') {
+      retellings++
+      if (data.authored === true) {
+        notes.push(`${rel} — retelling marked as written by hand`)
+      }
+      continue
+    }
+
+    count++
+    if (locale !== DEFAULT_LOCALE) translations[locale]++
 
     // Count topic usage. The build already rejects an unknown topic; this
     // catches the reverse — a declared topic nobody writes about.
@@ -148,6 +183,10 @@ for (const chapter of CHAPTERS) {
 
 line(`  ${count} entr${count === 1 ? 'y' : 'ies'} across ${CHAPTERS.length} chapters` +
      (drafts ? `, ${drafts} draft` : ''))
+line(`  ${retellings} retold in plain language, ` +
+     LOCALES.filter((l) => l !== DEFAULT_LOCALE)
+       .map((l) => `${translations[l]} translated to ${l}`)
+       .join(', '))
 /* A topic with fewer than two entries is not a classification — it is a
    dead end that still gets its own page and its own sitemap row. Two is the
    threshold at which "browse by this" starts meaning something. This is the
