@@ -1,0 +1,40 @@
+---
+title: I cut the list short, judged from it, and pushed to the wrong remote
+date: 2026-08-26
+kind: reconsidered
+summary: Read the remote list through head -2 and took the first entry for the target. Anything hard to undo gets read whole.
+topics: [process, tooling]
+tags: [git, habit]
+---
+
+A monorepo had four remotes on it. I looked at the list like this.
+
+```bash
+git remote -v | head -2
+```
+
+I took the first entry for the target and pushed. The main remote was elsewhere.
+
+## Cause
+
+Judging from a truncated list. Not knowing how many remotes there were,
+I read two lines and went with "that'll be the one."
+
+Nothing broke. It was a fast-forward on a branch that already existed — no overwrite,
+no divergence — and the SHAs matched in all three places, so consistency held.
+That means I was lucky, not that the judgement was sound.
+
+## What changed
+
+Anything hard to undo, like a remote or a branch, gets confirmed from the whole list.
+No `head`, no `grep`. Reading four lines costs less time
+than checking what happened after a push to the wrong place.
+
+## What came with it
+
+That branch's upstream pointed at a local `master` rather than at a remote.
+So `git status`'s ahead/behind was a number with no relation to any remote,
+and a bare `git push` was in a position to do something other than intended.
+
+The number I was reading was not pointing at the thing I thought it was —
+which makes the cause the same as above.

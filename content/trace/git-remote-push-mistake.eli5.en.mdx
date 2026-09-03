@@ -1,0 +1,41 @@
+---
+title: I looked at a shortened list and sent code to the wrong place
+summary: I looked at only two lines of an address list and assumed the first was right. Anything hard to undo needs the list read to the end.
+authored: false
+---
+
+The code store I was working in had **four addresses** it could send code to.
+Each address points at a different server.
+
+I looked at that list like this.
+
+```bash
+git remote -v | head -2
+```
+
+`head -2` means **show me only the top two lines**.
+Then I decided the first line was the address I wanted, and sent the code.
+
+The address I should have used was a different one.
+
+## Why it happened
+
+I judged from a list I had cut short.
+Not even knowing how many addresses there were, I read two lines and thought "that'll be it."
+
+Luckily nothing broke.
+The code attached cleanly to what was already there, so nothing was overwritten and nothing split apart.
+That means I was lucky, not that my judgement was right.
+
+## What I changed
+
+When handling something hard to undo, **I read the list all the way to the end.**
+I do not attach a command that shortens it.
+Reading four lines takes less time than checking what happened after sending code to the wrong place.
+
+## Something I found along the way
+
+That line of work was pointing, by default, not at a server but at **another line of work inside my own computer.**
+
+So the number telling me "you are a few ahead of the server" had nothing to do with any server.
+The number I was reading was not pointing at what I thought it was — which makes the cause the same as above.

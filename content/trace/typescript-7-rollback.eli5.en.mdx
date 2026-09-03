@@ -1,0 +1,33 @@
+---
+title: I installed a new version, then took it out again
+summary: I installed a faster new version and the whole code-checking toolchain stopped. I went back to the old one.
+authored: false
+---
+
+This site is built with a tool called **TypeScript**.
+It catches mistakes before the code ever runs.
+
+Version 7.0.2 of that tool was out.
+It had been rebuilt from scratch and was said to be much faster. So I installed it.
+
+When I ran the code checks, everything stopped with this message.
+
+```
+typescript-eslint does not support TS 7.0.
+```
+
+It means a different tool — the one that checks code style — does not know about 7.0 yet.
+This site's default setup calls that tool from the inside,
+so everything halts even if I use none of its rules.
+
+## How I decided
+
+I timed the checks with the version I had been using. **0.87 seconds.**
+That was not the part that felt slow.
+
+What I stood to gain was **speed nobody would notice.**
+What I stood to lose was **the entire code-checking toolchain.**
+
+So I went back to 5.9.3. When the other tools catch up, I will try again.
+
+> A new version is not something you must take; it is something you choose. And a choice needs a reason.

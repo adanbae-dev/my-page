@@ -1,0 +1,30 @@
+---
+title: TypeScript 7 went in, then came back out
+date: 2026-08-24
+kind: abandoned
+summary: Chasing the native port's speed nearly cost the entire lint pipeline.
+topics: [process, tooling]
+tags: [tooling, typescript]
+---
+
+The latest in the registry was TypeScript **7.0.2**. Native port, far faster type checking.
+In it went.
+
+`pnpm lint` blew up.
+
+```
+typescript-eslint does not support TS 7.0.
+```
+
+`typescript-eslint` does not support the TS 7 API yet.
+`eslint-config-next` imports it internally, so the crash happens
+even with not a single rule in use.
+
+## The call
+
+Type checking in the build took **872ms**. It was not the bottleneck.
+What was on offer was speed nobody would feel; what was at stake was the whole lint pipeline.
+
+Back down to 5.9.3. When the ecosystem catches up, it goes up again.
+
+> The latest version is a choice, not a default. And a choice needs a reason.
