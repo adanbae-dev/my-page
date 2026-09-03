@@ -65,6 +65,19 @@
   padding-block: var(--section-y);
 }
 
+/* Two beats on the SAME ground read as one block, so the boundary must not
+   pay for two paddings. At 1440px `--section-y` is ~170px and the eras/
+   capabilities seam was opening a ~340px hole in the middle of one
+   continuous dark field.
+   
+   Only the same-tone case. Where the ground inverts, the doubled space IS
+   the composition — that pause is what makes the inversion land, and the
+   golden path is built on it. The selector stops applying on its own if a
+   light section is ever inserted between these two. */
+.beat + .beat {
+  padding-block-start: 0;
+}
+
 .beatTitle {
   margin-block: var(--space-s) var(--space-m);
 }

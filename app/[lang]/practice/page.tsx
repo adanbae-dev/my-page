@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { Sigil } from '@/components/Sigil'
 import { cx } from '@/lib/cx'
 import { getEntry } from '@/lib/content/load'
-import { historyFor } from '@/lib/git/load'
+import { commits as allCommits, historyFor } from '@/lib/git/load'
 import type { Commit } from '@/lib/git/schema'
 import { isLocale, localePath, type Locale } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
@@ -206,13 +206,21 @@ export default async function PracticePage({
               <dd>{d.practice.spanValue.replace('{n}', String(years))}</dd>
             </dl>
 
-            {/* The mark, lit by what this page can point at rather than by
-                the whole record — the same subset idiom an entry page uses. */}
+            {/* The mark, lit by the commits behind what this page points at.
+            
+                `within` is required for a subset, and passing `undefined`
+                was wrong: it makes the mark claim that these commits ARE the
+                record, so the unearned slots render as ticks and the arc
+                reads as "this is the whole history". Handing it the full
+                record instead lights the subset at the slots the record gave
+                them, with the rest stated as a ring — which is the true
+                claim, and the same idiom an entry page uses for its own
+                history. */}
             <Sigil
               commits={evidence}
-              within={undefined}
+              within={allCommits()}
               id="practice-sigil"
-              label={d.practice.evidenceLabel}
+              label={d.sigil.practiceLabel.replace('{n}', String(evidence.length))}
               className={styles.mark}
             />
           </div>
