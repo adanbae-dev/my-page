@@ -91,6 +91,14 @@ React emits inline styles for the few dynamic values this product sets, and
 nonce-ing them would mean giving up static prerendering on every route.
 Scripts get no exemption beyond Next's own bootstrap.
 
+**Where they are served from depends on the mode**, and the split is not
+cosmetic. `next.config.ts` declares `headers()` for `next dev` only;
+production serves them from `public/_headers`, generated from the same
+`lib/csp.mjs` by `scripts/sync-headers.mjs`. `output: 'export'` cannot do
+`headers()` and drops them with a warning rather than an error — see
+[Deploying — Cloudflare](#deploying--cloudflare) for why that is the most
+dangerous item on this page.
+
 ## The release gate
 
 `pnpm check:release` is deliberately **not** part of `pnpm verify`. `verify`
@@ -118,6 +126,133 @@ remains, and only the author can clear it:**
 
 That is the correct final state for this handover. The gate is not broken; it
 is doing the one job nobody else can do.
+
+## Deploying — Cloudflare
+
+Static export onto Workers Static Assets. Nothing runs at request time, which
+is the same posture the `redirects()` note in `next.config.ts` describes: this
+product refused a `proxy.ts` because it would put an edge function on every
+request, and both of Cloudflare's server-side options for Next — **vinext**
+(their current default recommendation) and **`@opennextjs/cloudflare`** —
+reintroduce exactly that cost for a site where 100% of routes are already
+prerendered.
+
+### What the export cost
+
+`output: 'export'` does not fail on the features it cannot do. It prints a
+warning and drops them. Four things had to change, and the build refused to
+proceed without the first three:
+
+| | Problem | Fix |
+|---|---|---|
+| 1 | `Page "/[lang]/[...rest]" returned incomplete params` | catch-all deleted; a catch-all cannot enumerate URLs that do not exist |
+| 2 | `dynamic = "force-static" not configured on route "/sitemap.xml"` | declared on `sitemap.ts`, `robots.ts`, `icon.tsx`, `opengraph-image.tsx` |
+| 3 | 404 came out as the framework default, 6,999 bytes | `app/[lang]/404/page.tsx` + `scripts/sync-404.mjs` |
+| 4 | `headers` and `redirects` silently dropped — **warning only** | `public/_headers` (generated) and `public/_redirects` |
+
+Item 4 is the dangerous one. The build succeeds; the site ships with no
+Content-Security-Policy; nothing says so.
+
+### Why the 404 needed a route of its own
+
+`out/404.html` is written from Next's built-in not-found, never from this
+product's. The catch-all that used to cover an unmatched URL cannot be
+exported at all, so `app/[lang]/404/page.tsx` renders the 404 as an ORDINARY
+page instead.
+
+Not via `notFound()`. Measured: a route that only calls `notFound()` exports
+an HTML file whose `<body>` is **38 bytes** — `<div hidden><!--$--><!--/$--></div>`
+— with every visible string present only inside the RSC payload in a
+`<script>`. It renders blank with JavaScript off, which is the one thing this
+product claims it does not do. As a plain page the body is 11,260 bytes of
+server-rendered markup.
+
+The markup lives in `components/NotFound.tsx` so that this route and
+`app/[lang]/not-found.tsx` cannot drift.
+
+Cloudflare's `not_found_handling: "404-page"` serves the **nearest**
+`404.html`, searching upward, which makes the 404 bilingual for free:
+`out/ko/404.html` answers `/ko/anything` and `out/en/404.html` answers
+`/en/anything`. `scripts/sync-404.mjs` copies the default locale's copy to
+`out/404.html` for a path with no locale in it, and **fails the build** if
+that file is missing or too small to hold the rendered page.
+
+### Why `_headers` is generated, not written
+
+`check:release` imports `contentSecurityPolicy` from `lib/csp.mjs` and asserts
+that the production policy has no `'unsafe-eval'` and does carry
+`frame-ancestors`, `object-src`, `base-uri` and `upgrade-insecure-requests`.
+A hand-copied CSP in `_headers` would leave that gate checking a string
+nothing serves — passing while the deployed policy drifted.
+`scripts/sync-headers.mjs` reads the same function, `pnpm build` runs it
+first, and it fails on Cloudflare's limits (100 rules, 2,000 chars per line).
+
+It also sets `Content-Type: image/png` for `/icon` and `/*/opengraph-image`.
+`next/og` writes those as real PNGs **with no file extension** — confirmed
+with `file --mime-type` on a real export — and a static host types a response
+from its extension, so without those two rules the favicon and every social
+card are served as an octet-stream and silently do not render.
+
+### Why the export is build-only
+
+`output: 'export'` set unconditionally also changes `next dev`. Measured:
+
+| dev behaviour | unconditional | build-only |
+|---|---|---|
+| CSP header on a dev response | 0 | 1 |
+| `/ko/nope` | 500 | 404 |
+| warnings on dev start | 2 | 0 |
+
+The 500 is `Page "/[lang]/[section]/page" is missing param ... required with
+"output: export"`. So `output` is production-only and `headers`/`redirects`
+are dev-only — each mode gets the half it can use, and no build prints a
+warning it is meant to ignore.
+
+One dev-only loss remains and is deliberate: with the catch-all gone, an
+unmatched URL in `next dev` shows the framework 404 rather than this one.
+`/ko/404` and `/en/404` are real routes, so the page is one click away.
+
+### Deploying
+
+```bash
+pnpm add -D wrangler                                   # done
+NEXT_PUBLIC_SITE_URL=https://<domain> pnpm build        # writes ./out
+NEXT_PUBLIC_SITE_URL=https://<domain> pnpm check:release
+pnpm deploy                                             # wrangler deploy
+```
+
+`NEXT_PUBLIC_SITE_URL` is not optional. Unset, `check:release` reports 77
+blockers — one for the variable and one per route with `localhost` baked into
+its canonical URL. With a real origin the same gate reports **READY**.
+
+`wrangler.jsonc` declares no Worker script: `assets.directory` is the whole
+deployment, so asset requests never reach or bill for a Worker.
+
+### Check on the first deploy
+
+One thing is not verifiable locally. This export writes both
+`out/ko/practice.html` and `out/ko/practice/` — the second holding the RSC
+payload for client navigation — and Cloudflare's documentation does not cover
+that shape. `html_handling: "auto-trailing-slash"` should serve the flat file
+at `/ko/practice`; confirm it is a 200 and not a 307 loop.
+
+| Request | Expected |
+|---|---|
+| `/` | 302 → `/ko` |
+| `/ko/practice` | 200, not a redirect loop |
+| `/ko/nope` | 404 with this site's 404, in Korean |
+| `/en/nope` | 404 with this site's 404, in English |
+| `/nope` | 404, Korean |
+| `/icon` | `content-type: image/png` |
+| any page | `content-security-policy` present |
+| `/ko/feed.xml` | `application/atom+xml` |
+| client navigation | the `.txt` RSC payload returns 200 |
+
+If the last two rows fail, `trailingSlash: true` moves the export to
+`out/ko/practice/index.html` and is the alternative — it changes the shape of
+every internal link, so it is a decision, not a toggle.
+
+---
 
 ## Open, deliberately
 

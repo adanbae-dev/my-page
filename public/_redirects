@@ -1,0 +1,18 @@
+# Cloudflare reads this out of the asset directory. `public/` is copied into
+# `out/` verbatim by `next build`, so this ships as `out/_redirects`.
+#
+# These two lived in next.config.ts `redirects()` until the static export.
+# `output: 'export'` drops that config with a warning rather than an error,
+# and the first of these is not cosmetic: without it there is no
+# `out/index.html` at all and the bare domain returns 404.
+#
+# Limits: 2,000 static rules, 100 dynamic, 1,000 chars per line.
+
+# `/` has no language, so it cannot render. 302 rather than 301 because the
+# choice of default locale is a product decision that may change, and a
+# cached permanent redirect would outlive it in browsers.
+/          /ko            302
+
+# The feed was unprefixed before locales existed. 301 because that move is
+# settled — this one is permanent on purpose.
+/feed.xml  /ko/feed.xml   301

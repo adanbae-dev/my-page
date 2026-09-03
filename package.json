@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm run sync:headers && next build && pnpm run sync:404",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -23,7 +23,10 @@
     "release": "pnpm run verify && pnpm run check:release",
     "check:motion": "node scripts/check-motion.mjs",
     "sync:perf": "node scripts/sync-perf.mjs",
-    "check:practice": "node scripts/check-practice.mjs"
+    "check:practice": "node scripts/check-practice.mjs",
+    "sync:headers": "node scripts/sync-headers.mjs",
+    "deploy": "wrangler deploy",
+    "sync:404": "node scripts/sync-404.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.7.0",
@@ -43,7 +46,8 @@
     "@types/three": "0.185.4",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.2",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "^4.128.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -21,6 +21,16 @@ import { url } from '@/lib/site.config'
 const languages = (path: string) =>
   Object.fromEntries(LOCALES.map((l) => [LOCALE_META[l].lang, url(localePath(l, path))]))
 
+/**
+ * `force-static` is required, not a hint.
+ *
+ * With `output: 'export'` the build REFUSES to collect this route without
+ * it: "export const dynamic = \"force-static\"/export const revalidate not
+ * configured on route ... with \"output: export\"". Nothing here reads the
+ * request, so declaring it costs nothing and the build says so plainly.
+ */
+export const dynamic = 'force-static'
+
 export default function sitemap(): MetadataRoute.Sitemap {
   return LOCALES.flatMap((lang) => {
     const entries = publishedEntries(lang)

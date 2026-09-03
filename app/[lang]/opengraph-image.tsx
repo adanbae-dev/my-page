@@ -6,6 +6,16 @@ import { OG, OG_CONTENT_TYPE, OG_SIZE, ogFonts } from '@/lib/og'
 import { sigilFrom, sigilSvgMarkup } from '@/lib/sigil'
 import { site } from '@/lib/site.config'
 
+/**
+ * `force-static` is required, not a hint.
+ *
+ * With `output: 'export'` the build REFUSES to collect this route without
+ * it: "export const dynamic = \"force-static\"/export const revalidate not
+ * configured on route ... with \"output: export\"". Nothing here reads the
+ * request, so declaring it costs nothing and the build says so plainly.
+ */
+export const dynamic = 'force-static'
+
 export const size = OG_SIZE
 export const contentType = OG_CONTENT_TYPE
 

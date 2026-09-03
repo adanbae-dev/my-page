@@ -2,6 +2,16 @@ import { ImageResponse } from 'next/og'
 
 import { OG } from '@/lib/og'
 
+/**
+ * `force-static` is required, not a hint.
+ *
+ * With `output: 'export'` the build REFUSES to collect this route without
+ * it: "export const dynamic = \"force-static\"/export const revalidate not
+ * configured on route ... with \"output: export\"". Nothing here reads the
+ * request, so declaring it costs nothing and the build says so plainly.
+ */
+export const dynamic = 'force-static'
+
 export const size = { width: 64, height: 64 }
 export const contentType = 'image/png'
 

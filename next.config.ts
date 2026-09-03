@@ -3,7 +3,49 @@ import type { NextConfig } from 'next'
 import { contentSecurityPolicy } from './lib/csp.mjs'
 import { DEFAULT_LOCALE } from './lib/i18n/config'
 
+/**
+ * `next dev` sets this to 'development' and `next build` to 'production'.
+ *
+ * The two config blocks below are DEV-ONLY, and the reason is mechanical:
+ * `output: 'export'` does not support `headers` or `redirects` and does not
+ * fail over them — it prints a warning and drops them. Leaving them declared
+ * would put two ignored warnings on every single build, which is how a real
+ * warning later goes unread. Their production counterparts are
+ * `public/_headers` (generated) and `public/_redirects` (written).
+ *
+ * Keeping them in dev is not symmetry for its own sake. The dev server is
+ * where a CSP violation is worth discovering, and `/` has to redirect
+ * somewhere on localhost too.
+ */
+const dev = process.env.NODE_ENV !== 'production'
+
 const nextConfig: NextConfig = {
+  /**
+   * Static export — BUILD ONLY, and the split is measured rather than tidy.
+   *
+   * Every route in this product is already prerendered: `dynamicParams` is
+   * false everywhere and the route handlers are `force-static`, so nothing
+   * runs at request time. Exporting makes that explicit and lets the site be
+   * served as plain assets, which is the posture the redirect note below
+   * describes — no edge function on any request.
+   *
+   * Setting it unconditionally also changes `next dev`, which is not what
+   * anyone wants. Measured on this repository:
+   *
+   *   Content-Security-Policy on a dev response   1 header  ->  0
+   *   /ko/nope (a URL matching no entry)          404       ->  500
+   *   warnings printed on every dev start         0         ->  2
+   *
+   * The 500 is `Page "/[lang]/[section]/page" is missing param ... which is
+   * required with "output: export"`. Development is where a CSP violation is
+   * worth catching and where a 404 should look like a 404, so the export and
+   * the two config blocks it forbids are split by mode instead.
+   *
+   * See docs/PRODUCTION.md for the four things the export cost, each of
+   * which the build refused to proceed without.
+   */
+  ...(dev ? {} : { output: 'export' as const }),
+
   reactStrictMode: true,
   poweredByHeader: false,
 
@@ -22,6 +64,7 @@ const nextConfig: NextConfig = {
    * `/` gets Korean and can switch. Adding proxy.ts later changes nothing
    * else.
    */
+  ...(dev && {
   async redirects() {
     return [
       { source: '/', destination: `/${DEFAULT_LOCALE}`, permanent: false },
@@ -67,6 +110,7 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  }),
 }
 
 export default nextConfig

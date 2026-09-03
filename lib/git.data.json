@@ -14,8 +14,92 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-03",
-  "head": "724f58d",
+  "head": "ea95813",
   "commits": [
+    {
+      "sha": "ea95813",
+      "date": "2026-09-03",
+      "subject": "Fix: 영어 단복수 — 이미 발행된 35개 페이지가 \"changed 1 times\" 였다",
+      "insertions": 38,
+      "deletions": 7,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "46bac0e",
+      "date": "2026-09-03",
+      "subject": "Fix: 화면으로 보고 나서야 보인 것 둘",
+      "insertions": 28,
+      "deletions": 5,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "06f1e76",
+      "date": "2026-09-03",
+      "subject": "Feat: 첫 직장 입사 연월을 시기에 넣는다 — 6년에서 13년으로",
+      "insertions": 48,
+      "deletions": 25,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "lib",
+        "docs"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "3b417a6",
+      "date": "2026-09-03",
+      "subject": "Docs: 브랜드 전략을 docs/ 로 옮기고, 추월당한 일곱 절을 고쳤다",
+      "insertions": 1187,
+      "deletions": 0,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "docs"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "aed5102",
+      "date": "2026-09-03",
+      "subject": "Feat: /practice — 이력서가 감추도록 만들어진 쪽을 그대로 렌더한다",
+      "insertions": 2076,
+      "deletions": 478,
+      "generated": 0,
+      "files": 10,
+      "areas": [
+        "app",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a44c91a",
+      "date": "2026-09-03",
+      "subject": "Build: 빌드 기록을 13커밋만큼 따라잡는다",
+      "insertions": 276,
+      "deletions": 2,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "724f58d",
       "date": "2026-09-03",
