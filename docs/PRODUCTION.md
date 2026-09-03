@@ -214,19 +214,71 @@ unmatched URL in `next dev` shows the framework 404 rather than this one.
 
 ### Deploying
 
+The domain is **goldibug.com**, and half the setup is already done. Measured
+with `dig`: the zone is on Cloudflare nameservers (`sima` and
+`gordon.ns.cloudflare.com`) and holds **no records at all** — no A, AAAA,
+CNAME, MX or TXT. Registration and zone creation are finished; nothing has
+ever been served from it.
+
+That empty state is what a Custom Domain wants. Cloudflare refuses to create
+one "on a hostname with an existing CNAME DNS record", and there is none.
+
 ```bash
-pnpm add -D wrangler                                   # done
-NEXT_PUBLIC_SITE_URL=https://<domain> pnpm build        # writes ./out
-NEXT_PUBLIC_SITE_URL=https://<domain> pnpm check:release
-pnpm deploy                                             # wrangler deploy
+pnpm add -D wrangler                                        # done
+npx wrangler login                                          # OAuth in the browser
+npx wrangler whoami                                         # confirm the account
+
+NEXT_PUBLIC_SITE_URL=https://goldibug.com pnpm build         # writes ./out
+NEXT_PUBLIC_SITE_URL=https://goldibug.com pnpm check:release # must say READY
+pnpm deploy                                                  # wrangler deploy
 ```
+
+`wrangler login` opens a browser and grants the CLI a token through
+Cloudflare's own screen — no API token is pasted into a terminal or a file.
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are the alternative and
+are what CI would use; a token belongs in the CI secret store, never in this
+repository.
 
 `NEXT_PUBLIC_SITE_URL` is not optional. Unset, `check:release` reports 77
 blockers — one for the variable and one per route with `localhost` baked into
 its canonical URL. With a real origin the same gate reports **READY**.
 
 `wrangler.jsonc` declares no Worker script: `assets.directory` is the whole
-deployment, so asset requests never reach or bill for a Worker.
+deployment, so asset requests never reach or bill for a Worker. Its `routes`
+entry with `custom_domain: true` makes Cloudflare create the DNS record and
+issue the certificate; nothing needs to be added by hand in the DNS tab.
+
+### www, and why it is not in wrangler.jsonc
+
+A Custom Domain matches the hostname **exactly**. A Worker on `goldibug.com`
+does not receive `www.goldibug.com`, and adding both as Custom Domains would
+publish the site at two canonical origins — which every `<link rel="canonical">`
+on the site would then contradict.
+
+So the apex is the site and www redirects to it. That is two things in the
+dashboard, not in this repository:
+
+1. **DNS** → add a **proxied** `AAAA` record for `www` pointing at `100::`.
+   A placeholder address, proxied, so the request reaches Cloudflare's edge
+   at all — there is nothing behind it.
+2. **Rules → Redirect Rules** → `www.goldibug.com/*` → `https://goldibug.com/$1`,
+   301, preserving path and query.
+
+### Email
+
+`docs/BRAND.md` §19-b says this site publishes no email address, and that
+stays true of the pages. A domain mailbox is a separate thing and Cloudflare
+does it on the same zone: **Compute → Email Service → Email Routing →
+Onboard Domain**. It adds the MX record plus SPF and DKIM TXT records, and
+forwards to a mailbox you already have, after that mailbox verifies itself
+by clicking a link Cloudflare mails it.
+
+It is **receive-only forwarding**. Sending *from* the address is a separate
+feature and is not part of onboarding.
+
+The MX and TXT records do not collide with the Worker's Custom Domain —
+different record types on the same zone — so the order of the two does not
+matter.
 
 ### Check on the first deploy
 

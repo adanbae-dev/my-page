@@ -14,8 +14,27 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-03",
-  "head": "ea95813",
+  "head": "18cc737",
   "commits": [
+    {
+      "sha": "18cc737",
+      "date": "2026-09-04",
+      "subject": "Feat: 정적 export 로 Cloudflare 배포 준비 — 네 개의 조용한 실패를 막았다",
+      "insertions": 1260,
+      "deletions": 578,
+      "generated": 818,
+      "files": 19,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "docs",
+        "config",
+        "generated"
+      ],
+      "entries": []
+    },
     {
       "sha": "ea95813",
       "date": "2026-09-03",

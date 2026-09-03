@@ -8,6 +8,19 @@
   "name": "personal-interface",
   "compatibility_date": "2026-09-03",
 
+  // The apex is the canonical host. Cloudflare creates the DNS record and
+  // issues the certificate for a Custom Domain automatically — the zone is
+  // already on Cloudflare nameservers (sima/gordon.ns.cloudflare.com) with no
+  // records in it, which is exactly the state a Custom Domain wants.
+  //
+  // A Custom Domain matches the hostname EXACTLY: a Worker on goldibug.com
+  // does not receive www.goldibug.com. www is handled by a Redirect Rule in
+  // the dashboard plus a proxied placeholder record, not here — see
+  // docs/PRODUCTION.md.
+  "routes": [
+    { "pattern": "goldibug.com", "custom_domain": true }
+  ],
+
   "assets": {
     "directory": "./out",
 

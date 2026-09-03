@@ -852,10 +852,12 @@ Goldibug는 처음부터 콘텐츠를 많이 만들 필요가 없다.
 -   프로젝트 공유 · 글 공유 — **아직**
 -   오픈소스/개인 실험 공개 — 이 사이트 자체가 첫 번째
 
-Phase 3 을 막고 있는 것은 콘텐츠가 아니라 배포다. `goldibug.dev` 가 아직
-등록돼 있지 않고 `NEXT_PUBLIC_SITE_URL` 이 비어 있어서, `pnpm check:release`
-가 76개 라우트 전부에 localhost 가 박혀 있다고 막는다. **공유할 URL 이
-없다는 것이 Phase 3 의 유일한 blocker 다.**
+Phase 3 을 막고 있는 것은 콘텐츠가 아니라 배포다. 다만 그 상태가 바뀌었다 —
+**`goldibug.com` 은 등록돼 있고 이미 Cloudflare 네임서버를 쓴다**
+(`sima`/`gordon.ns.cloudflare.com`). 존은 만들어져 있고 레코드가 하나도
+없다. 남은 것은 배포 자체와 `NEXT_PUBLIC_SITE_URL` 설정이고, 그때까지
+`pnpm check:release` 는 76개 라우트에 localhost 가 박혀 있다고 막는다.
+절차는 `docs/PRODUCTION.md` 의 "Deploying — Cloudflare" 에 있다.
 
 ### Phase 4 --- Ecosystem
 
@@ -1115,7 +1117,7 @@ Goldibug의 브랜딩이 성공했다고 판단하는 기준:
 | 1 | 워드마크 재설계 | **닫힘** — 워드마크 유지, 심볼 자리는 `lib/sigil.ts` 가 채웠다 |
 | 2 | 로고 light/dark 규칙 | **닫힘** — 마크가 `currentColor` 를 쓰므로 반전을 자동으로 따라간다 |
 | 3 | favicon / avatar 시스템 | **닫힘** — `app/icon.tsx`, `opengraph-image.tsx` 가 같은 계산에서 나온다 |
-| 4 | 도메인 header identity | **남음** — 도메인 미등록 (§18 Phase 3 blocker) |
+| 4 | 도메인 header identity | **남음** — 도메인·존은 준비됨(goldibug.com). 배포와 `NEXT_PUBLIC_SITE_URL` 만 남았다 |
 | 5 | Hero 카피 확정 | **닫힘** — `site.tagline`, 게이지로 렌더 |
 | 6 | 챕터별 visual language | **닫힘** — `tone`·`density` 가 폭·트래킹까지 연주 |
 | 7 | 프로젝트 상세 템플릿 | **닫힘** — `Work` 타입의 constraint/tradeoff/outcome |
