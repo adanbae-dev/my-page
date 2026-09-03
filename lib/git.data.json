@@ -13,9 +13,283 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-08-28",
-  "head": "7d374d5",
+  "generatedAt": "2026-09-03",
+  "head": "724f58d",
   "commits": [
+    {
+      "sha": "724f58d",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 6차 — 남은 세 편으로 전편 완비",
+      "insertions": 2041,
+      "deletions": 208,
+      "generated": 0,
+      "files": 9,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "83ef676",
+      "date": "2026-09-03",
+      "subject": "Feat: 쉬운 말 판을 라우트로 세운다 — 구현과 20편을 함께",
+      "insertions": 2045,
+      "deletions": 40,
+      "generated": 0,
+      "files": 31,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "content",
+        "scripts"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "influence-in-my-own-log"
+        }
+      ]
+    },
+    {
+      "sha": "aa9bc12",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 5차 — influence-in-my-own-log · gates-that-passed",
+      "insertions": 478,
+      "deletions": 0,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e1f77d9",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 4차 — crm-sidebar-vanished · bb-mcp-boundaries",
+      "insertions": 535,
+      "deletions": 12,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "crm-sidebar-vanished"
+        }
+      ]
+    },
+    {
+      "sha": "d443a07",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 3차 — gam · statistics-notation · keychain",
+      "insertions": 544,
+      "deletions": 0,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "20f30d1",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 2차 — 도식이 있는 네 편",
+      "insertions": 399,
+      "deletions": 0,
+      "generated": 0,
+      "files": 8,
+      "areas": [
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "b8028e9",
+      "date": "2026-09-03",
+      "subject": "Content: 영어판 1차 — LIVE 4편과 TRACE 3편",
+      "insertions": 366,
+      "deletions": 0,
+      "generated": 0,
+      "files": 14,
+      "areas": [
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "d18c823",
+      "date": "2026-09-03",
+      "subject": "Content: bb-mcp 두 편의 쉬운 버전을 채웠다",
+      "insertions": 220,
+      "deletions": 0,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "content"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "c05d9c4",
+      "date": "2026-09-03",
+      "subject": "Content: 원문 대비 누락 하나를 채웠다",
+      "insertions": 6,
+      "deletions": 1,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "make",
+          "slug": "bb-mcp-boundaries"
+        }
+      ]
+    },
+    {
+      "sha": "747843e",
+      "date": "2026-09-03",
+      "subject": "Content: bb-mcp 개발 기록을 두 편으로 옮겼다",
+      "insertions": 312,
+      "deletions": 0,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "make",
+          "slug": "bb-mcp-boundaries"
+        },
+        {
+          "chapter": "trace",
+          "slug": "keychain-truncated-my-token"
+        }
+      ]
+    },
+    {
+      "sha": "9cf738e",
+      "date": "2026-08-29",
+      "subject": "Content: 어려운 대목 넷을 그림으로 바꿨다",
+      "insertions": 244,
+      "deletions": 142,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "personal-llm-wiki"
+        },
+        {
+          "chapter": "think",
+          "slug": "the-guard-that-never-failed"
+        },
+        {
+          "chapter": "think",
+          "slug": "why-contrast-came-first"
+        },
+        {
+          "chapter": "trace",
+          "slug": "cascade-layer-inversion"
+        }
+      ]
+    },
+    {
+      "sha": "e359a53",
+      "date": "2026-08-29",
+      "subject": "Content: 한국어 원고의 어투를 다듬었다",
+      "insertions": 178,
+      "deletions": 157,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "lib",
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "live",
+          "slug": "off-hours"
+        },
+        {
+          "chapter": "live",
+          "slug": "where-i-live"
+        },
+        {
+          "chapter": "live",
+          "slug": "who-goldibug-is"
+        },
+        {
+          "chapter": "make",
+          "slug": "gam-ml-teaching-tool"
+        },
+        {
+          "chapter": "think",
+          "slug": "personal-llm-wiki"
+        },
+        {
+          "chapter": "trace",
+          "slug": "git-remote-push-mistake"
+        }
+      ]
+    },
+    {
+      "sha": "14c9640",
+      "date": "2026-08-29",
+      "subject": "Fix: 사이트의 404 를 처음으로 실제로 보여준다",
+      "insertions": 271,
+      "deletions": 219,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "styles"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a5ac2b7",
+      "date": "2026-08-29",
+      "subject": "Fix: 직전 커밋이 lint 를 통과하지 못한 채로 들어갔다",
+      "insertions": 168,
+      "deletions": 153,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "399f141",
+      "date": "2026-08-29",
+      "subject": "Perf: 행 캡을 개수에서 글자 수로 — 개수는 잘못된 양을 묶는다",
+      "insertions": 488,
+      "deletions": 267,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib",
+        "styles"
+      ],
+      "entries": []
+    },
     {
       "sha": "7d374d5",
       "date": "2026-08-29",
