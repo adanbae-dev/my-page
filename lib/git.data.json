@@ -14,8 +14,40 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-04",
-  "head": "15830c5",
+  "head": "d3c3841",
   "commits": [
+    {
+      "sha": "d3c3841",
+      "date": "2026-09-05",
+      "subject": "Content: 차트를 그리는 사람이 아니라 — 네 판",
+      "insertions": 763,
+      "deletions": 1,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "content",
+        "scripts"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "not-someone-who-draws-charts"
+        }
+      ]
+    },
+    {
+      "sha": "dc824a7",
+      "date": "2026-09-04",
+      "subject": "Build: 89커밋 · 127라우트로 기록을 따라잡는다",
+      "insertions": 311,
+      "deletions": 250,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "15830c5",
       "date": "2026-09-04",
