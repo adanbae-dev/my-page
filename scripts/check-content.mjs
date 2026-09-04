@@ -73,7 +73,22 @@ function splitName(base) {
 
 let retellings = 0
 const MAX_SUMMARY = 160
-const today = new Date().toISOString().slice(0, 10)
+/**
+ * The latest date that is "today" somewhere on Earth.
+ *
+ * `toISOString()` is UTC, and an entry is dated in the timezone its author
+ * was standing in. This repository is written from KST (UTC+9), so for the
+ * nine hours between 00:00 and 09:00 local, a correctly dated entry read as
+ * being in the future and the gate refused it. Measured while it happened:
+ * UTC 2026-09-04 22:41 against KST 2026-09-05 07:41 — the same instant, one
+ * day apart, and the entry dated today was rejected as tomorrow's.
+ *
+ * UTC+14 is the earliest civil timezone in use, so a date beyond it is in the
+ * future no matter where the author is. That is the only bound this check can
+ * state without knowing the author's timezone, and the thing it exists to
+ * catch — a date typed as next month — is nowhere near a one-day margin.
+ */
+const today = new Date(Date.now() + 14 * 60 * 60 * 1000).toISOString().slice(0, 10)
 
 const line = (s) => process.stdout.write(s + '\n')
 const problems = []

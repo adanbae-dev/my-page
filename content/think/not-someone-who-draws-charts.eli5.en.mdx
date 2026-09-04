@@ -1,0 +1,177 @@
+---
+title: Not the person who draws charts
+summary: I want to work on showing data as pictures. Wanting is also a claim, so I counted how much evidence there actually is.
+authored: false
+---
+
+Search this whole site's code for the letters `d3` and exactly one line comes
+back.
+
+```
+"mermaid bundles d3 and dagre and exceeds 500KB gzipped,"
+```
+
+**It only shows up as a reason not to use it.**
+
+D3 is a well-known tool for turning data into pictures. And the material
+laying out the direction I want to go puts it **right in the middle** of the
+things to learn.
+
+Wanting to go somewhere is also a claim. This site's rule is that **a claim
+carries its evidence**, so I counted the six things to learn, one at a time.
+
+## What the count says
+
+<figure>
+  <svg viewBox="0 0 640 200" role="img"
+       aria-label="Of the six things to learn, four have evidence on this site, D3 has zero, and choosing well cannot be counted"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">Things to learn — evidence on this site, per box</text>
+
+    <rect x="0" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="48" fontSize="12" fill="currentColor">Building UI</text>
+    <text x="10" y="64" fontSize="12" fill="currentColor" opacity="0.6">3 entries</text>
+
+    <rect x="104" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="114" y="48" fontSize="12" fill="currentColor">Drawing</text>
+    <text x="114" y="64" fontSize="12" fill="currentColor" opacity="0.6">9 entries</text>
+
+    <rect x="208" y="30" width="96" height="40" fill="var(--accent)" stroke="none" />
+    <text x="218" y="48" fontSize="12" fill="var(--on-accent)">The D3 tool</text>
+    <text x="218" y="64" fontSize="12" fill="var(--on-accent)">0</text>
+
+    <rect x="312" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="322" y="48" fontSize="12" fill="currentColor">Handling data</text>
+    <text x="322" y="64" fontSize="12" fill="currentColor" opacity="0.6">2 entries</text>
+
+    <rect x="416" y="30" width="104" height="40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
+    <text x="426" y="48" fontSize="12" fill="currentColor">Choosing well</text>
+    <text x="426" y="64" fontSize="12" fill="currentColor" opacity="0.6">cannot count</text>
+
+    <rect x="528" y="30" width="112" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="538" y="48" fontSize="12" fill="currentColor">Usable by all</text>
+    <text x="538" y="64" fontSize="12" fill="currentColor" opacity="0.6">3 · one missed</text>
+
+    <path d="M96 50 L104 50 M200 50 L208 50 M304 50 L312 50 M408 50 L416 50 M520 50 L528 50"
+          stroke="currentColor" strokeWidth="1" opacity="0.5" />
+
+    <text x="0" y="112" fontSize="13" fill="currentColor">Four have evidence. One is zero. One I do not know how to count.</text>
+    <text x="0" y="140" fontSize="13" fill="var(--accent-text)">And the zero is something this site already turned down once, for being heavy.</text>
+    <text x="0" y="170" fontSize="12" fill="currentColor" opacity="0.55">The number is how many entries you can open on this site.</text>
+  </svg>
+</figure>
+
+**Drawing, 9 entries.** Every picture on this site is **drawn by hand.** No
+tool. That is why they follow the light and dark screen automatically, and why
+each one is only a few hundred bytes.
+
+**Handling data, 2 entries.** One of them counted a team's real records and
+found that what I thought was **a tool for managing tasks** was actually a
+tool for managing releases. 18 releases against 11 tasks.
+
+**Usable by all, 3 entries.** The brightness difference between text and
+background is pinned down as a promise, and if it slips the site refuses to be
+built at all.
+
+**D3, zero.** And the three things I am supposed to build — a screen that
+explains data, a map or a time graph, and a reusable set of charts — are all
+zero too.
+
+## The box I could not write zero in
+
+I did not write zero next to `choosing well`. I wrote "cannot count", because
+being honest required it.
+
+Drawing nine pictures meant **choosing what to show and how**, every time. The
+picture in the entry just before this one draws two boxes **deliberately
+identical.** The point of that entry is that the two cannot be told apart on
+screen, so the picture had to be un-tellable-apart too.
+
+That was a choice, and it was the right one. But **I chose it backwards from
+what the writing needed, not because I knew any theory.** I have never learned
+how colours mislead, or how an axis can be drawn so it fools people. So **I
+have no standard of my own for telling whether my choice was right.**
+
+Having zero evidence and **having no standard to judge by are different.** The
+first you fix by making something. The second you have to learn first.
+
+## The box that hurts most is not D3
+
+The material I read says that when people hire for this, one thing they
+actually check is **"can it be used with a keyboard".**
+
+There is one thing on this site worth calling a visualisation: a 3D screen
+where records stand up as bars. One bar per entry, height is length, across is
+time order.
+
+And in this site's own notes, I wrote this.
+
+> The bars in that view **cannot be reached with a keyboard.** There is a list
+> as another way in, and putting keyboard access on the bars is worth doing
+> and has not been done.
+
+**On the subject I have written about most, the one visualisation I have
+fails.** Brightness pinned as a promise, button sizes raised to the standard —
+and the bars still cannot be reached by keyboard.
+
+D3 being zero is missing because **I never did it.** This one is **done and
+then left out**, which is a different kind of thing.
+
+## Does the reason for turning it down still hold
+
+The reason for not using a drawing tool was this — you cannot make someone
+download 500KB just to draw one picture. That entry only had 12KB of room.
+
+That judgement is still right. **But it does not carry over to D3.**
+
+The difference is **what the picture is for.**
+
+- On this site, a picture is **an illustration helping the writing.** Put a big tool behind one illustration and it weighs more than the text.
+- On a screen whose job is showing data, the chart **is the product.** The scale you weigh it on is a different scale entirely.
+
+I had put two different things on the same scale and expected the same answer.
+Measuring by weight was right; **carrying that measurement to a different
+problem was not.**
+
+Drawing by hand nine times was not wasted either. To know **what a tool is
+doing for you**, working it out yourself first is faster.
+
+## One thing I was already doing
+
+The last sentence of the material says this.
+
+> The goal is not the person who draws charts, but the person who understands
+> what the data means, picks the right way to show it, and builds it into
+> something that works well.
+
+The middle one — **picking the right way to show it** — is something this site
+was already doing. Just never with a chart.
+
+This site's mark works that way. It **folds the record of the work into a
+round shape.** One slot per piece of work, depth is how many lines that work
+changed, marks reaching outside are the big stages.
+
+**That is data turned into a picture.** It just was not called a chart. And
+nobody can paste that mark onto someone else's site, **because their data is
+different.** That is exactly where showing data parts ways with decoration.
+
+## What I did not check
+
+Half the evidence here is what I counted myself. The other half is what that
+material says. The two should not be treated the same.
+
+It names a few real companies as examples. **I did not open those job posts
+myself.** I use them only as grounds that such jobs exist, and I am not
+claiming to have checked what any of them ask for.
+
+If you do not separate what you checked from what you were told, the reader
+cannot tell which half to believe.
+
+## What to do next
+
+- **Do not skip the basics.** Nine pictures prove I know the medium, not that I know the theory. That is what "cannot count" meant.
+- **Pay the keyboard debt first.** The one visualisation I have already fails a standard I already wrote down. That comes before starting three new things.
+- **Use D3 first in a product, not in an illustration.** Put it in this site's pictures and the reason I turned it down becomes right again.
+
+An unproven box is not the embarrassing part. **Not writing down that it is
+unproven** is.

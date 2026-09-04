@@ -1,0 +1,208 @@
+---
+title: Not someone who draws charts
+date: 2026-09-05
+updated: 2026-09-05
+summary: I want to move toward data visualisation. A direction is a claim, so I counted the evidence — what this archive already proves, and what it does not.
+topics: [design, frontend, knowledge, process]
+tags: [data-visualization, career, svg, d3]
+---
+
+Search this repository for `d3` and one line comes back.
+
+```
+think/branch-strategy.mdx:241
+> The diagram is inline SVG. mermaid bundles d3 and dagre and exceeds 500KB
+> gzipped,
+```
+
+**It appears only as a reason not to use it.** There is no import anywhere in
+the code.
+
+And the report that lays out the direction I want to move in puts the
+recommended stack like this —
+`TypeScript/React → SVG → D3.js → data transformation/SQL → visualisation theory → accessibility/performance`.
+D3 sits in the middle of it.
+
+A direction is a claim. This site's rule is that a claim carries its evidence,
+so I counted that stack one box at a time.
+
+## What the count says
+
+<figure>
+  <svg viewBox="0 0 640 200" role="img"
+       aria-label="Of the six boxes in the recommended stack, four have evidence in this archive, D3 has zero, and visualisation theory could not be counted"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">The recommended stack — evidence in this archive, per box</text>
+
+    <rect x="0" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="10" y="48" fontSize="12" fill="currentColor">TS · React</text>
+    <text x="10" y="64" fontSize="12" fill="currentColor" opacity="0.6">3 entries</text>
+
+    <rect x="104" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="114" y="48" fontSize="12" fill="currentColor">SVG</text>
+    <text x="114" y="64" fontSize="12" fill="currentColor" opacity="0.6">9 entries</text>
+
+    <rect x="208" y="30" width="96" height="40" fill="var(--accent)" stroke="none" />
+    <text x="218" y="48" fontSize="12" fill="var(--on-accent)">D3</text>
+    <text x="218" y="64" fontSize="12" fill="var(--on-accent)">0</text>
+
+    <rect x="312" y="30" width="96" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="322" y="48" fontSize="12" fill="currentColor">Data · SQL</text>
+    <text x="322" y="64" fontSize="12" fill="currentColor" opacity="0.6">2 entries</text>
+
+    <rect x="416" y="30" width="104" height="40" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" />
+    <text x="426" y="48" fontSize="12" fill="currentColor">Theory</text>
+    <text x="426" y="64" fontSize="12" fill="currentColor" opacity="0.6">uncountable</text>
+
+    <rect x="528" y="30" width="112" height="40" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="538" y="48" fontSize="12" fill="currentColor">A11y · perf</text>
+    <text x="538" y="64" fontSize="12" fill="currentColor" opacity="0.6">3 · one gap</text>
+
+    <path d="M96 50 L104 50 M200 50 L208 50 M304 50 L312 50 M408 50 L416 50 M520 50 L528 50"
+          stroke="currentColor" strokeWidth="1" opacity="0.5" />
+
+    <text x="0" y="112" fontSize="13" fill="currentColor">Four already have evidence. One is zero. One I do not know how to count.</text>
+    <text x="0" y="140" fontSize="13" fill="var(--accent-text)">And the zero is a box this repository already rejected once, on weight.</text>
+    <text x="0" y="170" fontSize="12" fill="currentColor" opacity="0.55">The number is a count of entries you can open on this site.</text>
+  </svg>
+</figure>
+
+**SVG, 9 entries.** Every figure on this site is hand-written inline SVG. No
+library. They use `currentColor` and `var(--accent)`, so they follow the
+site's inversion automatically, and each one is a few hundred bytes.
+
+**Data, 2 entries.** `make/work-calendar` measured real records with
+`node:sqlite` and found that what I thought was a task-management tool was
+actually a release-management tool — 18 releases against 11 tasks.
+`think/statistics-notation` is distributions and notation.
+
+**Accessibility and performance, 3 entries.** The contrast contract in
+`think/why-contrast-came-first` is enforced by `pnpm check:contrast`, which
+measures the real ratios and fails the build when one drifts.
+`make/personal-interface` has its JS budget pinned by a gate.
+
+**D3, zero.** And the three deliverables the report asks for — an analytical
+dashboard, one of map/time-series/network, and a reusable chart system — are
+all zero too.
+
+## The box I could not count
+
+I did not write zero next to `visualisation theory`. I wrote "uncountable",
+and honesty required it.
+
+Drawing nine figures meant choosing, every time, what to show and how. The
+figure in `think/the-screen-said-it-was-fine`, written days ago, **draws two
+boxes deliberately identical**. That entry's whole argument is that the two
+cases are indistinguishable on screen, so the figure had to reproduce that
+indistinguishability. The difference appears only on the right — in the
+outgoing query — marked in accent.
+
+That is a visual encoding, chosen. But **it was chosen backwards from the
+argument, not from theory.** I have never studied normalisation, colour
+scales, or the axis choices that mislead, so I have no standard of my own for
+judging whether what I picked was right.
+
+Having zero evidence and **having no standard to judge by are different
+things.** The first you fix by making something. The second you fix by
+learning first.
+
+## The box that hurts most is not D3
+
+The report lists, among the competencies actually checked in hiring,
+`accessibility, keyboard navigation, colour safety`.
+
+There is one thing on this site worth calling a visualisation: the WebGL field
+in TRACE. One bar per record, height is length, the horizontal axis is time.
+
+And `docs/PRODUCTION.md` says this about it, in my own words:
+
+```
+- Keyboard access to the WebGL field. The list is the accessible path;
+  roving tabindex over the bars is worth doing and is not done.
+```
+
+**On the subject I have written about most, the one visualisation I have
+fails.** The contrast contract is pinned by a gate, tap targets were raised to
+the WCAG threshold, and the bars still cannot be reached from a keyboard. The
+list is an accessible alternative, so it is not inaccessible — but to the
+question "can the visualisation be used from a keyboard", this site's answer
+is no.
+
+D3 at zero is missing because it was never done. This is **done and then left
+out**, which is a different kind of thing.
+
+## Does the reason for rejecting it still hold
+
+The judgement that dropped mermaid in `think/branch-strategy` was this: you
+cannot load 500KB gzipped to draw one diagram. That entry's route had 12KB of
+JS headroom.
+
+That judgement is still right. **And it does not transfer into a reason to
+avoid D3.**
+
+The difference is what the chart is. On this site a figure is **an
+illustration serving the prose**. Attach a library to one illustration and it
+outweighs the text it illustrates. In an analytical dashboard the chart **is
+the product**. The denominator is not the same.
+
+I had put two different things on the same scale and expected the same answer.
+Measuring by weight was right; **carrying that measurement across to a
+different problem was not.**
+
+So this is a decision to revisit, not a rule to keep. Writing SVG by hand nine
+times was not wasted either. To know what `scale`, `axis` and `join` are doing
+for you, computing the coordinates yourself first is the faster route.
+
+## One thing already happening
+
+The report's last sentence is this.
+
+> The goal is not someone who draws charts, but someone who understands what
+> the data means, chooses the right visual representation, and builds it as a
+> high-performance interactive data product.
+
+The middle one — choosing the right representation — is something this site
+was already doing. Just never with a chart.
+
+The site's mark is that. `lib/sigil.ts` folds the repository's commit record
+into coordinates. One slot per commit, depth is how many lines that commit
+changed by hand, the marks reaching past the ring are the phases the history
+declared for itself. 64 slots × 3 rings.
+
+**That is data encoded visually.** It simply was not called a chart. And
+nobody can paste that mark onto another site, because the data is different.
+That is exactly where visualisation parts company with decoration.
+
+## What I did not verify about the report
+
+Half the evidence in this entry is what I counted. The other half is what the
+report asserts. The two should not carry equal weight.
+
+The report cites 2026 hiring examples: a Data Visualization Specialist /
+Creative Coder at MIT Senseable City Seoul, a UI Data Visualization Engineer
+at Adobe, a Data Visualization Engineer 5 at Netflix, a Data Visualization
+Engineer at Planet. **I did not open those postings.** They are cited as
+grounds that the titles exist, and I am not claiming to have verified what any
+of them require.
+
+This is why this site puts gates on its own numbers. Fail to separate what was
+checked from what was passed along, and the reader cannot tell which half to
+believe.
+
+## About the next six months
+
+The report has a six-month roadmap and I am not copying it here. It belongs to
+the report; a second copy is a second thing to keep in step.
+
+What the count above changes is the order.
+
+- **Do not skip month one.** Nine figures are evidence of knowing the medium, not of knowing the theory. That is what "uncountable" meant
+- **Pay the keyboard debt first.** The one visualisation I have already fails a standard I already wrote down. That comes before starting three new projects
+- **Use D3 first in a product, not in an illustration.** Put it in this site's figures and the judgement I rejected it with becomes right again
+
+This entry is the same thing `/practice` does. That page marks five things the
+CV claims and this site has not proven. This one does it **to a direction
+rather than to a past.**
+
+An unproven box is not the embarrassing part. Not writing down that it is
+unproven is.
