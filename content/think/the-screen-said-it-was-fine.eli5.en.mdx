@@ -1,0 +1,200 @@
+---
+title: The screen said nothing was wrong
+summary: A search filter had been broken for nearly half a year. No error, no blank page. Some breakages cannot be found by looking at the screen.
+authored: false
+---
+
+> The company name, server addresses and member data are left out. Listing
+> numbers are made-up test numbers.
+
+The work is fixing an admin screen the staff use inside the company.
+
+The seven breakages fixed today all had one thing in common.
+**There was nothing wrong on screen.** No red text, no blank page, no
+spinner going round. It just quietly showed the wrong answer.
+
+## One — the search condition had the wrong name
+
+When the program asks the server "find me things matching this", the
+**name** of the condition has to match exactly.
+
+The name the server knows is `is_live`.
+The name the program was sending was `isLIVE`. Similar, but a different name.
+
+Digging through the history, it had been that way since the day it was
+written. For **163 days**.
+
+### Why nobody noticed
+
+This is the heart of it.
+
+**When this server gets a condition it does not know, it does not refuse. It
+just ignores it.** And ignoring it means finding everything, with no
+condition at all.
+
+But on screen these two look **exactly the same.**
+
+- everything came back because the condition was ignored
+- everything came back because everything really does match
+
+<figure>
+  <svg viewBox="0 0 640 210" role="img"
+       aria-label="An ignored condition and a condition everything matches look identical on screen and differ only in the request sent to the server"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">On screen — the two are identical</text>
+    <rect x="0" y="26" width="128" height="70" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="12" y="52" fontSize="13" fill="currentColor">40 found</text>
+    <text x="12" y="74" fontSize="12" fill="currentColor" opacity="0.6">condition ignored</text>
+    <rect x="146" y="26" width="128" height="70" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="158" y="52" fontSize="13" fill="currentColor">40 found</text>
+    <text x="158" y="74" fontSize="12" fill="currentColor" opacity="0.6">really is everything</text>
+    <path d="M137 46 L137 76" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <text x="0" y="118" fontSize="12" fill="currentColor" opacity="0.55">no way to tell them apart</text>
+
+    <text x="330" y="14" fontSize="12" fill="var(--accent-text)">The request sent — they differ</text>
+    <rect x="330" y="26" width="300" height="32" fill="none" stroke="var(--accent)" strokeWidth="2" />
+    <text x="342" y="47" fontSize="13" fill="currentColor">wrong name → the server throws it away</text>
+    <rect x="330" y="64" width="300" height="32" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="342" y="85" fontSize="13" fill="currentColor">right name → the server reads it</text>
+    <text x="330" y="118" fontSize="12" fill="currentColor" opacity="0.55">only findable here</text>
+
+    <text x="0" y="160" fontSize="13" fill="currentColor">Click the condition, see the same list, assume they must all be like that.</text>
+    <text x="0" y="184" fontSize="13" fill="currentColor">That guess looked right for 163 days — because only the screen was checked.</text>
+  </svg>
+</figure>
+
+So the check was put **on the request being sent, not on the screen.**
+The request going out to the server is caught in the middle and the name is
+read directly. The screen is not looked at.
+
+The check looks at two things.
+
+1. whether the new name goes out
+2. **whether the old name is still there**
+
+The second matters more. Check only the first, and **adding the new name
+without deleting the old one** still passes. The server ignores names it does
+not know, so it works in that state, and the next person learns that both
+names are needed.
+
+## Two — a check is only a check after you have seen it fail
+
+For everything fixed today, **the fix was deliberately undone** first, to see
+the check fail. Seven times.
+
+The habit paid off twice today.
+
+**Once it caught a different breakage.** Undoing it and running again brought
+back a value I had felt was odd at the start but never connected.
+
+**Once it caught a mistake in my own check.** I undid the fix and it failed at
+**the wrong place**. It turned out I had written "pass once there is more than
+one request", but opening the screen already sent two. So the check passed
+before the click had done anything, and was **reading an old request**.
+
+> A check that passes proves nothing. Only a check you have **watched fail**
+> proves anything. And watching it fail is what exposes mistakes in the check
+> itself.
+
+## Three — I revived something deleted three months ago
+
+Told that "the condition box is empty when you arrive by link", I added
+another condition box. Check passed, saved.
+
+Later, reading the history, I found this.
+
+```
+2026-06-01  removed that input box from this search
+```
+
+**I had revived a box that was deliberately deleted three months ago.** The
+reason was simple — the same value was being taken in two boxes, and that
+work had cleaned up the duplicate.
+
+There was a reason I missed it. **A check confirming that box appears was
+still there.** When the box was deleted, the check was not. So the code said
+"gone" and the check said "must be there", and that batch of checks happened
+not to be running, so nobody saw it.
+
+In the end I solved it by not adding a box. Putting the value that arrives by
+link into **the box that was already there** shows it in place, and it can be
+cleared. The problem went away without another box.
+
+> **Before adding** something, look at whether it was **ever deleted.** It
+> takes thirty seconds.
+>
+> And **a check that outlives its feature argues for the wrong side.** When
+> you delete a feature, delete its check too.
+
+## Four — "all" was expressed as a special date
+
+Choose "all" in the date condition and the program sent **one very old date** —
+older than any record. The result is that everything comes back.
+
+The trouble is that the date is only safe **in code that knows it is a special
+value.** Code that does not know believes it is a real date.
+
+The same program does it in the other direction too. "No time limit" is stored
+as `9999-12-31`. And the trace of that already going wrong is in the code — a
+record of a table breaking because a screen believed that date was a real end
+date.
+
+> "All" should not be a special value. It should be **not sending the
+> condition at all.**
+
+This was the other half of the link breakage. Arriving by link, the date
+condition was still "within a month", so older items were filtered out and
+**zero** came back. And what you look for by link is old by nature, so it was
+**a combination that failed almost every time.**
+
+## Five — the words on screen go straight to the server
+
+The request that changes a status takes **Korean words**, not a number code.
+Things like `"검증실패"`. Send anything but the four allowed ones and it is
+refused.
+
+But that list of words was written **in two places**. The values matched, so
+nothing had gone wrong yet.
+
+Usually when a list of display words diverges, **only the words** differ. But
+these words are **the value sent to the server.** Fix one side and you get
+refused. They were merged into one.
+
+## Six — buttons that looked clickable and did nothing
+
+The status buttons were already built. They were even set up to receive what
+should happen when clicked — but **nobody was passing that in**, so they were
+display-only.
+
+Yet the cursor turned into a hand and the colour changed on hover. Clicking
+did nothing.
+
+Wiring them up, **only the values the server actually accepts** were made
+clickable and the rest were dimmed. The server accepts fewer values than the
+screen shows — three of eight, four of nine. The current value was made
+unclickable too: sending the same value again is a round trip to the server
+that changes nothing.
+
+## What to keep
+
+All seven were **quietly wrong, with no error.** The code compiled and the
+console was clean. The screen said everything was fine, and every time it
+looked right.
+
+So every rule left behind is about **what counts as evidence.**
+
+- **Check search conditions from the request being sent, not the screen.** On a server that quietly ignores unknown conditions, the screen is not evidence.
+- **Undo the fix and watch the check fail.** Otherwise you do not know what that check protects.
+- **Before adding, look at whether it was deleted.**
+- **When you delete a feature, delete its check.**
+- **Express "all" as not sending the condition.**
+- **If a word on screen is also a value sent to the server, write it in one place.**
+
+## What there is no evidence for yet
+
+The checks built today run against a **fake server.** They only prove that the
+program's own path is right. Four things still need asking of the real server —
+things that **work now, but I have not confirmed from documentation why they
+work.**
+
+That is its own version of the screen saying everything is fine.

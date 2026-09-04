@@ -1,0 +1,251 @@
+---
+title: The screen said everything was fine
+date: 2026-09-04
+updated: 2026-09-04
+summary: One filter had been dead for 163 days. No error, no empty state. Some bugs cannot be verified from what the page renders.
+topics: [debugging, frontend, process]
+tags: [testing, verification, state-management, admin]
+---
+
+> Organisation identifiers, hosts and accounts, ticket numbers and member data
+> are excluded. Listing numbers are synthetic test values. The structure and
+> the code patterns are exactly as they are.
+
+The guard looked like this.
+
+```ts
+if (filters.isLIVE !== 'all') params.isLIVE = filters.isLIVE;
+```
+
+The name the server accepts is `is_live`. This API takes both snake_case and
+camelCase, and the camelCase of `is_live` is `isLive`. `isLIVE` is neither.
+
+`git log -S` says it had that name from the commit that introduced it.
+**163 days.**
+
+## Why nobody noticed
+
+There are 19 places in the list query that assign a value, and only this one
+departed from the convention.
+
+```
+searchUserType  contractType  buildingType  roomType  naverStatus
+houseCDate  saleNumber  hidxNumber  …          ← ordinary camelCase
+verification_type                              ← snake_case, matching the API docs
+isLIVE                                         ← neither
+```
+
+Two conventions mixed in one file is visible when you read it. **A third
+convention is not.** It does not look like a typo; it looks like one
+consistent style of its own.
+
+But a wrong name does not by itself explain 163 days. The screen had its own
+reason for staying quiet.
+
+**This server does not reject an unknown query parameter with a 400. It
+ignores it silently.** The response is then the unfiltered list. And on
+screen, "the filter did not apply" and "everything matches the filter" are
+**indistinguishable**.
+
+<figure>
+  <svg viewBox="0 0 640 210" role="img"
+       aria-label="An ignored filter and a filter that everything matches look identical on screen and differ only in the outgoing query string"
+       style={{ inlineSize: '100%', blockSize: 'auto', color: 'var(--figure)' }}>
+    <text x="0" y="14" fontSize="12" fill="currentColor" opacity="0.55">On screen — the two are the same</text>
+    <rect x="0" y="26" width="128" height="70" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="12" y="52" fontSize="13" fill="currentColor">40 rows</text>
+    <text x="12" y="74" fontSize="12" fill="currentColor" opacity="0.6">filter ignored</text>
+    <rect x="146" y="26" width="128" height="70" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="158" y="52" fontSize="13" fill="currentColor">40 rows</text>
+    <text x="158" y="74" fontSize="12" fill="currentColor" opacity="0.6">all of them match</text>
+    <path d="M137 46 L137 76" stroke="currentColor" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+    <text x="0" y="118" fontSize="12" fill="currentColor" opacity="0.55">no way to tell them apart</text>
+
+    <text x="330" y="14" fontSize="12" fill="var(--accent-text)">Outgoing query — they differ</text>
+    <rect x="330" y="26" width="300" height="32" fill="none" stroke="var(--accent)" strokeWidth="2" />
+    <text x="342" y="47" fontSize="13" fill="currentColor">isLIVE=NOT_LIVE  → server discards</text>
+    <rect x="330" y="64" width="300" height="32" fill="none" stroke="currentColor" strokeWidth="1" />
+    <text x="342" y="85" fontSize="13" fill="currentColor">is_live=NOT_LIVE → server reads</text>
+    <text x="330" y="118" fontSize="12" fill="currentColor" opacity="0.55">only provable here</text>
+
+    <text x="0" y="160" fontSize="13" fill="currentColor">Click LIVE, see the same list, conclude they must all be LIVE.</text>
+    <text x="0" y="184" fontSize="13" fill="currentColor">That conclusion held for 163 days — because only the screen was checked.</text>
+  </svg>
+</figure>
+
+So the test went on the wire rather than on the screen.
+
+```ts
+const q = new URLSearchParams(listQueries[listQueries.length - 1] ?? '');
+expect(q.get('is_live')).toBe('NOT_LIVE');
+expect(q.has('isLIVE')).toBe(false);   // and that the old name is not still there
+```
+
+Requests are intercepted, the query strings collected, and read directly. The
+screen is not looked at.
+
+The second line matters more than the first. Assert only that the new name goes
+out, and **adding** the correct name without **removing** the old one still
+passes. The server ignores what it does not know, so it works in that state,
+and the next person learns that both names have to be kept.
+
+## A test is only a test after you have seen it fail
+
+For everything fixed today, the fix was deliberately reverted first to watch
+the test fail. Seven times.
+
+```
+Expected 1             Received 0             the detail table has no previous-number row
+Expected "2000-01-01"  Received "2026-08-04"  the date range narrowed to one month
+Expected "9100"        Received null          the identifier never left on the click path
+Expected "9100"        Received null          the value never reached the input
+Expected "created"     Received "hidx"        searching reset the sort
+Expected disabled      Received enabled       a value the server rejects was clickable
+Expected "NOT_LIVE"    Received null          the filter sent no parameter
+```
+
+The habit paid twice today.
+
+**Once it caught someone else's bug.** `Expected "2000-01-01" Received
+"2026-08-04"` — that date had been sitting in the first URL I was handed, and
+I had not connected it. Reverting produced the same value again.
+
+**Once it caught a bug in my own test.** Reverting the sort test made it fail
+at the wrong point.
+
+```ts
+await expect.poll(() => listQueries.length).toBeGreaterThan(1);   // wrong
+```
+
+If the initial load issues two requests, this poll passes the instant after
+the click and **reads the stale last query**. The search case captured the
+count before clicking; only the sort case did not.
+
+> A passing test proves nothing. Only a test you have watched fail proves
+> anything. And watching it fail is what exposes the defects in the test
+> itself.
+
+## A test that outlives its feature argues for the wrong side
+
+Told that "the filter is empty when you arrive by link", I added an identifier
+input to the filter panel. Passed, committed.
+
+Then, checking for side effects, I found this.
+
+```
+2026-06-01  removed the identifier input field from the all-listings search
+```
+
+**I had revived a field that was deliberately deleted three months ago.** The
+reason was simple — the listing number IS that identifier. The same value was
+being taken in two inputs, and that commit had cleaned up the duplication.
+
+Part of why I missed it was on the repository's side. **An e2e spec asserting
+that the field is displayed was still there.** It was not cleaned up when the
+field was removed. The code said "gone" and the test said "must be present",
+and the suite it lived in had not been running for a stretch because of a
+wiring gap, so nobody saw the contradiction.
+
+The final fix was not to add an input at all. Putting the incoming value into
+the existing listing-number filter shows it in that field, where it can also
+be cleared. The problem went away without another input.
+
+> Before adding something, check whether it was ever deleted.
+> `git log -S "<the exact symbol>" -- <file>` is one line.
+
+## A sentinel is billed in full to the code that does not know it is special
+
+"All" in the date filter was implemented like this.
+
+```ts
+export const DATE_RANGE_OPTIONS = [
+  { value: '2000-01-01', label: 'All' },   // a date older than any record, as the lower bound
+  { value: '1m', label: 'Within a month' },
+];
+```
+
+The option values **mix a relative token with an absolute date**, and the first
+line of the conversion function special-cases this one value. The two sibling
+screens put `value: ''` in the same place and send no parameter at all. Only
+this screen was the exception.
+
+This repository uses a sentinel in the other direction too — no time limit is
+stored as `9999-12-31`. And the trace of that already going wrong is in the
+code: a timeline comment records an axis range breaking because something
+believed an unlimited end date was a real one.
+
+**A sentinel costs nothing in the code that knows it is special, and is billed
+in full to the code that does not.** "All" should not be a magic value; it
+should be the absence of a parameter.
+
+This was also half of the arrive-by-link bug. Coming in by identifier, the
+date default `1m` came along, and older records were filtered out to zero. The
+targets are by definition old, so it was **a combination that failed almost
+always**.
+
+## When a display string travels on the wire
+
+The status-change API takes a **Korean label** in `code`, not a numeric code.
+
+```
+POST  …/naver-status     body { "code": "검증실패" }
+allowed  등록완료 / 등록취소 / 등록실패 / 검증실패
+anything else → 400 INVALID_INPUT_VALUE
+```
+
+But the code-to-label table existed in **two places**: the filter options in
+the constants file, and a local map inside the column definitions. The values
+matched, so nothing had gone wrong yet.
+
+When display labels diverge, usually only the words on screen differ. But this
+label is **the value that goes to the API**. Fix one side and you get a 400.
+The local map was deleted and folded into the single constant.
+
+> When a string is both a display value and a wire value, it gets exactly one
+> definition.
+
+## Buttons that looked clickable and did nothing
+
+The status-change UI needed nothing new. The section and the button component
+were already there, and the component already accepted an `onChange` prop.
+**Nobody was passing one**, so it was display-only.
+
+Every value was a `<button>` with `cursor-pointer` and a hover style. Clicking
+did nothing.
+
+Wiring it up, `changeable` was added so that only the values the server accepts
+are enabled and the rest render `disabled`. The point is that the server accepts
+fewer values than the UI displays — 3 of 8 for one status, 4 of 9 for the other.
+The current value is disabled too: sending the same value again is a round trip
+that changes nothing.
+
+## The screen said everything was fine
+
+The seven things fixed today shared one property. **No error, no empty state,
+no spinner.** It compiled and the console was clean. The screen said everything
+was fine, and every time, it looked right.
+
+So every rule left behind is about what counts as evidence.
+
+- **Verify filters and search from the outgoing query.** On a server that silently ignores unknown parameters, what renders is not evidence
+- **Revert the fix and watch the test fail.** Otherwise you do not know what that test protects
+- **Check the deletion history before adding.** Thirty seconds would have prevented reviving a three-month-old decision
+- **Delete a feature's tests when you delete the feature.** What is left argues for the wrong side later
+- **Express "all" as the absence of a parameter**
+- **A display string that is also a wire value gets one definition**
+
+## What there is no evidence for yet
+
+Mocked tests prove the front-end path only. Four things still need a real call.
+
+| Item | State of the evidence |
+|---|---|
+| The three allowed values for the visibility change | No API docs. Only a body sample |
+| A third status value in the filter | Not in the documented list of allowed values |
+| Whether the listing-number parameter accepts the identifier | Only the prose description |
+| The previous-number field in the list response | Not in the response field table — the server may need to add it |
+
+Only the status change is documented down to the allowed values and the 400
+response, so its evidence is solid. The other four **work now, and I have not
+confirmed from documentation why they work.** That is its own version of the
+screen saying everything is fine.
