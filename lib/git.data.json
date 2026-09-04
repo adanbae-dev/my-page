@@ -13,9 +13,42 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-09-03",
-  "head": "18cc737",
+  "generatedAt": "2026-09-04",
+  "head": "15830c5",
   "commits": [
+    {
+      "sha": "15830c5",
+      "date": "2026-09-04",
+      "subject": "Content: 화면은 정상이라고 말했다 — 네 판",
+      "insertions": 868,
+      "deletions": 0,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "think",
+          "slug": "the-screen-said-it-was-fine"
+        }
+      ]
+    },
+    {
+      "sha": "99dce6a",
+      "date": "2026-09-04",
+      "subject": "Feat: goldibug.com 을 배포 대상으로 못박는다 — 존은 이미 준비돼 있었다",
+      "insertions": 447,
+      "deletions": 361,
+      "generated": 0,
+      "files": 5,
+      "areas": [
+        "lib",
+        "docs",
+        "config"
+      ],
+      "entries": []
+    },
     {
       "sha": "18cc737",
       "date": "2026-09-04",
