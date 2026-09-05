@@ -74,6 +74,7 @@ pnpm release    # verify + 배포 가능 여부
 | | |
 |---|---|
 | [BRAND.md](docs/BRAND.md) | 브랜드 — 네 챕터의 근거, 다섯 가지 약속, 공개 정책, 정정 기록 |
+| [DATA-VISUALIZATION.md](docs/DATA-VISUALIZATION.md) | 방향 — 센 증거, 공공누리 라이선스 함정, 포트폴리오 셋과 페이즈 |
 | [ART-DIRECTION.md](docs/ART-DIRECTION.md) | Inverted Duotone — 팔레트가 대비에서 역산된 과정, 액센트 법칙 |
 | [GOLDEN-PATH.md](docs/GOLDEN-PATH.md) | 라우트 구조, 톤 리듬, 인덱스 바 |
 | [PERSONAL-SYSTEM.md](docs/PERSONAL-SYSTEM.md) | 콘텐츠 모델, MDX 파이프라인, 아카이브 |
