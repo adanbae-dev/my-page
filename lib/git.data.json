@@ -14,8 +14,51 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-05",
-  "head": "bc63ad1",
+  "head": "81e29bb",
   "commits": [
+    {
+      "sha": "81e29bb",
+      "date": "2026-09-05",
+      "subject": "Content: 쉬운 판에서 \"사람이 쓰지 않았습니다\" 를 뺀다",
+      "insertions": 24,
+      "deletions": 11,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e6b1fa3",
+      "date": "2026-09-05",
+      "subject": "Fix: CSP 가 비컨을 막고 있었다 — 문서가 시키는 값이 실제 URL 과 안 맞는다",
+      "insertions": 80,
+      "deletions": 11,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "lib",
+        "scripts",
+        "docs",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "6a97bca",
+      "date": "2026-09-05",
+      "subject": "Build: 93커밋 기록 갱신",
+      "insertions": 308,
+      "deletions": 266,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "bc63ad1",
       "date": "2026-09-05",
