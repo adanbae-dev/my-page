@@ -331,11 +331,20 @@ exactly the per-page question. It costs one hole in the CSP.
 
 The beacon is injected at the edge, so it arrives as a script this site did
 not write and `script-src 'self'` refuses it. `lib/csp.mjs` admits exactly one
-external origin:
+external origin, **as a host with no path**:
 
 ```
-https://static.cloudflareinsights.com/beacon.min.js
+https://static.cloudflareinsights.com
 ```
+
+The path is omitted deliberately. Cloudflare's documentation says to allow
+`.../beacon.min.js`; what it actually serves is
+`.../beacon.min.js/v31edd6df95cf4e85…`, a versioned path. In CSP a source
+whose path does not end in `/` must match the URL path **exactly**, so the
+documented value does not match what is served, and the browser refuses the
+script. `check:release` now fails on any allowed source carrying a path that
+does not end in `/` — narrowing this back looks like tightening security and
+is actually turning analytics off.
 
 **`connect-src` gets nothing.** Under Cloudflare's AUTOMATIC injection the
 beacon reports to the site's own domain, which `'self'` already covers. Manual
@@ -363,9 +372,29 @@ the worst of both outcomes: visitors pay the bytes, the console carries a
 violation, and no data arrives.
 
 Which is why this was opened deliberately rather than left to fail quietly.
-Before the change, the live HTML carried zero occurrences of
-`cloudflareinsights` — automatic injection had never been switched on, so the
-site was in neither state.
+
+### Two ways this was measured wrong first
+
+**`curl` cannot see the beacon.** Cloudflare injects it only for requests that
+look like a browser. Nine checks with a default curl User-Agent — across
+cache MISS responses on paths never requested before — all reported zero
+occurrences of `cloudflareinsights`, and led twice to the conclusion that
+automatic injection does not work for Workers Static Assets. It does. Sending
+a real browser `User-Agent` and `Accept` header returned the beacon on every
+path.
+
+**Reading the CSP is not checking the CSP.** With the beacon confirmed
+present, the policy still blocked it, because of the versioned path above.
+That was only visible by loading the page in a headless browser over CDP and
+reading the console:
+
+```
+Loading the script … violates the following Content Security Policy
+LOADING FAILED: csp
+```
+
+Both failures share a shape this repository writes about often: the check
+that was easy to run answered a different question from the one being asked.
 
 ### The alternative that was not taken
 

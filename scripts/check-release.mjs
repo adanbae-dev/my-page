@@ -103,6 +103,21 @@ if (!origin) {
    * `script-src`, so a host appearing in a directive nobody thought to check
    * — connect-src, img-src, font-src — still trips this. */
   const ALLOWED_ORIGINS = [ANALYTICS_SCRIPT]
+
+  /* A source with a path must match the URL path EXACTLY unless it ends in
+     `/`. Cloudflare serves the beacon from a VERSIONED path, so a source
+     narrowed back to `.../beacon.min.js` silently stops matching and the
+     browser refuses the script — measured, not reasoned: `LOADING FAILED:
+     csp` in a real browser while `curl` saw nothing wrong. Narrowing this
+     looks like tightening security and is actually turning analytics off. */
+  for (const origin of ALLOWED_ORIGINS) {
+    const afterHost = origin.replace(/^https?:\/\/[^/]+/, '')
+    if (afterHost && !afterHost.endsWith('/')) {
+      blockers.push(
+        `CSP source ${origin} carries a path that does not end in "/" — it will only match that exact URL, and the beacon is served from a versioned path`,
+      )
+    }
+  }
   const found = prod.match(/https?:\/\/[^\s;]+/g) ?? []
   for (const origin of found) {
     if (!ALLOWED_ORIGINS.includes(origin)) {
