@@ -306,6 +306,87 @@ every internal link, so it is a decision, not a toggle.
 
 ---
 
+## Observability
+
+The site needed to answer two questions — which pages are read, and how many
+people arrive in a day — and this deployment shape rules out most of the ways
+to answer them.
+
+### What this shape rules out
+
+| Option | Why not here |
+|---|---|
+| **Logpush** (raw HTTP logs) | HTTP request logs are Enterprise-only |
+| **Workers Logpush** | Available on Workers Paid, but `wrangler.jsonc` declares no Worker script — asset requests never invoke one, so there are no trace events to push |
+| **Workers Analytics Engine** | Same: needs a Worker running |
+| **A Worker in front of the assets** | `run_worker_first: true` would work and would reintroduce the per-request invocation this whole architecture exists to avoid |
+| **Zone analytics alone** | Server-side and free, but it counts requests — bots and every asset included — not readers, and it does not answer "which page" |
+
+### What was chosen
+
+Cloudflare Web Analytics. Free, no cookies, and its `Path` dimension is
+exactly the per-page question. It costs one hole in the CSP.
+
+### The hole, and what keeps it from growing
+
+The beacon is injected at the edge, so it arrives as a script this site did
+not write and `script-src 'self'` refuses it. `lib/csp.mjs` admits exactly one
+external origin:
+
+```
+https://static.cloudflareinsights.com/beacon.min.js
+```
+
+**`connect-src` gets nothing.** Under Cloudflare's AUTOMATIC injection the
+beacon reports to the site's own domain, which `'self'` already covers. Manual
+embedding would report to `cloudflareinsights.com` and need a second hole — so
+automatic injection is not a convenience here, it is the reason the second
+hole stays shut.
+
+`pnpm check:release` now asserts that the set of external origins in the
+production policy is **exactly** that one, scanning the whole policy rather
+than only `script-src`, so a host slipped into `connect-src` or `img-src`
+still trips it. The dev policy is asserted to have **none** — it is the policy
+a developer reads most often, and a host sitting in it teaches that the site
+talks to that host in every environment.
+
+Negative-tested: a second host in `script-src`, a host in `connect-src`, a
+host in `img-src`, and an external origin leaking into dev were all caught.
+A declared origin missing from the policy is a warning rather than a blocker —
+removing the beacon is a legitimate decision and the site works without it.
+
+### The trap worth knowing
+
+**A CSP that blocks the beacon does not remove it.** The script still
+downloads and still executes; only its report fails. Blocking it is therefore
+the worst of both outcomes: visitors pay the bytes, the console carries a
+violation, and no data arrives.
+
+Which is why this was opened deliberately rather than left to fail quietly.
+Before the change, the live HTML carried zero occurrences of
+`cloudflareinsights` — automatic injection had never been switched on, so the
+site was in neither state.
+
+### The alternative that was not taken
+
+`run_worker_first` accepts an array of route patterns, so a Worker can handle
+`/api/hit` while every other path is still served straight from assets with no
+Worker invocation. A first-party beacon posting there needs **no CSP change at
+all** — `connect-src 'self'` already permits it — and sends nothing to a third
+party.
+
+It was not taken because it means building and operating an analytics system,
+and what this site needed was a page-view count. If the third-party script
+ever becomes the wrong trade, that is the door to walk through, and it is
+already open.
+
+### What is collected
+
+See `docs/BRAND.md` §19-b. No cookies, no accounts, no way to link one person
+across two visits.
+
+---
+
 ## Open, deliberately
 
 - **LIVE** is still a placeholder entry. What someone does outside work is

@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
-import { contentSecurityPolicy } from '../lib/csp.mjs'
+import { contentSecurityPolicy, ANALYTICS_SCRIPT } from '../lib/csp.mjs'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const APP = join(ROOT, '.next', 'server', 'app')
@@ -90,6 +90,39 @@ if (!origin) {
     'upgrade-insecure-requests',
   ]) {
     if (!prod.includes(required)) blockers.push(`production CSP is missing: ${required}`)
+  }
+
+  /* THE SET OF EXTERNAL ORIGINS IS EXACTLY ONE.
+   *
+   * `script-src` admits Cloudflare's analytics beacon, and that hole was
+   * opened on purpose — see lib/csp.mjs for the trade. What this asserts is
+   * that it stays the ONLY one. A policy is not weakened by its first
+   * documented exception; it is weakened by the second one nobody noticed.
+   *
+   * Matching every `scheme://host` in the whole policy rather than only in
+   * `script-src`, so a host appearing in a directive nobody thought to check
+   * — connect-src, img-src, font-src — still trips this. */
+  const ALLOWED_ORIGINS = [ANALYTICS_SCRIPT]
+  const found = prod.match(/https?:\/\/[^\s;]+/g) ?? []
+  for (const origin of found) {
+    if (!ALLOWED_ORIGINS.includes(origin)) {
+      blockers.push(`production CSP admits an undeclared external origin: ${origin}`)
+    }
+  }
+  for (const expected of ALLOWED_ORIGINS) {
+    if (!found.includes(expected)) {
+      /* Not a blocker. Removing the beacon is a legitimate decision and the
+         site works without it; this only says the two files disagree. */
+      warnings.push(`lib/csp.mjs declares ${expected} but the production policy does not carry it`)
+    }
+  }
+
+  /* The dev policy gets no external origin at all. It is the policy a
+     developer reads most often, and a host sitting in it teaches that the
+     site talks to that host in every environment. */
+  const devExternal = dev.match(/https?:\/\/[^\s;]+/g) ?? []
+  if (devExternal.length) {
+    blockers.push(`development CSP admits an external origin: ${devExternal.join(', ')}`)
   }
 }
 
