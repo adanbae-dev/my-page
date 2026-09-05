@@ -13,9 +13,51 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-09-04",
-  "head": "d3c3841",
+  "generatedAt": "2026-09-05",
+  "head": "bc63ad1",
   "commits": [
+    {
+      "sha": "bc63ad1",
+      "date": "2026-09-05",
+      "subject": "Feat: 방문자 수를 세기 위해 CSP 에 구멍 하나를 뚫고, 그 구멍을 게이트로 묶는다",
+      "insertions": 183,
+      "deletions": 2,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "lib",
+        "scripts",
+        "docs",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e6527ce",
+      "date": "2026-09-05",
+      "subject": "Docs: 데이터 시각화 방향을 문서로 — 아직 증거가 없는 유일한 문서",
+      "insertions": 203,
+      "deletions": 0,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "docs"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "5cbef9b",
+      "date": "2026-09-05",
+      "subject": "Build: 91커밋 · 131라우트",
+      "insertions": 310,
+      "deletions": 250,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "d3c3841",
       "date": "2026-09-05",
