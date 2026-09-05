@@ -264,10 +264,19 @@ export function toEntry(args: {
  * it got shorter — two copies is two things to keep in step, and one of them
  * would eventually be wrong. The loader reads those from the original.
  *
- * `authored` is required and has no default. This site's claim is that the
- * prose is the evidence, so a retelling nobody wrote by hand has to say so
- * on the page; a default would let an unlabelled one through, which is the
- * one failure this field exists to prevent.
+ * `authored` is required and has no default, and it no longer renders.
+ *
+ * It used to append "nobody wrote these sentences by hand" to the notice on
+ * every retelling. That was removed: the notice already tells the reader,
+ * before the prose, that the author's own sentences are on the other side of
+ * the switch — which is the disclosure a reader acts on. Naming the
+ * mechanism on top of it read as a disclaimer about the whole site rather
+ * than about one register.
+ *
+ * The field stays required anyway. It records which retellings were written
+ * by hand, `pnpm check:content` reports the count, and the day one of them is
+ * rewritten by hand this is where that becomes true. A default would make the
+ * record silently wrong, which is the one failure this field still prevents.
  */
 export type Eli5 = {
   readonly chapter: SectionId

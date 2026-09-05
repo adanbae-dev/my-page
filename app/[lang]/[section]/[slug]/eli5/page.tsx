@@ -139,11 +139,17 @@ export default async function Eli5Page({
 
           {/* Said before the prose, not after it. A reader who is going to
               decide this page is not the author's writing should get to
-              decide it before reading a page of it. */}
-          <p className={cx('small', styles.notice)}>
-            {d.entry.plainNotice}
-            {!eli5.authored && ` ${d.entry.plainMachine}`}
-          </p>
+              decide it before reading a page of it.
+              
+              This used to append a second sentence — "nobody wrote these
+              sentences by hand" — whenever `authored` was false, which is
+              every retelling on the site. It was removed because the notice
+              above already carries the disclosure that matters: it tells the
+              reader, before they read a word, that the author's own sentences
+              are on the other side of the switch. Naming the mechanism on top
+              of that added nothing a reader acts on and read as a disclaimer
+              about the whole site rather than about one register. */}
+          <p className={cx('small', styles.notice)}>{d.entry.plainNotice}</p>
 
           {!eli5.translated && (
             <p className={cx('small', 'muted', styles.untranslated)}>

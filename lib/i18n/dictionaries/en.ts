@@ -93,7 +93,6 @@ export const en = {
     registerPlain: 'In plain words',
     plainNotice:
       'This is the entry retold in plain words. The sentences the author wrote are on the other side of the switch.',
-    plainMachine: 'Nobody wrote the sentences on this page by hand.',
     plainReadingMinutes: '~{n} min plain',
   },
 
