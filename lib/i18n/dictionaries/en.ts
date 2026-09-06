@@ -422,10 +422,10 @@ export const en = {
   renewal: {
     heading: 'The renewal right and the 5% cap',
     lead:
-      'The median jeonse renewal rose 4.9% when the tenant invoked their renewal right and 4.7% when they did not. On the averages the cap appears to do nothing. What it does is not in the middle — it is in the ceiling.',
+      'The median jeonse renewal rose {medianUp}% when the tenant invoked their renewal right and {medianDown}% when they did not. On the averages the cap appears to do nothing. What it does is not in the middle — it is in the ceiling: nine in ten invoked renewals stayed under {p90Up}%, and for the rest that line sits at {p90Down}%.',
     chartHeading: 'Deposit increase · by whether the renewal right was invoked',
     note:
-      'Two distributions across one axis instead of side by side. Side by side they are two similar-looking shapes a reader has to overlay in their head; across one axis they are a single silhouette — a wall on one side, a tail on the other — and the comparison happens in the eye. The two groups differ by more than ten thousand contracts, so each is drawn as a share of itself, and both use the same pixels per point: a bar twice as tall is twice as common. Giving each half its own scale would have filled the picture more evenly and made the 47% spike look like the 27% one.',
+      'Two distributions across one axis instead of side by side. Side by side they are two similar-looking shapes a reader has to overlay in their head; across one axis they are a single silhouette — a wall on one side, a tail on the other — and the comparison happens in the eye. The two groups differ by more than ten thousand contracts, so each is drawn as a share of itself, and both use the same pixels per point: a bar twice as tall is twice as common. Giving each half its own scale would have filled the picture more evenly and made the {peakUp}% spike look like the {peakDown}% one.',
     caption: '{kept} renewals · jeonse to jeonse · filed {from} – {to}',
     summary:
       'Two histograms of deposit increases on jeonse renewals, mirrored across one axis: renewals where the tenant invoked the statutory renewal right above, and renewals where they did not below. The invoked side stops dead at 5%; the other continues well past it.',

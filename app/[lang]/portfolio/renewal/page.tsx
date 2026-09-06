@@ -52,6 +52,18 @@ export default async function RenewalPage({
   const d = dict(lang)
   const [up, down] = RENEWAL_SERIES
 
+  /* Filled in rather than written into the sentence. Another month of
+     filings moves every one of these, and a paragraph that quotes them is
+     wrong the moment the chart under it is regenerated. */
+  const stats = {
+    medianUp: up?.median ?? 0,
+    medianDown: down?.median ?? 0,
+    p90Up: up?.p90?.toFixed(1) ?? '',
+    p90Down: down?.p90?.toFixed(1) ?? '',
+    peakUp: Math.round(Math.max(...(up?.bins ?? [0]))),
+    peakDown: Math.round(Math.max(...(down?.bins ?? [0]))),
+  }
+
   return (
     <>
       <JsonLd
@@ -78,7 +90,7 @@ export default async function RenewalPage({
             <span className="accentBlock">{' vs '}</span>
             {down?.median?.toFixed(1)}
           </h1>
-          <p className="lead measure">{d.renewal.lead}</p>
+          <p className="lead measure">{t(d.renewal.lead, stats)}</p>
         </div>
       </section>
 
@@ -93,7 +105,9 @@ export default async function RenewalPage({
           <h2 id="chart-title" className={cx('h2', 'beat', styles.beatTitle)}>
             {d.renewal.chartHeading}
           </h2>
-          <p className={cx('small', 'muted', 'measure', styles.note)}>{d.renewal.note}</p>
+          <p className={cx('small', 'muted', 'measure', styles.note)}>
+            {t(d.renewal.note, stats)}
+          </p>
 
           <RenewalDistribution
             labels={{
