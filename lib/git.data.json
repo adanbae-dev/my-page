@@ -14,8 +14,37 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-06",
-  "head": "0f47a57",
+  "head": "48062da",
   "commits": [
+    {
+      "sha": "48062da",
+      "date": "2026-09-06",
+      "subject": "Feat: 값 층 둘째 — 인구로 설명되지 않는 것, 그리고 시군구 좌표 245/256",
+      "insertions": 181,
+      "deletions": 40,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e46a0be",
+      "date": "2026-09-06",
+      "subject": "Build: 기록 갱신",
+      "insertions": 295,
+      "deletions": 268,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "0f47a57",
       "date": "2026-09-06",
