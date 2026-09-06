@@ -176,6 +176,8 @@ export const en = {
       'Front-end practice split into what is claimed and what can be shown — including the claims this site has not proven yet.',
     portfolio:
       'Things built here. A tile cartogram of Korea, and why it ships with its values missing.',
+    districts:
+      'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
 
   weight: {
@@ -369,6 +371,34 @@ export const en = {
 
     closing:
       'The plan this page executes against is docs/DATA-VISUALIZATION.md. One item on it is finished — this grid. The rest has no evidence yet.',
+  },
+
+  districts: {
+    heading: 'District cartogram',
+    lead:
+      'The sixteen provinces broken into 245 districts. Not one name is visible — the hexagons have a 13px radius and no text fits inside one. What is visible is the distribution.',
+    mapHeading: 'Brokerages per 10,000 residents · by district',
+    note:
+      'Hexagon size is the value. The province map filled each hexagon from the bottom; this one scales it — there is no label to protect here, and a 13px bar would be a smudge. Scaling grows the shape in both dimensions, so area tracks the value only when the radius tracks its square root. The province map\u2019s linear scale and this one\u2019s square root are not an inconsistency: they encode through different properties.',
+    caption: '{n} districts · hexagon size is offices per 10,000 residents.',
+    listing: 'See all of them in rank order',
+    summary:
+      'A hexagon-grid cartogram of real-estate brokerages per 10,000 residents across 245 Korean districts. A larger hexagon is a higher rate. The same numbers are listed in rank order below.',
+    source:
+      'MOLIT brokerage registrations 2026-08-18 ÷ MOIS registered population 2026-07-31 · positions from area-weighted centroids of the 2023 NGII district boundaries · all under 이용허락범위 제한 없음',
+
+    limitsHead: 'What this map does not hide',
+    placedTerm: 'Tiles are displaced',
+    placedWhy:
+      '245 districts on a 30×35 grid of 1,050 cells. Each centroid claims the nearest free cell, which displaces it by 1.05 cells on average and 4.60 at worst. Seoul\u2019s twenty-five districts and Cheongju\u2019s four cannot all sit on their true positions when the grid is coarser than they are. A denser grid barely helps — 38×44 gives 0.89 — so it stops here.',
+    missingTerm: 'Eleven are absent',
+    missingWhy:
+      'The boundary file is 2023 and the population and brokerage files are 2026. In between, Hwaseong split into four wards, Incheon reorganised into five and Cheongju into two. No 2023 centroid exists for a district created in 2024 — Hwaseong\u2019s Dongtan, Manse, Byeongjeom and Hyohaeng; Incheon\u2019s Geomdan, Michuhol, Seohae, Yeongjong and Jemulpo; Cheongju\u2019s Seowon and Cheongwon. They are named rather than invented.',
+    labelsTerm: 'There are no labels',
+    labelsWhy:
+      'Names do not fit on 245 hexagons. This map answers "where is the rate high", not "what is Sejong\u2019s rate". Names and numbers appear on hover and are listed in full, in rank order, below.',
+
+    back: '← Portfolio',
   },
 
   notFound: {

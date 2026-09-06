@@ -132,11 +132,55 @@ for (const [, name, body] of layers) {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* 5. The district grid                                                */
+/* ------------------------------------------------------------------ */
+
+/* Generated, so the failures are different in kind from the hand-placed
+   province grid: nobody will notice two of 245 hexagons overlapping, and a
+   regenerated file that silently lost rows still draws a map. */
+const dsrc = readFileSync(join(ROOT, 'lib', 'cartogram.districts.data.ts'), 'utf8')
+const dRows = Number(/D_GRID_ROWS = (\d+)/.exec(dsrc)?.[1])
+const dCols = Number(/D_GRID_COLS = (\d+)/.exec(dsrc)?.[1])
+const districts = [
+  ...dsrc.matchAll(
+    /\{ sido: '([^']+)', sgg: '([^']+)', row: (\d+), col: (\d+), brokers: (\d+), pop: (\d+) \}/g,
+  ),
+].map((m) => ({ sido: m[1], sgg: m[2], row: +m[3], col: +m[4], brokers: +m[5], pop: +m[6] }))
+
+if (!districts.length) problems.push('lib/cartogram.districts.data.ts parsed no districts')
+if (!dRows || !dCols) problems.push('district grid has no dimensions')
+
+const dCells = new Map()
+for (const d of districts) {
+  if (d.row >= dRows || d.col >= dCols) {
+    problems.push(`${d.sgg} sits at (${d.row},${d.col}), outside the ${dRows}x${dCols} district grid`)
+  }
+  const cell = `${d.row},${d.col}`
+  if (dCells.has(cell)) problems.push(`${d.sgg} and ${dCells.get(cell)} share district cell (${cell})`)
+  dCells.set(cell, d.sgg)
+  /* A district with no residents divides by zero in `per10k`. The helper
+     guards it, but a zero here means the join produced a row with no
+     population and that is a data problem, not a rendering one. */
+  if (d.pop <= 0) problems.push(`${d.sgg} has no population — the join lost it`)
+}
+
+const dNames = new Set(districts.map((d) => `${d.sido}/${d.sgg}`))
+if (dNames.size !== districts.length) problems.push('two district rows share a name')
+
+const dDeclared = Number(/DISTRICT_BROKER_TOTAL = (\d+)/.exec(dsrc)?.[1] ?? 0)
+const dSum = districts.reduce((a, d) => a + d.brokers, 0)
+if (!dDeclared) problems.push('the district table declares no DISTRICT_BROKER_TOTAL')
+else if (dSum !== dDeclared) {
+  problems.push(`district brokers add up to ${dSum.toLocaleString()} but the declared total is ${dDeclared.toLocaleString()}`)
+}
+
 line('')
 line('  CARTOGRAM')
 line('  ' + '-'.repeat(70))
 line(`  ${tiles.length} tiles on a ${rows}x${cols} grid · ${seen.size} cells used`)
 line(`  value layers: ${layers.length} · ${layers.map((l) => l[1]).join(', ')}`)
+line(`  districts: ${districts.length} on ${dRows}x${dCols} · ${dSum.toLocaleString()} brokerages`)
 for (const p of problems) line(`  ✗ ${p}`)
 line('  ' + '-'.repeat(70))
 if (problems.length) {

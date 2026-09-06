@@ -126,6 +126,12 @@ export default async function PortfolioPage({
           {/* Why it stops at 17. Stated on the page, not only in the source —
               a reader who wonders where 시군구 went should not have to read
               the repository to find out. */}
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/districts')}>
+              {d.districts.heading} →
+            </Link>
+          </p>
+
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>
               {d.portfolio.cartogram.limitsHead}

@@ -1,0 +1,59 @@
+/* Unlayered on purpose. */
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.caption {
+  color: var(--muted);
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 34rem;
+  block-size: auto;
+}
+
+/* The grid is scaffolding: it should be visible enough to read as a shape and
+   quiet enough that the filled hexagons are what the eye lands on. */
+.outlines use {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 0.8;
+}
+
+.fills use {
+  fill: var(--accent);
+}
+
+.listing {
+  max-inline-size: var(--measure);
+}
+
+.summaryLine {
+  cursor: pointer;
+  min-block-size: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.list {
+  margin-block: var(--space-s) 0;
+  padding-inline-start: var(--space-l);
+  display: grid;
+  gap: var(--space-3xs);
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.list li::marker {
+  color: var(--muted);
+}
+
+.source {
+  margin: 0;
+}

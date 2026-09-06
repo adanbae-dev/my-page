@@ -93,13 +93,3 @@
 .mapNote {
   margin-block: 0 var(--space-m);
 }
-
-.deeper {
-  margin-block-start: var(--space-xl);
-}
-
-.deeper a {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 24px;
-}

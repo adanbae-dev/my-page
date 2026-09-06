@@ -88,6 +88,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: { languages: languages('/portfolio') },
       },
       {
+        url: url(localePath(lang, '/portfolio/districts')),
+        changeFrequency: 'monthly' as const,
+        priority: 0.5,
+        alternates: { languages: languages('/portfolio/districts') },
+      },
+      {
         url: url(localePath(lang, '/practice')),
         changeFrequency: 'monthly' as const,
         priority: 0.6,
