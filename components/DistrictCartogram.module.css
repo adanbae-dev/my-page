@@ -36,23 +36,25 @@
  * reader never has to be told which end is more. It also survives a change
  * of accent, because there is no hex literal here to go stale.
  *
- * The bottom step is 24% rather than 0: below about a fifth the hexagon
+ * The bottom step is 32% rather than 0: below about a third the hexagon
  * stops separating from the ground and the country loses its coastline. The
- * top step goes PAST the accent, 18% of the way to the figure colour,
- * because a ramp whose last two steps are 87% and 100% of the same colour
- * has no top — and the top is the thing this map is for.
+ * TOP TWO steps go past the accent, 20% and 45% of the way to the figure
+ * colour, and that is not decoration — Fisher-Jenks puts nine districts
+ * above 25.7 and three above 34.0, and nine tiles out of 245 have to be
+ * findable at a glance or the classification did nothing.
  *
  * The classes are written as :global because the markup they style is a
  * build-time string, not JSX — see lib/cartogram.districts.figure.ts. They
  * are scoped by the module class around them, so `q0` cannot leak.
  */
-.cells :global(.q0) { fill: color-mix(in oklab, var(--accent) 24%, var(--ground)); }
-.cells :global(.q1) { fill: color-mix(in oklab, var(--accent) 38%, var(--ground)); }
-.cells :global(.q2) { fill: color-mix(in oklab, var(--accent) 52%, var(--ground)); }
+.cells :global(.q0) { fill: color-mix(in oklab, var(--accent) 32%, var(--ground)); }
+.cells :global(.q1) { fill: color-mix(in oklab, var(--accent) 44%, var(--ground)); }
+.cells :global(.q2) { fill: color-mix(in oklab, var(--accent) 56%, var(--ground)); }
 .cells :global(.q3) { fill: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
-.cells :global(.q4) { fill: color-mix(in oklab, var(--accent) 85%, var(--ground)); }
+.cells :global(.q4) { fill: color-mix(in oklab, var(--accent) 82%, var(--ground)); }
 .cells :global(.q5) { fill: var(--accent); }
-.cells :global(.q6) { fill: color-mix(in oklab, var(--accent) 82%, var(--figure)); }
+.cells :global(.q6) { fill: color-mix(in oklab, var(--accent) 80%, var(--figure)); }
+.cells :global(.q7) { fill: color-mix(in oklab, var(--accent) 55%, var(--figure)); }
 
 /* A hairline of ground between neighbours. Without it two cells of the same
    class merge and the tiling reads as a blob; with it the grid stays
@@ -70,9 +72,8 @@
 .legend {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: end;
   gap: var(--space-3xs) var(--space-2xs);
-  max-inline-size: 32rem;
+  max-inline-size: 34rem;
 }
 
 .legendHead {
@@ -80,7 +81,8 @@
   margin: 0;
 }
 
-.ramp {
+.ramp,
+.scale {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -90,32 +92,38 @@
 }
 
 .ramp li {
-  block-size: 1.5rem;
-  display: flex;
-  align-items: flex-end;
+  block-size: 1.25rem;
 }
 
-.tick {
-  /* Under the swatch, not on it: the low classes are dark and the high ones
-     are the accent, so no single text colour is legible on all seven. */
-  translate: 0 1.35rem;
-  color: var(--muted);
+/* The lower bound of each class over the count in it, both left-aligned to
+   the swatch they belong to. */
+.scale li {
+  display: flex;
+  flex-direction: column;
   font-variant-numeric: tabular-nums;
+}
+
+/* The break is the number being read; the count is context for it. Both have
+   to stay legible — `--rule` is a hairline colour, not a text one. */
+.count {
+  color: var(--muted);
 }
 
 .legendMax {
   margin: 0;
-  translate: 0 1.35rem;
+  align-self: start;
   font-variant-numeric: tabular-nums;
 }
 
-.q0 { background: color-mix(in oklab, var(--accent) 24%, var(--ground)); }
-.q1 { background: color-mix(in oklab, var(--accent) 38%, var(--ground)); }
-.q2 { background: color-mix(in oklab, var(--accent) 52%, var(--ground)); }
+.q0 { background: color-mix(in oklab, var(--accent) 32%, var(--ground)); }
+.q1 { background: color-mix(in oklab, var(--accent) 44%, var(--ground)); }
+.q2 { background: color-mix(in oklab, var(--accent) 56%, var(--ground)); }
 .q3 { background: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
-.q4 { background: color-mix(in oklab, var(--accent) 85%, var(--ground)); }
+.q4 { background: color-mix(in oklab, var(--accent) 82%, var(--ground)); }
 .q5 { background: var(--accent); }
-.q6 { background: color-mix(in oklab, var(--accent) 82%, var(--figure)); }
+.q6 { background: color-mix(in oklab, var(--accent) 80%, var(--figure)); }
+.q7 { background: color-mix(in oklab, var(--accent) 55%, var(--figure)); }
+
 
 /* ------------------------------------------------------------------ */
 

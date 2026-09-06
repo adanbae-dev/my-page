@@ -4,6 +4,7 @@ import {
   D_CELLS,
   D_CELL_PATH,
   D_CLASSES,
+  D_CLASS_COUNTS,
   D_RANKED,
   D_SVG_HEIGHT,
   D_SVG_WIDTH,
@@ -62,16 +63,29 @@ export function DistrictCartogram({
         </svg>
       </HexTip>
 
+      {/* Three rows over the same eight columns: the ramp, the value each
+          class starts at, and how many districts are in it. The third row is
+          not decoration — Fisher-Jenks does not equalise counts, and a
+          reader looking at three pale tiles is owed the number three. */}
       <div className={styles.legend}>
         <p className={cx('label', 'muted', styles.legendHead)}>{labels.legend}</p>
+
         <ol className={styles.ramp}>
           {Array.from({ length: D_CLASSES }, (_, i) => (
-            <li key={i} className={styles[`q${i}`]}>
-              <span className={cx('label', styles.tick)}>{D_BREAKS[i]?.toFixed(1)}</span>
+            <li key={i} className={styles[`q${i}`]} />
+          ))}
+        </ol>
+        <span />
+
+        <ol className={styles.scale}>
+          {Array.from({ length: D_CLASSES }, (_, i) => (
+            <li key={i} className="label">
+              {D_BREAKS[i]?.toFixed(1)}
+              <span className={styles.count}>{D_CLASS_COUNTS[i]}</span>
             </li>
           ))}
         </ol>
-        <p className={cx('label', 'muted', styles.legendMax)}>{D_BREAKS[D_CLASSES]?.toFixed(1)}</p>
+        <p className={cx('label', styles.legendMax)}>{D_BREAKS[D_CLASSES]?.toFixed(1)}</p>
       </div>
 
       <details className={styles.listing}>

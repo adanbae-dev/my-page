@@ -91,41 +91,117 @@ export const D_SVG_HEIGHT = Math.round((D_GRID_ROWS - 1) * STEP_Y + R * 2 + 2)
 export const D_CELL_PATH = hexPath(R)
 
 /**
- * SEVEN CLASSES OF EQUAL COUNT, and the reason is the shape of the data.
+ * EIGHT CLASSES, CUT WHERE THE DATA HAS GAPS.
  *
- * The first version of this map encoded the rate as the SIZE of the hexagon,
- * scaled by square root against the maximum. It did not read. Measured on
- * the same 245 rows:
+ * Two schemes were tried before this one and both failed in a way the map
+ * showed. The distribution is the reason:
  *
- *   p10   5.3      p50  13.5      p90  20.9      p100  39.8
+ *   p10   5.3    p50  13.5    p90  20.9    p95  22.7    p100  39.8
  *
- * The top of the range belongs to four districts in central Seoul, and
- * scaling to 39.8 squeezed the middle eighty percent of the country into
- * radii between 0.36 and 0.72 of full — a two-fold difference in radius
- * spread across 196 districts, next to each other, at forty pixels each.
- * Everything looked the same because, on that scale, everything was.
+ * and above p95 sit four districts of central Seoul — 중구 39.8, 강남 37.0,
+ * 용산 34.0, 서초 31.3 — a tail twice as long as the body it hangs off.
  *
- * Colour replaces it, and the classes are QUANTILES: 35 districts per class,
- * so each step of the ramp is the same amount of country. That guarantees
- * the picture uses its whole range no matter how the values bunch, and it
- * costs the reader the ability to read magnitude off the ramp — a class is
- * "the next 35 districts up", not "five more per ten thousand". The breaks
- * are therefore printed under the map rather than left implicit, and the
- * exact number for any one district is in its popup.
+ *   SIZE, sqrt-scaled to the maximum. The tail set the maximum, so the
+ *   middle 80% of the country landed between 0.36 and 0.72 of full radius.
+ *   A two-fold radius difference across 196 touching tiles is invisible.
  *
- * Size is gone as a channel. At 245 tiles it was never going to beat colour,
- * and dropping it lets every hexagon reach its neighbours — which is what
- * makes the country read as a country rather than as 245 dots.
+ *   COLOUR, seven classes of equal count. The counts were perfect and the
+ *   widths were not: 5.0, 3.9, 2.4, 2.1, 2.3, 2.5 — and then 20.6. The top
+ *   class was wider than the other six together, so 19.3 and 39.8 were the
+ *   same colour. Which is the complaint that produced this comment.
+ *
+ * So the breaks are NATURAL BREAKS now — Fisher-Jenks, computed exactly by
+ * dynamic programming below, which places k classes so that the total
+ * squared deviation inside them is as small as it can be. It is the scheme
+ * that answers "where does this data actually separate" instead of imposing
+ * an answer, and on these 245 rows it puts the Seoul four in a class of
+ * their own and still splits the crowded middle:
+ *
+ *   count  41 · 27 · 46 · 56 · 43 · 23 ·  6 ·  3
+ *   width 5.6 ·3.2 ·3.0 ·3.2 ·3.5 ·6.0 ·8.3 ·5.9
+ *
+ * WHAT IT COSTS is even counts: the top two classes are nine districts
+ * between them, so nine tiles carry the two hottest colours. That is the
+ * honest picture — there really are only nine — but it means area on this
+ * map is not proportional to anything, and the legend has to be read rather
+ * than assumed. The breaks are printed under it, and every exact number is
+ * one hover away.
  */
-export const D_CLASSES = 7
+export const D_CLASSES = 8
+
+/**
+ * Fisher-Jenks, exact.
+ *
+ * O(k·n²) with n = 245 and k = 8 — about half a million cheap iterations,
+ * once, at build time. The greedy approximation usually quoted for this is
+ * not needed at this size, and an approximation would make the breaks depend
+ * on the starting guess rather than on the data.
+ *
+ * The within-class sum of squares comes from prefix sums, so `sse` is O(1)
+ * and the whole thing stays a triple loop rather than a quadruple one.
+ */
+function naturalBreaks(sorted: readonly number[], k: number): number[] {
+  const n = sorted.length
+  const s1 = new Float64Array(n + 1)
+  const s2 = new Float64Array(n + 1)
+  for (let i = 0; i < n; i++) {
+    s1[i + 1] = s1[i]! + sorted[i]!
+    s2[i + 1] = s2[i]! + sorted[i]! * sorted[i]!
+  }
+  /** Squared deviation of sorted[i..j). */
+  const sse = (i: number, j: number): number => {
+    const m = j - i
+    if (m <= 0) return 0
+    const sum = s1[j]! - s1[i]!
+    return s2[j]! - s2[i]! - (sum * sum) / m
+  }
+
+  const INF = Number.POSITIVE_INFINITY
+  let prev = new Float64Array(n + 1).fill(INF)
+  prev[0] = 0
+  const back: number[][] = []
+  for (let c = 1; c <= k; c++) {
+    const cur = new Float64Array(n + 1).fill(INF)
+    const from = new Int32Array(n + 1)
+    for (let j = c; j <= n; j++) {
+      for (let i = c - 1; i < j; i++) {
+        if (prev[i] === INF) continue
+        const t = prev[i]! + sse(i, j)
+        if (t < cur[j]!) {
+          cur[j] = t
+          from[j] = i
+        }
+      }
+    }
+    back.push(Array.from(from))
+    prev = cur
+  }
+
+  const starts: number[] = []
+  let j = n
+  for (let c = k; c >= 1; c--) {
+    const i = back[c - 1]![j]!
+    starts.push(i)
+    j = i
+  }
+  return starts.reverse().map((i) => sorted[i]!)
+}
 
 const rates = DISTRICTS.map(per10k).sort((a, b) => a - b)
 
 /** Lower bound of each class, then the maximum. `D_CLASSES + 1` numbers. */
 export const D_BREAKS: readonly number[] = [
-  ...Array.from({ length: D_CLASSES }, (_, i) => rates[Math.floor((i * rates.length) / D_CLASSES)]!),
+  ...naturalBreaks(rates, D_CLASSES),
   rates[rates.length - 1]!,
 ]
+
+/** How many districts fall in each class — the thing Jenks does not equalise. */
+export const D_CLASS_COUNTS: readonly number[] = D_BREAKS.slice(0, D_CLASSES).map(
+  (lo, i) => {
+    const hi = i + 1 < D_CLASSES ? D_BREAKS[i + 1]! : Number.POSITIVE_INFINITY
+    return rates.filter((v) => v >= lo && v < hi).length
+  },
+)
 
 const classOf = (v: number): number => {
   for (let i = D_CLASSES - 1; i > 0; i--) if (v >= D_BREAKS[i]!) return i

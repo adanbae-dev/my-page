@@ -75,7 +75,8 @@
     "of the payload, so what remains is inherent.",
     "",
     "  size encoding, two SVG layers              30,310 B",
-    "  colour encoding, one layer                 28,497 B   <- shipped",
+    "  colour encoding, one layer                 28,497 B",
+    "  natural breaks, 8 classes, legend counts   29,018 B   <- shipped",
     "",
     "The last two steps ADDED capability and one of them REMOVED weight. The",
     "hexagons tile the country's own outline instead of scattering across a",
@@ -94,15 +95,21 @@
     "per-hexagon <title> would have saved 4,585 B and is the whole of the hover",
     "with JavaScript off. Neither is a byte problem, so neither was solved as one.",
     "",
-    "The exception is this route's measurement plus 943 B, not an allowance to",
-    "grow into, and it leaves the global ceiling where /ko/build (23,354 B) has",
+    "The last 521 B is prose, not picture: quantile classing put 19.3 and 39.8",
+    "in the same colour, and replacing it with Fisher-Jenks meant the page now",
+    "has to say why the classes hold 41, 27, 46, 56, 43, 23, 6 and 3 districts",
+    "rather than 35 each. A classification a reader cannot check is worse than",
+    "a wider budget line.",
+    "",
+    "The exception is this route's measurement plus 934 B, not an allowance to",
+    "grow into, and it leaves the global ceiling where /ko/build (23,210 B) has",
     "always had to live."
   ],
   "overrides": {
     "/portfolio/districts": {
       "$why": "245 districts x (name, cell, brokers, population) drawn as a hexagon tiling of the country, plus the same 245 rows listed again in rank order. The page IS the data. See the measurements in $comment above.",
-      "html": 29440,
-      "total": 309248
+      "html": 29952,
+      "total": 309760
     }
   },
   "unit": "gzip-bytes",
