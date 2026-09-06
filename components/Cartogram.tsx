@@ -26,6 +26,13 @@ import styles from './Cartogram.module.css'
  * data at the same time is not that. Each hexagon additionally carries a
  * `<title>`, and the figure states its own summary.
  */
+/** A count prints whole; a rate prints to its declared precision. */
+const fmt = (v: number, layer: ValueLayer | null): string =>
+  v.toLocaleString(undefined, {
+    minimumFractionDigits: layer?.decimals ?? 0,
+    maximumFractionDigits: layer?.decimals ?? 0,
+  })
+
 export function Cartogram({
   layer,
   names,
@@ -74,7 +81,7 @@ export function Cartogram({
             <g key={h.code} className={styles.hex}>
               <title>
                 {names[h.code] ?? h.abbr}
-                {h.value !== undefined && ` · ${h.value.toLocaleString()}`}
+                {h.value !== undefined && ` · ${fmt(h.value, layer)}`}
               </title>
 
               {h.value !== undefined && filled > 0 && (
@@ -103,7 +110,7 @@ export function Cartogram({
               </text>
               {h.value !== undefined && (
                 <text x={h.x} y={h.y + 2} className={styles.value}>
-                  {h.value.toLocaleString()}
+                  {fmt(h.value, layer)}
                 </text>
               )}
             </g>
@@ -118,7 +125,7 @@ export function Cartogram({
             <li key={h.code}>
               {names[h.code] ?? h.abbr}
               {h.value !== undefined && (
-                <span className="muted"> · {h.value.toLocaleString()}</span>
+                <span className="muted"> · {fmt(h.value, layer)}</span>
               )}
             </li>
           ))}

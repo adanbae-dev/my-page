@@ -96,31 +96,39 @@ for (const loc of LOCALES) {
   }
 }
 
-/* 4. A value layer, if present, is complete and sourced.
-      Null is the expected state today and is not a problem. */
-const layerNull = /export const VALUE_LAYER: ValueLayer \| null = null/.test(src)
-if (!layerNull) {
-  const values = [...src.matchAll(/'(\d+)':\s*[\d_]+/g)].map((m) => m[1])
+/* 4. Every value layer is complete, sourced, and adds up.
+
+      Checked per layer, not once: the second layer was added months after the
+      first and a check written for "the value layer" would have kept passing
+      while the new one went unverified. */
+const layers = [...src.matchAll(/const ([A-Z_0-9]+): ValueLayer = \{([\s\S]*?)\n\}/g)]
+if (layers.length === 0) {
+  notes.push('no value layers — the grid renders as labels only')
+}
+for (const [, name, body] of layers) {
+  const codes = [...body.matchAll(/'(\d+)':\s*[\d_.]+/g)].map((m) => m[1])
   for (const t of tiles) {
-    if (!values.includes(t.code)) problems.push(`the value layer has no entry for ${t.abbr} (${t.code})`)
+    if (!codes.includes(t.code)) problems.push(`${name} has no entry for ${t.abbr} (${t.code})`)
   }
   for (const key of ['name:', 'url:', 'license:']) {
-    if (!src.includes(key)) problems.push(`the value layer is missing source.${key.slice(0, -1)} — a number with no source is a rumour`)
+    if (!body.includes(key)) {
+      problems.push(`${name} is missing source.${key.slice(0, -1)} — a number with no source is a rumour`)
+    }
   }
-
-  /* CHECKSUM. The sixteen numbers are sums this repository computed over
-     3,619 rows of a published file; nothing about them is self-evident. If
-     one digit is mistyped the map still draws, one tile is just the wrong
-     height. Adding them back up against the recorded national total is the
-     only check that catches it. */
-  const declared = Number((/NATIONAL_TOTAL = ([\d_]+)/.exec(src)?.[1] ?? '0').replace(/_/g, ''))
-  const sum = [...src.matchAll(/'(\d+)': ([\d_]+),/g)].reduce(
-    (a, m) => a + Number(m[2].replace(/_/g, '')),
-    0,
-  )
-  if (!declared) problems.push('the value layer has no NATIONAL_TOTAL to check the sum against')
-  else if (sum !== declared) {
-    problems.push(`the values add up to ${sum.toLocaleString()} but NATIONAL_TOTAL says ${declared.toLocaleString()}`)
+  if (!/total:/.test(body)) problems.push(`${name} does not declare a total (a number, or null when summing is meaningless)`)
+  const declared = /total: ([\d_]+)/.exec(body)?.[1]
+  if (declared) {
+    /* CHECKSUM. These numbers are sums this repository computed over
+       thousands of published rows; nothing about them is self-evident. A
+       mistyped digit still draws a map, one bar is just the wrong height. */
+    const want = Number(declared.replace(/_/g, ''))
+    const got = [...body.matchAll(/'\d+':\s*([\d_.]+)/g)].reduce(
+      (a, m) => a + Number(m[1].replace(/_/g, '')),
+      0,
+    )
+    if (Math.abs(got - want) > 0.5) {
+      problems.push(`${name} values add up to ${got.toLocaleString()} but total says ${want.toLocaleString()}`)
+    }
   }
 }
 
@@ -128,7 +136,7 @@ line('')
 line('  CARTOGRAM')
 line('  ' + '-'.repeat(70))
 line(`  ${tiles.length} tiles on a ${rows}x${cols} grid · ${seen.size} cells used`)
-line(`  value layer: ${layerNull ? 'empty (declared, not forgotten)' : 'present — checked for completeness and a source'}`)
+line(`  value layers: ${layers.length} · ${layers.map((l) => l[1]).join(', ')}`)
 for (const p of problems) line(`  ✗ ${p}`)
 line('  ' + '-'.repeat(70))
 if (problems.length) {

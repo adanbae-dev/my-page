@@ -322,6 +322,20 @@ export const en = {
       summary: 'A hexagon-grid cartogram of Korea\u2019s 16 first-level divisions. How full each hexagon is shows registered population; Gyeonggi is the largest and Sejong the smallest. The same numbers are listed in order below.',
       listing: 'See them in reading order',
 
+      layers: {
+        population: {
+          title: 'Registered population',
+          note: 'As of 2026-07-31. It counts registrations rather than people — it includes residents whose whereabouts are unregistered and excludes foreign nationals. The published file is 3,619 rows of neighbourhoods with no province totals in it, so these numbers are those rows summed by province.',
+          caption: '{n} divisions · bar length is population.',
+          summary: 'A hexagon-grid cartogram of registered population across Korea\u2019s 16 first-level divisions. Gyeonggi is the largest and Sejong the smallest. The same numbers are listed in order below.',
+        },
+        brokersPer10k: {
+          title: 'Brokerages per 10,000 residents',
+          note: 'Drawing the raw office count would redraw the population map — 82,445 nationally, and the largest counts sit where the most people do. Dividing changes the order. Sejong at 21.5 and Jeju at 21.0 come out above Seoul at 20.4, and Gyeonggi, which has more offices than anywhere else at 22,708, lands mid-table at 16.5. Gangwon is last at 11.4.',
+          caption: '{n} divisions · bar length is offices per 10,000 residents.',
+          summary: 'A hexagon-grid cartogram of real-estate brokerages per 10,000 residents. Sejong and Jeju rank above Seoul; Gangwon is lowest. The same numbers are listed in order below.',
+        },
+      },
       limitsHead: 'Why it stops here',
       sggTerm: '~250 districts',
       sggWhy:

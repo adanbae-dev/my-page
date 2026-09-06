@@ -73,3 +73,23 @@
 .closingNote {
   margin-block-start: var(--space-l);
 }
+
+.mapBlock {
+  margin-block-start: var(--space-2xl);
+  padding-block-start: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.mapBlock:first-of-type {
+  margin-block-start: 0;
+  padding-block-start: 0;
+  border-block-start: none;
+}
+
+.mapTitle {
+  margin-block: 0 var(--space-2xs);
+}
+
+.mapNote {
+  margin-block: 0 var(--space-m);
+}

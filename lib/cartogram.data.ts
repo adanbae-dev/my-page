@@ -114,6 +114,18 @@ export type ValueLayer = {
   readonly source: { readonly name: string; readonly url: string; readonly license: string }
   /** Division code -> value. Every code in DIVISIONS must be present. */
   readonly values: Readonly<Record<string, number>>
+  /**
+   * The sum, when summing means something — and null when it does not.
+   *
+   * A count of people adds up to a national total and the gate re-adds it to
+   * catch a mistyped digit. A RATE does not: adding "offices per 10,000
+   * residents" across sixteen provinces produces a number with no referent.
+   * Null says the checksum does not apply here rather than leaving the gate
+   * to invent one.
+   */
+  readonly total: number | null
+  /** Decimal places to print. A count has none; a rate has one. */
+  readonly decimals: number
 }
 
 /**
@@ -141,13 +153,15 @@ export type ValueLayer = {
  */
 export const NATIONAL_TOTAL = 51_088_284
 
-export const VALUE_LAYER: ValueLayer | null = {
+const POPULATION: ValueLayer = {
   id: 'population',
   source: {
     name: '행정안전부 지역별(행정동) 성별 연령별 주민등록 인구수 · 2026-07-31',
     url: 'https://www.data.go.kr/data/15097972/fileData.do',
     license: '이용허락범위 제한 없음',
   },
+  total: NATIONAL_TOTAL,
+  decimals: 0,
   values: {
     '41': 13_768_157,
     '11': 9_284_263,
@@ -167,6 +181,58 @@ export const VALUE_LAYER: ValueLayer | null = {
     '36': 390_972,
   },
 }
+
+/**
+ * Offices per 10,000 residents — the layer that earns the second map.
+ *
+ * Drawing the raw office count would redraw the population map: 82,445
+ * offices nationally, and the biggest counts sit exactly where the most
+ * people do. A second cartogram that says the same thing as the first is
+ * decoration.
+ *
+ * The rate does not. Sejong (21.5) and Jeju (21.0) come out ABOVE Seoul
+ * (20.4), and Gyeonggi — which has the most offices of anywhere, 22,708 —
+ * lands mid-table at 16.5. Gangwon is last at 11.4. That ordering is not
+ * derivable from either input on its own, which is the whole reason to put
+ * it on a map.
+ *
+ * Derived here from the two sources below, per province, and rounded to one
+ * decimal. `total` is null: adding rates across provinces yields a number
+ * that refers to nothing.
+ */
+const BROKERS_PER_10K: ValueLayer = {
+  id: 'brokersPer10k',
+  source: {
+    name: '국토교통부 중개사무소 등록현황 2026-08-18 ÷ 행정안전부 주민등록인구 2026-07-31',
+    url: 'https://www.data.go.kr/data/15063946/fileData.do',
+    license: '이용허락범위 제한 없음',
+  },
+  total: null,
+  decimals: 1,
+  values: {
+    '36': 21.5,
+    '50': 21.0,
+    '11': 20.4,
+    '41': 16.5,
+    '26': 16.2,
+    '30': 16.0,
+    '27': 15.4,
+    '28': 14.7,
+    '48': 14.5,
+    '44': 14.4,
+    '31': 14.3,
+    '52': 14.1,
+    '12': 14.1,
+    '43': 13.1,
+    '47': 11.8,
+    '51': 11.4,
+  },
+}
+
+export const VALUE_LAYERS: readonly ValueLayer[] = [POPULATION, BROKERS_PER_10K]
+
+/** Kept for the first map, which is the one the page leads with. */
+export const VALUE_LAYER: ValueLayer | null = POPULATION
 
 /* ------------------------------------------------------------------ */
 /* Derived                                                            */

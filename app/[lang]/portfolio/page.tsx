@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation'
 import { Cartogram } from '@/components/Cartogram'
 import { JsonLd } from '@/components/JsonLd'
 import { cx } from '@/lib/cx'
-import { DIVISIONS, VALUE_LAYER } from '@/lib/cartogram.data'
+import { DIVISIONS, VALUE_LAYERS } from '@/lib/cartogram.data'
 import { isLocale, localePath } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
@@ -97,19 +97,31 @@ export default async function PortfolioPage({
             {d.portfolio.cartogram.intro}
           </p>
 
-          <Cartogram
-            layer={VALUE_LAYER}
-            names={d.portfolio.cartogram.divisions}
-            labels={{
-              caption: d.portfolio.cartogram.caption.replace(
-                '{n}',
-                String(DIVISIONS.length),
-              ),
-              emptyLayer: d.portfolio.cartogram.emptyLayer,
-              listing: d.portfolio.cartogram.listing,
-              summary: d.portfolio.cartogram.summary,
-            }}
-          />
+          {/* Two maps, not a toggle. A switcher would need client JavaScript
+              and this page ships none; more to the point, the argument is the
+              COMPARISON — the second map is only interesting while the first
+              is still on screen. */}
+          {VALUE_LAYERS.map((layer) => {
+            const copy = d.portfolio.cartogram.layers[
+              layer.id as keyof typeof d.portfolio.cartogram.layers
+            ]
+            return (
+              <div key={layer.id} className={styles.mapBlock}>
+                <h3 className={cx('h3', styles.mapTitle)}>{copy.title}</h3>
+                <p className={cx('small', 'muted', 'measure', styles.mapNote)}>{copy.note}</p>
+                <Cartogram
+                  layer={layer}
+                  names={d.portfolio.cartogram.divisions}
+                  labels={{
+                    caption: copy.caption.replace('{n}', String(DIVISIONS.length)),
+                    emptyLayer: d.portfolio.cartogram.emptyLayer,
+                    listing: d.portfolio.cartogram.listing,
+                    summary: copy.summary,
+                  }}
+                />
+              </div>
+            )
+          })}
 
           {/* Why it stops at 17. Stated on the page, not only in the source —
               a reader who wonders where 시군구 went should not have to read
