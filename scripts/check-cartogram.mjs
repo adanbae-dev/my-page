@@ -47,6 +47,27 @@ for (const t of tiles) {
   seen.set(cell, t.abbr)
 }
 
+/* 1b. Every row is a contiguous run of columns.
+      A hole inside the shape makes the cartogram read as scattered tiles
+      rather than a country — the outline a reader recognises comes from the
+      tiles touching. This is the invariant that keeps a future edit from
+      quietly reintroducing one. */
+{
+  const byRow = new Map()
+  for (const t of tiles) {
+    if (!byRow.has(t.row)) byRow.set(t.row, [])
+    byRow.get(t.row).push(t.col)
+  }
+  for (const [row, cols] of [...byRow].sort((a, b) => a[0] - b[0])) {
+    const sorted = [...cols].sort((a, b) => a - b)
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] !== sorted[i - 1] + 1) {
+        problems.push(`row ${row} skips column ${sorted[i - 1] + 1} — a hole inside the shape`)
+      }
+    }
+  }
+}
+
 /* 2. Codes are unique. A duplicate silently drops a division from the map. */
 const byCode = new Map()
 for (const t of tiles) {

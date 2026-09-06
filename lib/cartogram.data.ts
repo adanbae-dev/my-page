@@ -21,10 +21,18 @@
  * question was about the value. Equal tiles remove that.
  *
  * The (row, col) below are DESIGNED, not measured, and that is what a tile
- * grid map is — every published one is arranged by hand. It is checkable at a
- * glance rather than on trust: Gangwon is north-east, Jeju is off the
- * south-west corner, Busan and Ulsan are south-east, Gwangju sits inside
- * Jeonnam. Anyone who knows the map can falsify it in seconds.
+ * grid map is — every published one is arranged by hand.
+ *
+ * They are packed so that every row is a CONTIGUOUS run of cells, with no
+ * holes anywhere in the shape. An earlier version left gaps where no division
+ * happened to fall and the result read as scattered confetti rather than a
+ * country; the outline a reader recognises comes from the tiles touching.
+ *
+ * The arrangement is checkable at a glance rather than on trust. West coast
+ * down the left — Incheon, Chungnam, Jeonbuk, Jeonnam-Gwangju. East coast
+ * down the right — Gangwon, Gyeongbuk, Ulsan, Busan. Daejeon directly south
+ * of Sejong, Daegu inside Gyeongbuk's southern half, Jeju alone off the
+ * bottom. Anyone who knows the map can falsify it in seconds.
  *
  * WHY THIS STOPS AT 16.
  *
@@ -55,7 +63,7 @@ export type Division = {
   readonly col: number
 }
 
-export const GRID_ROWS = 7
+export const GRID_ROWS = 6
 export const GRID_COLS = 5
 
 /**
@@ -63,22 +71,28 @@ export const GRID_COLS = 5
  * order the grid does and a misplaced tile is visible in the diff.
  */
 export const DIVISIONS: readonly Division[] = [
-  { code: '41', abbr: '경기', row: 0, col: 2 },
-  { code: '51', abbr: '강원', row: 0, col: 3 },
-  { code: '28', abbr: '인천', row: 1, col: 1 },
-  { code: '11', abbr: '서울', row: 1, col: 2 },
-  { code: '44', abbr: '충남', row: 2, col: 1 },
-  { code: '36', abbr: '세종', row: 2, col: 2 },
-  { code: '43', abbr: '충북', row: 2, col: 3 },
-  { code: '47', abbr: '경북', row: 2, col: 4 },
-  { code: '30', abbr: '대전', row: 3, col: 2 },
-  { code: '27', abbr: '대구', row: 3, col: 4 },
-  { code: '52', abbr: '전북', row: 4, col: 1 },
-  { code: '31', abbr: '울산', row: 4, col: 4 },
-  { code: '12', abbr: '전남광주', row: 5, col: 1 },
-  { code: '48', abbr: '경남', row: 5, col: 2 },
-  { code: '26', abbr: '부산', row: 5, col: 3 },
-  { code: '50', abbr: '제주', row: 6, col: 1 },
+  // 서해안에서 동해안으로, 북에서 남으로. 행마다 칸이 이어져 빈 구멍이 없다.
+  { code: '28', abbr: '인천', row: 0, col: 1 },
+  { code: '11', abbr: '서울', row: 0, col: 2 },
+  { code: '41', abbr: '경기', row: 0, col: 3 },
+  { code: '51', abbr: '강원', row: 0, col: 4 },
+
+  { code: '44', abbr: '충남', row: 1, col: 0 },
+  { code: '36', abbr: '세종', row: 1, col: 1 },
+  { code: '43', abbr: '충북', row: 1, col: 2 },
+  { code: '47', abbr: '경북', row: 1, col: 3 },
+
+  { code: '30', abbr: '대전', row: 2, col: 1 },
+  { code: '27', abbr: '대구', row: 2, col: 2 },
+  { code: '31', abbr: '울산', row: 2, col: 3 },
+
+  { code: '52', abbr: '전북', row: 3, col: 0 },
+  { code: '48', abbr: '경남', row: 3, col: 1 },
+  { code: '26', abbr: '부산', row: 3, col: 2 },
+
+  { code: '12', abbr: '전남광주', row: 4, col: 0 },
+
+  { code: '50', abbr: '제주', row: 5, col: 0 },
 ]
 
 /* ------------------------------------------------------------------ */
