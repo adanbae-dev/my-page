@@ -14,8 +14,35 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-06",
-  "head": "edd92b1",
+  "head": "0f47a57",
   "commits": [
+    {
+      "sha": "0f47a57",
+      "date": "2026-09-06",
+      "subject": "Feat: 카토그램을 붙인다 — 행마다 칸이 이어지게",
+      "insertions": 56,
+      "deletions": 21,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib",
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "bdfcb24",
+      "date": "2026-09-06",
+      "subject": "Build: 기록 갱신",
+      "insertions": 423,
+      "deletions": 393,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "edd92b1",
       "date": "2026-09-06",
