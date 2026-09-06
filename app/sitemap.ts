@@ -100,6 +100,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: { languages: languages('/portfolio/renewal') },
       },
       {
+        url: url(localePath(lang, '/portfolio/direct')),
+        changeFrequency: 'monthly' as const,
+        priority: 0.5,
+        alternates: { languages: languages('/portfolio/direct') },
+      },
+      {
         url: url(localePath(lang, '/practice')),
         changeFrequency: 'monthly' as const,
         priority: 0.6,

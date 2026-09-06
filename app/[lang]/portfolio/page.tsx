@@ -141,6 +141,12 @@ export default async function PortfolioPage({
             </Link>
           </p>
 
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/direct')}>
+              {d.direct.heading} →
+            </Link>
+          </p>
+
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>
               {d.portfolio.cartogram.limitsHead}

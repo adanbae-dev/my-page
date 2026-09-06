@@ -176,6 +176,8 @@ export const en = {
       'Front-end practice split into what is claimed and what can be shown — including the claims this site has not proven yet.',
     portfolio:
       'Things built here. A tile cartogram of Korea, and why it ships with its values missing.',
+    direct:
+      'Brokerage density appears to explain the direct-deal rate; population explains it better. Two log-log scatter plots of 176 Korean districts against two competing explanations.',
     renewal:
       'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are 4.9% and 4.7%; the shares above the 5% cap are 0.2% and 30.7%.',
     districts:
@@ -376,6 +378,47 @@ export const en = {
       'The plan this page executes against is docs/DATA-VISUALIZATION.md. One item on it is finished — this grid. The rest has no evidence yet.',
   },
 
+  direct: {
+    heading: 'Direct deals, and the better explanation',
+    lead:
+      'Districts with more brokerage offices per resident have fewer sales done without a broker. r = {rDensity}. But population explains the same rate better — r = {rPop} — and the two explanations are tangled with each other at {rBoth}.',
+    chartHeading: 'The same 176 districts, two different explanations',
+    note:
+      'Two panels rather than one, because the finding is not a correlation but a comparison of correlations. Publishing the left panel alone would be true and misleading. With the same y axis and the same points, the left panel\u2019s story is visibly still there in the right one — which is what "partly a proxy" looks like. Both axes are logarithmic. The rate runs from {minRate}% to {maxRate}% and the population across an order of magnitude, so on linear axes one district sits alone in a corner and the other 175 pile into a smudge, and every correlation quoted becomes a statement about that district rather than about the country. There is no trend line: a line would read as a claim about cause, and the point of the page is that neither panel establishes one.',
+    caption: '{plotted} districts · {deals} apartment sales · filed {from} – {to}',
+    summary:
+      'Two log-log scatter plots of the direct-deal rate across 176 Korean districts. The left explains it by brokerage offices per 10,000 residents, the right by population. The right correlation is the stronger one.',
+    source:
+      'MOLIT apartment sale transactions · share filed as a direct deal · office and population counts from the same table as the district map · 이용허락범위 제한 없음',
+    density: 'Offices per 10,000 residents',
+    population: 'Registered population',
+    rate: 'Direct-deal share',
+    r: 'r = {r}',
+
+    readoutHead: 'In numbers',
+    rowNational: 'National direct-deal share',
+    rowMedian: 'Median district',
+    rowRDensity: 'r · office density ↔ direct rate',
+    rowRPop: 'r · population ↔ direct rate',
+    rowRBoth: 'r · population ↔ office density',
+
+    limitsHead: 'What this figure does not hide',
+    confoundTerm: 'Neither panel is a cause',
+    confoundWhy:
+      'That population explains it better does not make population the cause either. Places with fewer people have fewer apartments, fewer sales, more transactions between people who already know each other, and no market for an office to survive in — all of it moves together. What the figure can show is that quoting the office-density number alone would look like a finished explanation, and that is why there are two panels.',
+    floorTerm: 'Thin districts are not plotted',
+    floorWhy:
+      'A district with fewer than {floor} apartment sales in the window is counted but not drawn. Where there were nine sales, one transaction either way is the difference between a 0% and a 33% direct rate. Of the {districts} districts with any sales, {plotted} are plotted and {dropped} are not. A dot resting on eleven deals looks exactly like one resting on eleven thousand.',
+    aptTerm: 'Apartments only',
+    aptWhy:
+      'Transaction filings are separate APIs for apartments, row houses, detached houses, officetels, land and commercial property. Only apartments were fetched — six types would be six times the calls, and each type has its own brokerage habits, so mixing them would blur what the y axis measures. "Direct-deal rate" here means the direct-deal rate on apartment sales.',
+
+    gapTerm: 'Not every response arrived',
+    gapWhy:
+      'The API is called once per (district, month), so a complete window is {expected} responses. {responses} came back and {missing} did not — this gateway goes down in bursts of minutes, and the missing pairs are mostly the first month of the window for a few central Seoul districts. Those districts are computed over eleven months rather than twelve. Filling them will move the numbers slightly, which is why the correlations on this page are filled in from the data rather than written into the sentences.',
+
+    back: '← Portfolio',
+  },
   renewal: {
     heading: 'The renewal right and the 5% cap',
     lead:

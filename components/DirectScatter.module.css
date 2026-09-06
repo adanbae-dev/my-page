@@ -1,0 +1,70 @@
+/* Unlayered on purpose. */
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.caption {
+  color: var(--muted);
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 56rem;
+  block-size: auto;
+}
+
+.frame {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+/* Semi-transparent because the point of 176 dots is where they PILE UP, and
+   opaque marks at this radius would hide their own density. */
+.dots circle {
+  fill: var(--accent);
+  fill-opacity: 0.62;
+}
+
+.ticks text {
+  fill: var(--muted);
+  font-size: 10px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.yTicks text {
+  text-anchor: end;
+}
+
+.axisTitle {
+  fill: var(--muted);
+  font-size: 10px;
+  font-weight: var(--wt-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.r {
+  fill: var(--figure);
+  font-size: 13px;
+  font-weight: var(--wt-black);
+  text-anchor: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.named text {
+  fill: var(--figure);
+  font-size: 10px;
+  font-weight: var(--wt-bold);
+}
+
+.source {
+  margin: 0;
+}

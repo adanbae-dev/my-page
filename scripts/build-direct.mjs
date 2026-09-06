@@ -1,0 +1,234 @@
+#!/usr/bin/env node
+/**
+ * Derive lib/direct.data.ts from the trade cache.
+ *
+ * The question this page started with: 중개사무소가 많은 곳일수록 직거래가
+ * 적은가. The answer is yes, and that is not the finding.
+ *
+ *   r(중개사무소 밀도, 직거래율)      -0.58
+ *   r(인구,           직거래율)      -0.63     <- stronger
+ *   r(인구, 중개사무소 밀도)          +0.55
+ *
+ * Broker density predicts the direct-deal rate, and population predicts it
+ * better — and the two predictors move together. So the first correlation is
+ * partly broker density standing in for "small town". The page publishes
+ * both scatters side by side rather than the flattering one alone, which is
+ * the whole reason it exists.
+ *
+ * A FLOOR ON DEALS. A district with nine apartment sales in a year can post
+ * a direct-deal rate of 0% or 33% on one transaction either way. Districts
+ * under the floor are counted and named rather than plotted, because a point
+ * that rests on eleven deals looks exactly like one that rests on eleven
+ * thousand.
+ *
+ * Run after `node scripts/fetch-rtms.mjs trade <from> <to>`.
+ */
+
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const CACHE = join(ROOT, '.rtms-cache', 'trade')
+const OUT = join(ROOT, 'lib', 'direct.data.ts')
+
+/** Below this many sales in the window a rate is noise. */
+const FLOOR = 200
+
+const nfc = (v) => String(v ?? '').normalize('NFC').trim()
+
+const lawd = JSON.parse(readFileSync(join(ROOT, 'scripts', 'rtms', 'lawd.json'), 'utf8'))
+const byCode = new Map(lawd.map((r) => [r.lawd, `${r.sido} ${r.sgg}`]))
+
+/* Broker density and population come from the map's table, so the two pages
+   cannot disagree about how many offices a district has. */
+const dsrc = readFileSync(join(ROOT, 'lib', 'cartogram.districts.data.ts'), 'utf8')
+const district = new Map(
+  [
+    ...dsrc.matchAll(
+      /sido: '([^']+)', sgg: '([^']+)', row: \d+, col: \d+, brokers: (\d+), pop: (\d+)/g,
+    ),
+  ].map((m) => [
+    `${nfc(m[1])} ${nfc(m[2])}`,
+    { sido: nfc(m[1]), sgg: nfc(m[2]), brokers: +m[3], pop: +m[4] },
+  ]),
+)
+
+const files = readdirSync(CACHE).filter((f) => f.endsWith('.json'))
+if (!files.length) {
+  process.stderr.write('\n  x .rtms-cache/trade is empty\n\n')
+  process.exit(1)
+}
+
+const deals = new Map()
+const direct = new Map()
+const months = new Set()
+let rows = 0
+let offGrid = 0
+
+for (const f of files) {
+  const key = byCode.get(f.split('-')[0])
+  const payload = JSON.parse(readFileSync(join(CACHE, f), 'utf8'))
+  if (!key) {
+    offGrid += payload.length
+    continue
+  }
+  for (const r of payload) {
+    rows++
+    if (r.dealYear && r.dealMonth) {
+      months.add(`${r.dealYear}-${String(r.dealMonth).padStart(2, '0')}`)
+    }
+    deals.set(key, (deals.get(key) ?? 0) + 1)
+    if (nfc(r.dealingGbn) === '직거래') direct.set(key, (direct.get(key) ?? 0) + 1)
+  }
+}
+
+const round = (v, d = 2) => Math.round(v * 10 ** d) / 10 ** d
+
+const points = []
+let belowFloor = 0
+for (const [key, n] of deals) {
+  const d = district.get(key)
+  if (!d) continue
+  if (n < FLOOR) {
+    belowFloor++
+    continue
+  }
+  points.push({
+    /* 중구, 서구, 동구, 북구, 남구, 강서구 exist in several provinces —
+       thirteen of the plotted districts share a name with another. A tooltip
+       that says only 중구 names nothing. */
+    sido: d.sido,
+    sgg: d.sgg,
+    deals: n,
+    rate: round(((direct.get(key) ?? 0) / n) * 100),
+    /** Offices per 10,000 residents. The same figure the district map draws. */
+    density: round((d.brokers / d.pop) * 10_000, 1),
+    pop: d.pop,
+  })
+}
+points.sort((a, b) => b.rate - a.rate)
+
+function pearson(xs, ys) {
+  const n = xs.length
+  const mx = xs.reduce((a, b) => a + b, 0) / n
+  const my = ys.reduce((a, b) => a + b, 0) / n
+  let num = 0
+  let dx = 0
+  let dy = 0
+  for (let i = 0; i < n; i++) {
+    num += (xs[i] - mx) * (ys[i] - my)
+    dx += (xs[i] - mx) ** 2
+    dy += (ys[i] - my) ** 2
+  }
+  return round(num / Math.sqrt(dx * dy), 3)
+}
+
+const ln = (v) => Math.log(v)
+const logRate = points.map((p) => ln(p.rate))
+const r = {
+  density: pearson(points.map((p) => ln(p.density)), logRate),
+  pop: pearson(points.map((p) => ln(p.pop)), logRate),
+  both: pearson(points.map((p) => ln(p.pop)), points.map((p) => ln(p.density))),
+}
+
+const totalDeals = [...deals.values()].reduce((a, b) => a + b, 0)
+const totalDirect = [...direct.values()].reduce((a, b) => a + b, 0)
+const sortedRates = points.map((p) => p.rate).sort((a, b) => a - b)
+const median = sortedRates[Math.floor(sortedRates.length / 2)]
+const window = [...months].sort()
+/* The API is called once per (district, month). A window that came back
+   whole has one response per pair; this gateway drops calls in bursts, so
+   the shortfall is published rather than assumed away. */
+const expected = lawd.length * window.length
+
+const ts = `/**
+ * 직거래 비율, 그리고 그것을 설명한다고 주장하는 두 변수.
+ *
+ * GENERATED by scripts/build-direct.mjs — do not hand-edit.
+ *
+ * The page's argument is three correlations. Broker density predicts the
+ * direct-deal rate at ${r.density}; population predicts it better at ${r.pop};
+ * and the two predictors correlate with each other at ${r.both}. A page that
+ * published only the first would have been true and misleading.
+ *
+ * All three are on LOGS. Both the rate (${sortedRates[0]}% to
+ * ${sortedRates[sortedRates.length - 1]}%) and the population span more than
+ * an order of magnitude, and a Pearson on the raw values would have been a
+ * statement about the largest outlier rather than about the country.
+ *
+ * Districts with fewer than ${FLOOR} sales in the window are not plotted:
+ * ${belowFloor} of them, whose rates move by whole points on one transaction.
+ */
+
+export type DirectPoint = {
+  readonly sido: string
+  readonly sgg: string
+  /** Apartment sales filed in the window. */
+  readonly deals: number
+  /** Share of them filed as 직거래, in percent. */
+  readonly rate: number
+  /** Brokerage offices per 10,000 residents. */
+  readonly density: number
+  readonly pop: number
+}
+
+export const DIRECT_WINDOW = { from: '${window[0]}', to: '${window[window.length - 1]}' } as const
+
+/** Sales below which a district is counted but not plotted. */
+export const DIRECT_FLOOR = ${FLOOR}
+
+export const DIRECT_INTAKE = {
+  rows: ${rows},
+  deals: ${totalDeals},
+  direct: ${totalDirect},
+  districts: ${deals.size},
+  /** Responses on disk, and the number a complete window would have. */
+  responses: ${files.length},
+  expected: ${expected},
+  plotted: ${points.length},
+  belowFloor: ${belowFloor},
+  /** Rows filed under a code the district map does not carry. */
+  offGrid: ${offGrid},
+} as const
+
+/**
+ * The observed range. Exported so the prose can cite it through a
+ * placeholder instead of hardcoding it: this page is regenerated whenever
+ * another month lands, and a sentence that quotes 84.6% is wrong the moment
+ * a district passes it.
+ */
+export const DIRECT_RATE_RANGE = { min: ${sortedRates[0]}, max: ${sortedRates[sortedRates.length - 1]} } as const
+
+/** National share, and the median district. They are not the same number. */
+export const DIRECT_NATIONAL = ${round((totalDirect / totalDeals) * 100)}
+export const DIRECT_MEDIAN = ${median}
+
+/** Pearson r on natural logs. */
+export const DIRECT_R = {
+  density: ${r.density},
+  pop: ${r.pop},
+  both: ${r.both},
+} as const
+
+export const DIRECT_POINTS: readonly DirectPoint[] = [
+${points
+  .map(
+    (p) =>
+      `  { sido: '${p.sido}', sgg: '${p.sgg}', deals: ${p.deals}, rate: ${p.rate}, density: ${p.density}, pop: ${p.pop} },`,
+  )
+  .join('\n')}
+]
+`
+
+writeFileSync(OUT, ts, 'utf8')
+process.stdout.write(`
+  DIRECT DEALS
+  ${'-'.repeat(70)}
+  ${files.length} responses - ${rows.toLocaleString('en-US')} deals - ${window[0]} to ${window[window.length - 1]}
+  districts ${deals.size}, plotted ${points.length} (under ${FLOOR} deals: ${belowFloor}, off-grid rows: ${offGrid})
+  national ${round((totalDirect / totalDeals) * 100)}% - median district ${median}%
+  r(log density)=${r.density}  r(log pop)=${r.pop}  r(pop,density)=${r.both}
+  ${'-'.repeat(70)}
+  wrote lib/direct.data.ts
+`)
