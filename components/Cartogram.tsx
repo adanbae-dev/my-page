@@ -45,7 +45,7 @@ export function Cartogram({
 }) {
   /* Highest value sets the fill scale. Computed here rather than stored, so a
      value can never disagree with the scale drawn against it. */
-  const max = layer ? Math.max(...Object.values(layer.values)) : 0
+  const max = layer ? Math.max(...Object.values(layer.values).map(Number)) : 0
 
   const at = (row: number, col: number) =>
     DIVISIONS.find((d) => d.row === row && d.col === col)
@@ -68,15 +68,26 @@ export function Cartogram({
                   return <td key={col} className={styles.blank} aria-hidden="true" />
                 }
                 const value = layer?.values[d.code]
-                /* `--fill` drives the tile's ink. Without a layer every tile
-                   is drawn at the same weight, which is the honest picture:
-                   the grid exists, the variable does not. */
-                const fill = layer && value !== undefined ? value / max : 0
+                /* `--fill` drives the bar at the bottom of the tile, and it
+                   is scaled to 45% of the tile rather than 100% ON PURPOSE.
+                   
+                   Filling the whole tile put the number on top of the accent:
+                   Gyeonggi is the maximum, so its tile was solid orange with
+                   orange-grey digits on it, unreadable. The contrast contract
+                   in lib/tokens.data.ts governs token pairs, not text
+                   composited over a partial fill, so `pnpm check:contrast`
+                   had nothing to say about it — it took looking at the page.
+                   
+                   Capping the bar keeps every label on the ground where its
+                   contrast is the one the contract guarantees, and a row of
+                   bottom-anchored bars is easier to compare by length than a
+                   row of differently tinted squares anyway. */
+                const fill = layer && value !== undefined ? (value / max) * 45 : 0
                 return (
                   <td key={col} className={styles.cell}>
                     <div
                       className={styles.tile}
-                      style={{ '--fill': `${Math.round(fill * 100)}%` } as React.CSSProperties}
+                      style={{ '--fill': `${fill.toFixed(1)}%` } as React.CSSProperties}
                     >
                       {/* Focusable, in reading order, with the full name as
                           the accessible label — the two-letter tile text is a

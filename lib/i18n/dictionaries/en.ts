@@ -317,7 +317,7 @@ export const en = {
       heading: 'A tile cartogram of Korea',
       intro:
         'A tile cartogram draws every unit at the same size. On a real map Seoul is a dot and Gyeongbuk is enormous, so colouring the true shapes makes the reader compare areas when the question was about the value. Equal tiles remove that.',
-      caption: '17 first-level divisions. Grid positions are placed by hand.',
+      caption: '16 first-level divisions · registered population, 2026-07-31. Grid positions are placed by hand.',
       emptyLayer: 'no values yet',
       listing: 'See them in reading order',
 
@@ -333,18 +333,17 @@ export const en = {
         'Still empty. It has to be 공공누리 type 1 — a visualisation is a derivative work, and types 3 and 4 forbid modification — its labels have to work in both locales, and it has to answer a question rather than exist. No dataset has cleared all three yet.',
 
       divisions: {
+        '12': 'Jeonnam–Gwangju',
         '11': 'Seoul',
         '26': 'Busan',
         '27': 'Daegu',
         '28': 'Incheon',
-        '29': 'Gwangju',
         '30': 'Daejeon',
         '31': 'Ulsan',
         '36': 'Sejong',
         '41': 'Gyeonggi',
         '43': 'Chungbuk',
         '44': 'Chungnam',
-        '46': 'Jeonnam',
         '47': 'Gyeongbuk',
         '48': 'Gyeongnam',
         '50': 'Jeju',

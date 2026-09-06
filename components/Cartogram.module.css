@@ -63,7 +63,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /* Content sits in the upper half. The bar occupies at most the bottom 45%,
+     so a label never lands on the accent and never has to be re-coloured for
+     it. */
+  justify-content: flex-start;
+  padding-block-start: 14%;
   gap: 2px;
   /* SC 2.5.8 — the tile IS the target, and it is well over 24px at every
      width this grid renders at. */

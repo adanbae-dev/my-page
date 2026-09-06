@@ -86,6 +86,21 @@ if (!layerNull) {
   for (const key of ['name:', 'url:', 'license:']) {
     if (!src.includes(key)) problems.push(`the value layer is missing source.${key.slice(0, -1)} — a number with no source is a rumour`)
   }
+
+  /* CHECKSUM. The sixteen numbers are sums this repository computed over
+     3,619 rows of a published file; nothing about them is self-evident. If
+     one digit is mistyped the map still draws, one tile is just the wrong
+     height. Adding them back up against the recorded national total is the
+     only check that catches it. */
+  const declared = Number((/NATIONAL_TOTAL = ([\d_]+)/.exec(src)?.[1] ?? '0').replace(/_/g, ''))
+  const sum = [...src.matchAll(/'(\d+)': ([\d_]+),/g)].reduce(
+    (a, m) => a + Number(m[2].replace(/_/g, '')),
+    0,
+  )
+  if (!declared) problems.push('the value layer has no NATIONAL_TOTAL to check the sum against')
+  else if (sum !== declared) {
+    problems.push(`the values add up to ${sum.toLocaleString()} but NATIONAL_TOTAL says ${declared.toLocaleString()}`)
+  }
 }
 
 line('')
