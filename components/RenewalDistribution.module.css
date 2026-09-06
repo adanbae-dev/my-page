@@ -1,0 +1,98 @@
+/* Unlayered on purpose. */
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.caption {
+  color: var(--muted);
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 56rem;
+  block-size: auto;
+}
+
+/* The two series are the SAME measurement under two conditions, so they get
+   the same hue and differ in weight — a second colour would say they are
+   different things. The upper is the accent at full strength because it is
+   the one the cap acts on; the lower is the same accent halfway to the
+   ground, which reads as the quieter case without reading as a category. */
+.up rect {
+  fill: var(--accent);
+}
+
+.down rect {
+  fill: color-mix(in oklab, var(--accent) 52%, var(--ground));
+}
+
+.axis {
+  stroke: var(--figure);
+  stroke-width: 1;
+}
+
+/* The statutory line. Dashed, because it is a rule rather than a
+   measurement, and quiet enough that the bars stay the subject. */
+.capLine {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.capLabel {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: var(--wt-bold);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ticks text {
+  fill: var(--muted);
+  font-size: 11px;
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.edge {
+  opacity: 0.55;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s) var(--space-l);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.swatch {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  flex: none;
+}
+
+.swatchUp {
+  background: var(--accent);
+}
+
+.swatchDown {
+  background: color-mix(in oklab, var(--accent) 52%, var(--ground));
+}
+
+.source {
+  margin: 0;
+}

@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run check:contrast && pnpm run check:content && pnpm run check:practice && pnpm run check:cartogram",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run check:contrast && pnpm run check:content && pnpm run check:practice && pnpm run check:cartogram && pnpm run check:renewal",
     "check:budget": "node scripts/check-budget.mjs",
     "verify": "pnpm run check && pnpm run build && pnpm run check:layers && pnpm run check:motion && pnpm run check:budget",
     "check:layers": "node scripts/check-layers.mjs",
@@ -27,7 +27,10 @@
     "sync:headers": "node scripts/sync-headers.mjs",
     "deploy": "wrangler deploy",
     "sync:404": "node scripts/sync-404.mjs",
-    "check:cartogram": "node scripts/check-cartogram.mjs"
+    "check:cartogram": "node scripts/check-cartogram.mjs",
+    "check:renewal": "node scripts/check-renewal.mjs",
+    "build:renewal": "node scripts/build-renewal.mjs",
+    "fetch:sources": "node scripts/fetch-sources.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.7.0",

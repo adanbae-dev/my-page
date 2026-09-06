@@ -43,7 +43,7 @@ const APIS = {
     what: '아파트 전월세',
   },
   trade: {
-    path: '1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev',
+    path: '1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade',
     what: '아파트 매매',
   },
 }

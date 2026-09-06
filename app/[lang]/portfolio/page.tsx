@@ -132,6 +132,15 @@ export default async function PortfolioPage({
             </Link>
           </p>
 
+          {/* Not a map. It is on this page because it is the same source
+              file read for a different question, and because a portfolio of
+              one shape is a portfolio of one idea. */}
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/renewal')}>
+              {d.renewal.heading} →
+            </Link>
+          </p>
+
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>
               {d.portfolio.cartogram.limitsHead}

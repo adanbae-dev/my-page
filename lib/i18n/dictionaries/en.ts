@@ -176,6 +176,8 @@ export const en = {
       'Front-end practice split into what is claimed and what can be shown — including the claims this site has not proven yet.',
     portfolio:
       'Things built here. A tile cartogram of Korea, and why it ships with its values missing.',
+    renewal:
+      'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are 4.9% and 4.7%; the shares above the 5% cap are 0.2% and 30.7%.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
@@ -374,6 +376,43 @@ export const en = {
       'The plan this page executes against is docs/DATA-VISUALIZATION.md. One item on it is finished — this grid. The rest has no evidence yet.',
   },
 
+  renewal: {
+    heading: 'The renewal right and the 5% cap',
+    lead:
+      'The median jeonse renewal rose 4.9% when the tenant invoked their renewal right and 4.7% when they did not. On the averages the cap appears to do nothing. What it does is not in the middle — it is in the ceiling.',
+    chartHeading: 'Deposit increase · by whether the renewal right was invoked',
+    note:
+      'Two distributions across one axis instead of side by side. Side by side they are two similar-looking shapes a reader has to overlay in their head; across one axis they are a single silhouette — a wall on one side, a tail on the other — and the comparison happens in the eye. The two groups differ by more than ten thousand contracts, so each is drawn as a share of itself, and both use the same pixels per point: a bar twice as tall is twice as common. Giving each half its own scale would have filled the picture more evenly and made the 47% spike look like the 27% one.',
+    caption: '{kept} renewals · jeonse to jeonse · filed {from} – {to}',
+    summary:
+      'Two histograms of deposit increases on jeonse renewals, mirrored across one axis: renewals where the tenant invoked the statutory renewal right above, and renewals where they did not below. The invoked side stops dead at 5%; the other continues well past it.',
+    source:
+      'MOLIT apartment rental transactions · renewals where both the previous and the new contract were jeonse · 이용허락범위 제한 없음',
+    cap: '5%',
+    up: 'Right invoked',
+    down: 'Not invoked',
+    unit: '%',
+    share: '{share}% of {n}',
+
+    readoutHead: 'Summary statistics — the first two rows are the trap',
+    rowMedian: 'Median increase',
+    rowP90: '90th percentile',
+    rowOver: 'Share above 5%',
+    rowFrozen: 'Share held flat',
+
+    limitsHead: 'What this figure does not hide',
+    jeonseTerm: 'Jeonse only',
+    jeonseWhy:
+      'Of {renewals} renewals, {kept} were used. A deposit and a monthly rent are not one number, and combining them needs a conversion rate this page would have to invent. The {mixed} renewals with a monthly rent on either side were dropped. What was dropped is counted rather than quietly disappeared.',
+    blankTerm: '"Not invoked" may mean "not recorded"',
+    blankWhy:
+      'A blank renewal-right field is counted as not invoked. The filing does not distinguish a right that was not used from one that was not written down. If blanks are common, the lower distribution contains some invoked renewals — and that error makes the two distributions look MORE alike than they are. It weakens the finding rather than manufacturing it.',
+    filedTerm: 'Filed, not signed',
+    filedWhy:
+      'A transaction is filed within a window after the contract is signed, so the month here is the month it was reported, not the month it was agreed. Across a twelve-month window that lag does not change the shape of the distribution, but no single month should be read off it.',
+
+    back: '← Portfolio',
+  },
   districts: {
     heading: 'District cartogram',
     lead:
