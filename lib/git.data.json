@@ -14,8 +14,36 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-06",
-  "head": "22a4ae6",
+  "head": "51d6c10",
   "commits": [
+    {
+      "sha": "51d6c10",
+      "date": "2026-09-06",
+      "subject": "Feat: 카토그램에 인구를 채운다 — 그리고 시도는 17개가 아니라 16개였다",
+      "insertions": 129,
+      "deletions": 45,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "components",
+        "lib",
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "ab519d8",
+      "date": "2026-09-06",
+      "subject": "Build: 135라우트로 기록 갱신",
+      "insertions": 286,
+      "deletions": 242,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "22a4ae6",
       "date": "2026-09-06",
