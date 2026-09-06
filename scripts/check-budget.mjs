@@ -24,6 +24,26 @@ const budget = JSON.parse(readFileSync(join(ROOT, 'perf.budget.json'), 'utf8'))
 const kb = (n) => (n / 1024).toFixed(1).padStart(7) + ' KB'
 const line = (s) => process.stdout.write(s + '\n')
 
+/**
+ * The limit for one route in one category.
+ *
+ * A single global ceiling is right for 134 of the 135 routes, which are
+ * prose and differ from each other by a few kilobytes. It is wrong for one:
+ * /portfolio/districts carries 245 districts and their numbers, and raising
+ * the global limit to fit it would hand every prose page 6 KB of room it
+ * never asked for — which is the exact failure a budget exists to prevent.
+ *
+ * So the exception is NAMED. `overrides` is keyed by the locale-free path,
+ * an override may only RAISE a limit, and a route with one is marked in the
+ * table so it cannot quietly become the norm. Routes are still discovered
+ * from the build; nothing here adds a route, it only says what one is
+ * allowed to weigh.
+ */
+const overrides = budget.overrides ?? {}
+const overrideFor = (route) => overrides[route.replace(/^\/[a-z]{2}(?=\/|$)/, '')] ?? {}
+const limitFor = (route, key) =>
+  Math.max(budget.budgets[key], overrideFor(route)[key] ?? 0)
+
 /* The measurement itself lives in lib/perf/measure.mjs, because `pnpm
    sync:perf` needs the same numbers to write the snapshot the site
    publishes. This file is now only the part that compares them to a limit
@@ -57,15 +77,16 @@ for (const r of results) {
     failures++
     continue
   }
-  const over = KEYS.filter((k) => r.used[k] > budget.budgets[k])
+  const over = KEYS.filter((k) => r.used[k] > limitFor(r.route, k))
   if (over.length) failures++
+  const named = Object.keys(overrideFor(r.route))
   line(
     `  ${r.route.padEnd(36)}` +
       KEYS.map((k) => {
         const s = (r.used[k] / 1024).toFixed(1)
-        return (over.includes(k) ? `!${s}` : s).padStart(10)
+        return (over.includes(k) ? `!${s}` : named.includes(k) ? `*${s}` : s).padStart(10)
       }).join('') +
-      `   ${over.length ? '✗ ' + over.join(', ') : '✓'}`,
+      `   ${over.length ? '✗ ' + over.join(', ') : named.length ? '✓ *named exception' : '✓'}`,
   )
 }
 
@@ -76,10 +97,22 @@ line('  limit'.padEnd(32) + KEYS.map((k) => (budget.budgets[k] / 1024).toFixed(1
 // headroom actually is, rather than guessing from the total.
 if (ok.length) {
   line('')
+  /* Reported against the GLOBAL limit, and a route with a named exception is
+     skipped here: it would otherwise be permanently "tightest" and hide the
+     route that is actually closest to the limit everything else obeys. */
+  const plain = ok.filter((r) => Object.keys(overrideFor(r.route)).length === 0)
   for (const k of KEYS) {
-    const worst = ok.reduce((a, b) => (b.used[k] > a.used[k] ? b : a))
+    const pool = plain.length ? plain : ok
+    const worst = pool.reduce((a, b) => (b.used[k] > a.used[k] ? b : a))
     const pct = ((worst.used[k] / budget.budgets[k]) * 100).toFixed(0)
     line(`  ${k.padEnd(6)} tightest: ${worst.route.padEnd(34)} ${kb(worst.used[k])}  ${pct.padStart(3)}% of budget`)
+  }
+  for (const [route, caps] of Object.entries(overrides)) {
+    const which = Object.entries(caps)
+      .filter(([k]) => KEYS.includes(k))
+      .map(([k, v]) => `${k} ${(v / 1024).toFixed(1)} KB`)
+      .join(' · ')
+    line(`  named exception: ${route.padEnd(28)} ${which}`)
   }
 }
 

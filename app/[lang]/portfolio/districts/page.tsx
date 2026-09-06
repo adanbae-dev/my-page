@@ -17,10 +17,11 @@ import styles from './page.module.css'
  * The district map, on its own route — and the reason is a measurement.
  *
  * It was built to live under /portfolio beside the province maps. It does not
- * fit: that page had 7.1 KB of its 23.4 KB HTML budget left and this figure
- * costs 8.0 KB gzipped even after the cheapest encoding was chosen. A
- * separate route gets its own budget, so the province page keeps its labels
- * and this one gets its density.
+ * fit: that page had 7.1 KB of its HTML budget left and this figure costs
+ * several times that even after the cheapest encoding was chosen. A separate
+ * route gets its own budget, so the province page keeps its labels and this
+ * one gets its density. What the budget cost is written down in
+ * perf.budget.json, not absorbed quietly.
  */
 
 export async function generateMetadata({
@@ -96,12 +97,19 @@ export default async function DistrictsPage({
               listing: d.districts.listing,
               summary: d.districts.summary,
               source: d.districts.source,
+              tip: {
+                rate: d.districts.tipRate,
+                offices: d.districts.tipOffices,
+                people: d.districts.tipPeople,
+              },
             }}
           />
 
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>{d.districts.limitsHead}</p>
             <dl className={cx('small', 'measure', styles.limitList)}>
+              <dt>{d.districts.tiledTerm}</dt>
+              <dd>{d.districts.tiledWhy}</dd>
               <dt>{d.districts.placedTerm}</dt>
               <dd>{d.districts.placedWhy}</dd>
               <dt>{d.districts.missingTerm}</dt>

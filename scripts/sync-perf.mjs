@@ -84,6 +84,10 @@ const snapshot = {
   generatedAt: new Date().toISOString().slice(0, 10),
   head,
   budgets: budget.budgets,
+  /* Carried, not flattened. One route has a named exception and the page
+     that publishes these numbers has to show it against the limit it is
+     actually held to, or the site publishes itself as over budget. */
+  overrides: budget.overrides ?? {},
   shared: build.sharedBytes,
   deferred: build.deferred.bytes,
   routes,
@@ -94,7 +98,10 @@ writeFileSync(OUT, json, 'utf8')
 
 const kb = (n) => (n / 1024).toFixed(1)
 const worst = build.ok.reduce((a, b) => (b.used.total > a.used.total ? b : a))
-const pct = ((worst.used.total / budget.budgets.total) * 100).toFixed(0)
+const cap = (route, key) =>
+  Math.max(budget.budgets[key],
+    (budget.overrides ?? {})[route.replace(/^\/[a-z]{2}(?=\/|$)/, '')]?.[key] ?? 0)
+const pct = ((worst.used.total / cap(worst.route, 'total')) * 100).toFixed(0)
 
 line(`  ${build.ok.length} routes · head ${head || '(no git)'}`)
 line(`  heaviest   ${worst.route} — ${kb(worst.used.total)} KB (${pct}% of budget)`)

@@ -104,13 +104,23 @@ export const D_CELL_PATH = hexPath(R)
 const MAX_RATE = Math.max(...DISTRICTS.map(per10k))
 
 /**
- * Every cell that holds a district, drawn once as an outline.
+ * Every district's cell, at full size, as an outline — and this layer is
+ * also the one a pointer talks to.
  *
- * The empty cells are not drawn at all — at this density an empty grid
- * behind the data reads as noise.
+ * The empty cells are not drawn at all: 246 cells hold 245 districts, so the
+ * outline layer IS the country's silhouette and an unfilled grid behind it
+ * would be a second one.
+ *
+ * The name, the rate and the two counts hang here rather than on the fill
+ * because the fill is the value: a district with a low rate draws a hexagon
+ * a few units across, and hanging the hover target on that would ask the
+ * reader to hunt for the districts with the least to show. The full-size
+ * hexagon is the same size for everyone.
  */
 export const D_OUTLINES: string = DISTRICTS.map(
-  (d) => `<use href="#c" x="${cx0(d)}" y="${cy0(d)}"/>`,
+  (d) =>
+    `<use href="#c" x="${cx0(d)}" y="${cy0(d)}" data-n="${d.brokers},${d.pop}">` +
+    `<title>${esc(d.sido)} ${esc(d.sgg)} · ${per10k(d).toFixed(1)}</title></use>`,
 ).join('')
 
 /**
@@ -120,15 +130,14 @@ export const D_OUTLINES: string = DISTRICTS.map(
  * only when the radius tracks its root. A `scale()` on the shared reference
  * rather than a fresh `d` per district — 245 path strings said the same
  * thing 245 times.
+ *
+ * Nothing identifies these. They sit on top of the outlines and are inert to
+ * the pointer, so a hover always lands on the full-size cell underneath.
  */
 export const D_FILLS: string = DISTRICTS.map((d) => {
-  const rate = per10k(d)
-  const s = Math.sqrt(rate / MAX_RATE)
+  const s = Math.sqrt(per10k(d) / MAX_RATE)
   if (s * R < 0.5) return ''
-  return (
-    `<use href="#c" transform="translate(${cx0(d)} ${cy0(d)}) scale(${scaleNum(s)})">` +
-    `<title>${esc(d.sido)} ${esc(d.sgg)} · ${rate.toFixed(1)}</title></use>`
-  )
+  return `<use href="#c" transform="translate(${cx0(d)} ${cy0(d)}) scale(${scaleNum(s)})"/>`
 }).join('')
 
 /** The same numbers in rank order — the map's text alternative. */

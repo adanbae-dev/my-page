@@ -12,7 +12,7 @@ import { breadcrumbSchema, pageMetadata } from '@/lib/seo'
 import { dict } from '@/lib/i18n/dictionary'
 import { formatDate } from '@/lib/format'
 import { publishedEntries } from '@/lib/content/load'
-import { heaviest, KB, PCT, perf, PERF_KEYS } from '@/lib/perf'
+import { hasNamedLimit, heaviest, KB, limitOf, PCT, perf, PERF_KEYS } from '@/lib/perf'
 import { commits, eras, stats } from '@/lib/git/load'
 import { AREA_LABEL, type Commit } from '@/lib/git/schema'
 import { sigilFrom, SIGIL_SLOTS } from '@/lib/sigil'
@@ -396,7 +396,11 @@ export default async function BuildPage({
                     explanatory paragraph went instead. */}
                 <dl className={cx('label', styles.readout)}>
                   {PERF_KEYS.map((k) => {
-                    const limit = weight.budgets[k]
+                    /* The route's own limit, not the global one. The
+                       heaviest route is the one most likely to have a named
+                       exception, and reporting it against a ceiling it is
+                       not held to would publish this site as over budget. */
+                    const limit = limitOf(worst.route, k)
                     return (
                       <div key={k}>
                         <dt>{k}</dt>
@@ -419,7 +423,8 @@ export default async function BuildPage({
                   </div>
                 </dl>
                 <p className={cx('label', 'muted')}>
-                  {t(d.weight.heaviest, { route: worst.route })} ·{' '}
+                  {t(d.weight.heaviest, { route: worst.route })}
+                  {hasNamedLimit(worst.route) ? ` · ${d.weight.named}` : ''} ·{' '}
                   {t(d.weight.measured, { date: weight.generatedAt, head: weight.head })}
                 </p>
               </div>

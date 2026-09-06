@@ -12,10 +12,14 @@
   margin: 0;
 }
 
+/* Wider than it was. The tiling puts 245 hexagons inside the country's own
+   outline instead of scattering them, which only reads as a shape if one
+   hexagon is big enough to see — and the popup needs a target a pointer can
+   actually land on. */
 .svg {
   display: block;
   inline-size: 100%;
-  max-inline-size: 34rem;
+  max-inline-size: 46rem;
   block-size: auto;
 }
 
@@ -25,10 +29,17 @@
   fill: none;
   stroke: var(--rule);
   stroke-width: 0.8;
+  /* `visiblePainted` would give a 0.8-unit stroke as the entire hit area.
+     This layer is the hover target, so the whole hexagon has to answer. */
+  pointer-events: all;
+  cursor: crosshair;
 }
 
+/* Inert: the fill sits on top of the outline, so it has to let the pointer
+   through or a hover in the middle of a cell would hit nothing. */
 .fills use {
   fill: var(--accent);
+  pointer-events: none;
 }
 
 .listing {

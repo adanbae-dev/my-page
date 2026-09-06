@@ -1,0 +1,55 @@
+/* Unlayered on purpose. */
+
+/* The popup is positioned against this box, so it holds the map's width
+   rather than shrink-wrapping it: `fit-content` around an SVG sized at 100%
+   has nothing to measure and collapses to the 300px default. */
+.frame {
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: 46rem;
+}
+
+.tip {
+  position: absolute;
+  z-index: 2;
+  /* Up and to the right of the pointer, and never under it — a box under the
+     pointer takes the next pointermove and the map stops responding. */
+  translate: 14px calc(-100% - 14px);
+  pointer-events: none;
+
+  display: grid;
+  gap: var(--space-3xs);
+  padding: var(--space-2xs) var(--space-xs);
+  border: var(--rule-w) solid var(--rule);
+  background: var(--ground);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.35);
+  white-space: nowrap;
+}
+
+.name {
+  font-size: var(--t-small);
+  font-weight: var(--wt-bold);
+  line-height: var(--lh-snug);
+}
+
+.rate {
+  font-size: var(--t-h3);
+  font-weight: var(--wt-black);
+  line-height: var(--lh-tight);
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: var(--t-label);
+  font-weight: var(--wt-medium);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.counts {
+  font-size: var(--t-label);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}

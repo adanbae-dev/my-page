@@ -39,6 +39,13 @@ export type PerfSnapshot = {
   /** Commit the measured build was made from. Empty when git was unreadable. */
   readonly head: string
   readonly budgets: Readonly<Record<string, number>>
+  /**
+   * Per-route limits, keyed by the LOCALE-FREE path, that raise the global
+   * one. One route in this site is a data visualisation and the rest are
+   * prose; a ceiling that fits the first would stop binding on the rest. See
+   * perf.budget.json.
+   */
+  readonly overrides: Readonly<Record<string, Readonly<Record<string, number>>>>
   readonly shared: number
   readonly deferred: number
   readonly routes: Readonly<Record<string, RouteWeight>>
@@ -92,6 +99,27 @@ export const perf = memoStatic((): PerfSnapshot | null => {
   }
   if (!isCount(budgets['total'])) throw new PerfError('no total budget')
 
+  /* Optional: a snapshot written before overrides existed is still valid,
+     and it simply has none. Non-numeric entries are skipped rather than
+     rejected — `$why` lives in the same object and is prose, not a limit. */
+  const overrides: Record<string, Record<string, number>> = {}
+  const overridesRaw = o['overrides']
+  if (overridesRaw !== undefined) {
+    if (typeof overridesRaw !== 'object' || overridesRaw === null) {
+      throw new PerfError('overrides is not an object')
+    }
+    for (const [route, caps] of Object.entries(overridesRaw as Record<string, unknown>)) {
+      if (typeof caps !== 'object' || caps === null) {
+        throw new PerfError(`override "${route}" is not an object`)
+      }
+      const out: Record<string, number> = {}
+      for (const [k, v] of Object.entries(caps as Record<string, unknown>)) {
+        if (isCount(v)) out[k] = v
+      }
+      overrides[route] = out
+    }
+  }
+
   const routesRaw = o['routes']
   if (typeof routesRaw !== 'object' || routesRaw === null) {
     throw new PerfError('no routes')
@@ -106,6 +134,7 @@ export const perf = memoStatic((): PerfSnapshot | null => {
     generatedAt: o['generatedAt'],
     head: o['head'],
     budgets,
+    overrides,
     shared: o['shared'],
     deferred: o['deferred'],
     routes,
@@ -127,6 +156,26 @@ export function heaviest(): { route: string; weight: RouteWeight } | null {
   }
   return best
 }
+
+/**
+ * The limit one route is held to for one category.
+ *
+ * The global budget unless that route is named in `overrides`, and an
+ * override may only raise it — the same rule scripts/check-budget.mjs
+ * applies, so the page and the gate cannot disagree.
+ */
+export function limitOf(route: string, key: string): number | undefined {
+  const snap = perf()
+  if (!snap) return undefined
+  const global = snap.budgets[key]
+  const named = snap.overrides[route.replace(/^\/[a-z]{2}(?=\/|$)/, '')]?.[key]
+  if (global === undefined) return named
+  return named === undefined ? global : Math.max(global, named)
+}
+
+/** True when this route is held to a limit of its own. */
+export const hasNamedLimit = (route: string): boolean =>
+  Object.keys(perf()?.overrides[route.replace(/^\/[a-z]{2}(?=\/|$)/, '')] ?? {}).length > 0
 
 export const KB = (bytes: number): string => (bytes / 1024).toFixed(1)
 export const PCT = (bytes: number, limit: number): number =>
