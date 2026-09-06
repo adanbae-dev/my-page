@@ -13,9 +13,39 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-09-05",
-  "head": "81e29bb",
+  "generatedAt": "2026-09-06",
+  "head": "22a4ae6",
   "commits": [
+    {
+      "sha": "22a4ae6",
+      "date": "2026-09-06",
+      "subject": "Feat: /portfolio — 시도 17개 타일 카토그램, 값 층은 비운 채로",
+      "insertions": 790,
+      "deletions": 2,
+      "generated": 0,
+      "files": 11,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "534429d",
+      "date": "2026-09-05",
+      "subject": "Build: 기록 갱신",
+      "insertions": 307,
+      "deletions": 264,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "81e29bb",
       "date": "2026-09-05",
