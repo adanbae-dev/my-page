@@ -1,133 +1,128 @@
 import { cx } from '@/lib/cx'
-import {
-  DIVISIONS,
-  GRID_COLS,
-  GRID_ROWS,
-  tilesInReadingOrder,
-  type ValueLayer,
-} from '@/lib/cartogram.data'
+import { type ValueLayer } from '@/lib/cartogram.data'
+import { HEX_PATH, hexLayout, RADIUS } from '@/lib/cartogram.hex'
 import styles from './Cartogram.module.css'
 
 /**
- * A tile cartogram, rendered as a table.
+ * A hexagonal tile cartogram.
  *
- * NOT an <svg>. Every other figure on this site is inline SVG, and this one
- * deliberately is not — a cartogram is a grid of labelled cells with values,
- * which is what a table IS. Rendered as a table it arrives with row and
- * column semantics, cell headers, and a caption for free, and a screen reader
- * announces "행 3, 열 5, 대구" without a single ARIA attribute being invented
- * for it.
+ * The hexagons and the value scale come from `d3-hexbin` and `d3-scale`,
+ * evaluated in `lib/cartogram.hex.ts` DURING THE BUILD. Zero bytes of D3
+ * reach the browser and there is no client JavaScript here at all — see that
+ * file for the measurement that forced it (6.1 KB of route JS headroom
+ * against a library that unpacks to 851 KB).
  *
- * The published entry think/not-someone-who-draws-charts admitted that the
- * one visualisation on this site cannot be reached from a keyboard, and said
- * that debt gets paid before new work starts. This is the new work, so the
- * accessible path is the structure rather than an addition to it: the tiles
- * are real table cells, they are in the tab order in reading order, and there
- * is nothing to bolt on later.
+ * WHY HEXAGONS. Squares touch on four sides and meet at corners, so a square
+ * grid implies adjacency that is not there and hides adjacency that is. Every
+ * hexagon has exactly six neighbours, all sharing an edge, which is much
+ * closer to how administrative divisions actually border each other.
  *
- * Zero client JavaScript. A table does not need any.
+ * THE ACCESSIBLE PATH IS NOT A FALLBACK. The first version of this component
+ * was a `<table>`, which was keyboard-navigable by construction. Hexagons
+ * cannot be table cells, so the ordered list below carries the same numbers
+ * in the same order, and it is visible rather than hidden — the entry
+ * think/not-someone-who-draws-charts criticised bolting keyboard access onto
+ * a visualisation afterwards, and a text equivalent rendered from the same
+ * data at the same time is not that. Each hexagon additionally carries a
+ * `<title>`, and the figure states its own summary.
  */
 export function Cartogram({
   layer,
   names,
   labels,
 }: {
-  /** Null until a dataset clears the licensing bar. The grid still renders. */
   layer: ValueLayer | null
-  /** Division code -> full name, from the dictionary. */
   names: Readonly<Record<string, string>>
   labels: {
     caption: string
     emptyLayer: string
-    rowHeader: string
-    colHeader: string
+    listing: string
+    summary: string
   }
 }) {
-  /* Highest value sets the fill scale. Computed here rather than stored, so a
-     value can never disagree with the scale drawn against it. */
-  const max = layer ? Math.max(...Object.values(layer.values).map(Number)) : 0
-
-  const at = (row: number, col: number) =>
-    DIVISIONS.find((d) => d.row === row && d.col === col)
+  const { hexes, width, height } = hexLayout(layer)
+  const clipH = RADIUS * 2
 
   return (
     <figure className={styles.figure}>
-      <table className={styles.grid}>
-        <caption className={cx('small', styles.caption)}>
-          {labels.caption}
-          {!layer && <span className={styles.empty}> — {labels.emptyLayer}</span>}
-        </caption>
-        <tbody>
-          {Array.from({ length: GRID_ROWS }, (_, row) => (
-            <tr key={row}>
-              {Array.from({ length: GRID_COLS }, (_, col) => {
-                const d = at(row, col)
-                if (!d) {
-                  /* An empty cell is not a division. Marked presentational so
-                     a screen reader walks 17 tiles, not 42 cells. */
-                  return <td key={col} className={styles.blank} aria-hidden="true" />
-                }
-                const value = layer?.values[d.code]
-                /* `--fill` drives the bar at the bottom of the tile, and it
-                   is scaled to 45% of the tile rather than 100% ON PURPOSE.
-                   
-                   Filling the whole tile put the number on top of the accent:
-                   Gyeonggi is the maximum, so its tile was solid orange with
-                   orange-grey digits on it, unreadable. The contrast contract
-                   in lib/tokens.data.ts governs token pairs, not text
-                   composited over a partial fill, so `pnpm check:contrast`
-                   had nothing to say about it — it took looking at the page.
-                   
-                   Capping the bar keeps every label on the ground where its
-                   contrast is the one the contract guarantees, and a row of
-                   bottom-anchored bars is easier to compare by length than a
-                   row of differently tinted squares anyway. */
-                const fill = layer && value !== undefined ? (value / max) * 45 : 0
-                return (
-                  <td key={col} className={styles.cell}>
-                    <div
-                      className={styles.tile}
-                      style={{ '--fill': `${fill.toFixed(1)}%` } as React.CSSProperties}
-                    >
-                      {/* Focusable, in reading order, with the full name as
-                          the accessible label — the two-letter tile text is a
-                          visual abbreviation and should not be what a screen
-                          reader announces. */}
-                      <span className={styles.tileInner} tabIndex={0}>
-                        <span className={styles.abbr} aria-hidden="true">
-                          {d.abbr}
-                        </span>
-                        <span className="visuallyHidden">{names[d.code] ?? d.abbr}</span>
-                        {value !== undefined && (
-                          <span className={cx('label', styles.value)}>
-                            {value.toLocaleString()}
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <p className={cx('small', styles.caption)}>
+        {labels.caption}
+        {!layer && <span className={styles.empty}> — {labels.emptyLayer}</span>}
+      </p>
 
-      {/* The list is not a fallback. It is the same data in the order a
-          keyboard walks it, so the tab path has a visible counterpart. */}
-      <details className={styles.listing}>
-        <summary className={cx('label', styles.summary)}>{labels.rowHeader}</summary>
-        <ol className={cx('small', styles.list)}>
-          {tilesInReadingOrder().map((d) => (
-            <li key={d.code}>
-              {names[d.code] ?? d.abbr}
-              {layer?.values[d.code] !== undefined && (
-                <span className="muted"> · {layer.values[d.code]!.toLocaleString()}</span>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className={styles.svg}
+        role="img"
+        aria-label={labels.summary}
+      >
+        <defs>
+          {/* One clip per tile: the fill is a rectangle rising from the
+              hexagon's bottom edge, clipped to the hexagon. Sharing a single
+              hexagon path keeps this at one shape definition rather than
+              sixteen. */}
+          {hexes.map((h) => (
+            <clipPath key={h.code} id={`hex-${h.code}`}>
+              <path d={HEX_PATH} transform={`translate(${h.x} ${h.y})`} />
+            </clipPath>
+          ))}
+        </defs>
+
+        {hexes.map((h) => {
+          const filled = h.fill * clipH
+          return (
+            <g key={h.code} className={styles.hex}>
+              <title>
+                {names[h.code] ?? h.abbr}
+                {h.value !== undefined && ` · ${h.value.toLocaleString()}`}
+              </title>
+
+              {h.value !== undefined && filled > 0 && (
+                <rect
+                  x={h.x - RADIUS}
+                  y={h.y + RADIUS - filled}
+                  width={RADIUS * 2}
+                  height={filled}
+                  className={styles.fill}
+                  clipPath={`url(#hex-${h.code})`}
+                />
+              )}
+
+              <path
+                d={HEX_PATH}
+                transform={`translate(${h.x} ${h.y})`}
+                className={styles.outline}
+              />
+
+              {/* Sat above centre so the fill, which rises from the bottom,
+                  never reaches the label. The contract in lib/tokens.data.ts
+                  governs token pairs, not text over a partial fill, so this
+                  is kept clear by geometry rather than by a colour rule. */}
+              <text x={h.x} y={h.y - 10} className={styles.abbr}>
+                {h.abbr}
+              </text>
+              {h.value !== undefined && (
+                <text x={h.x} y={h.y + 2} className={styles.value}>
+                  {h.value.toLocaleString()}
+                </text>
+              )}
+            </g>
+          )
+        })}
+      </svg>
+
+      <ol className={cx('small', styles.list)} aria-label={labels.listing}>
+        {[...hexes]
+          .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+          .map((h) => (
+            <li key={h.code}>
+              {names[h.code] ?? h.abbr}
+              {h.value !== undefined && (
+                <span className="muted"> · {h.value.toLocaleString()}</span>
               )}
             </li>
           ))}
-        </ol>
-      </details>
+      </ol>
 
       {layer && (
         <figcaption className={cx('small', 'muted', styles.source)}>

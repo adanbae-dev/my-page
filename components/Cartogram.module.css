@@ -1,4 +1,4 @@
-/* Unlayered on purpose — see any other module in this repository. */
+/* Unlayered on purpose. */
 
 .figure {
   margin: 0;
@@ -7,106 +7,67 @@
   gap: var(--space-m);
 }
 
-.grid {
-  border-collapse: separate;
-  border-spacing: var(--space-3xs);
-  table-layout: fixed;
-  inline-size: 100%;
-  max-inline-size: 34rem;
-}
-
 .caption {
-  caption-side: top;
-  text-align: start;
   color: var(--muted);
-  padding-block-end: var(--space-s);
+  margin: 0;
 }
 
 .empty {
   color: var(--accent-text);
 }
 
-.blank {
-  padding: 0;
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 30rem;
+  block-size: auto;
 }
 
-.cell {
-  padding: 0;
+.fill {
+  fill: var(--accent);
 }
 
-/* @property so `--fill` can be interpolated rather than swapped. The same
-   registration the home page's gauge needs, for the same reason. */
-@property --fill {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
+.outline {
+  fill: none;
+  stroke: var(--rule);
+  stroke-width: 1;
 }
 
-.tile {
-  --fill: 0%;
-  position: relative;
-  aspect-ratio: 1;
-  /* The accent fills from the bottom, so a column of tiles reads like a set
-     of small bars rather than a set of differently tinted squares — position
-     is easier to compare than lightness. */
-  background-image: linear-gradient(
-    to top,
-    var(--accent) 0 var(--fill),
-    transparent var(--fill) 100%
-  );
-  box-shadow: inset 0 0 0 var(--rule-w) var(--rule);
-}
-
-.tileInner {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* Content sits in the upper half. The bar occupies at most the bottom 45%,
-     so a label never lands on the accent and never has to be re-coloured for
-     it. */
-  justify-content: flex-start;
-  padding-block-start: 14%;
-  gap: 2px;
-  /* SC 2.5.8 — the tile IS the target, and it is well over 24px at every
-     width this grid renders at. */
-  min-inline-size: 24px;
-  min-block-size: 24px;
-}
-
-.tileInner:focus-visible {
-  outline: var(--focus-w) solid var(--focus);
-  outline-offset: 2px;
-}
-
+/* `--figure`, not `--fg`.
+   
+   `--fg` is defined NOWHERE — not in styles/tokens.css, not in the built
+   CSS — and seven places in this repository were using it. It went unseen
+   for so long because of how the two properties fail differently: an invalid
+   `color: var(--figure)` becomes unset and INHERITS, which lands on the right
+   colour anyway, while `fill: var(--figure)` has no inherited value to fall back
+   to and drops to black. One undefined token, six invisible failures and one
+   visible one — and the visible one only appeared on a dark ground. */
 .abbr {
-  font-size: clamp(0.7rem, 2.2vw, 0.85rem);
-  line-height: 1;
+  fill: var(--figure);
+  font-size: 11px;
+  text-anchor: middle;
 }
 
 .value {
-  font-size: clamp(0.55rem, 1.6vw, 0.7rem);
-  color: var(--muted);
+  fill: var(--muted);
+  font-size: 8.5px;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
 }
 
-.listing {
-  max-inline-size: var(--measure);
-}
-
-.summary {
-  cursor: pointer;
-  min-block-size: 24px;
-  display: inline-flex;
-  align-items: center;
-}
-
+/* The list is the text equivalent, ordered by value rather than by position —
+   the grid answers "where", this answers "how much". */
 .list {
-  margin-block: var(--space-s) 0;
+  margin: 0;
   padding-inline-start: var(--space-l);
+  max-inline-size: var(--measure);
   display: grid;
   gap: var(--space-3xs);
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.list li::marker {
+  color: var(--muted);
 }
 
 .source {

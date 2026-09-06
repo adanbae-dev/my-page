@@ -279,7 +279,7 @@
 
 .sigilMark {
   inline-size: clamp(4.5rem, 40%, 7rem);
-  color: var(--fg);
+  color: var(--figure);
 }
 
 .sigilText {

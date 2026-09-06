@@ -52,7 +52,7 @@ export function NotFound({ locale }: { locale: Locale }) {
           spin
           id="nf"
           label={d.sigil.label}
-          style={{ inlineSize: 'clamp(4.5rem, 12vw, 7rem)', color: 'var(--fg)' }}
+          style={{ inlineSize: 'clamp(4.5rem, 12vw, 7rem)', color: 'var(--figure)' }}
         />
         <ul
           role="list"

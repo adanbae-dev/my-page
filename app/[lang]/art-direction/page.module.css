@@ -290,5 +290,5 @@
    is the one place the mark is the subject rather than a stamp. */
 .markFigure {
   inline-size: min(100%, 18rem);
-  color: var(--fg);
+  color: var(--figure);
 }

@@ -41,7 +41,7 @@
 }
 
 .span dd {
-  color: var(--fg);
+  color: var(--figure);
 }
 
 /* Sized here rather than by a utility class. `.sigil` sets

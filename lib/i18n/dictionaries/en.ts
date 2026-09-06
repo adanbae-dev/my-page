@@ -319,6 +319,7 @@ export const en = {
         'A tile cartogram draws every unit at the same size. On a real map Seoul is a dot and Gyeongbuk is enormous, so colouring the true shapes makes the reader compare areas when the question was about the value. Equal tiles remove that.',
       caption: '16 first-level divisions · registered population, 2026-07-31. Grid positions are placed by hand.',
       emptyLayer: 'no values yet',
+      summary: 'A hexagon-grid cartogram of Korea\u2019s 16 first-level divisions. How full each hexagon is shows registered population; Gyeonggi is the largest and Sejong the smallest. The same numbers are listed in order below.',
       listing: 'See them in reading order',
 
       limitsHead: 'Why it stops here',

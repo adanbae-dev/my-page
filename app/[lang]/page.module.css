@@ -44,7 +44,7 @@
   inline-size: clamp(4.5rem, 11vw, 8rem);
   align-self: end;
   justify-self: end;
-  color: var(--fg);
+  color: var(--figure);
 }
 
 /* Colour is deliberately NOT set here. Modules are unlayered and would beat
@@ -203,7 +203,7 @@
    marks that make positional claims do not turn. */
 .chapterMark {
   inline-size: 3.5rem;
-  color: var(--fg);
+  color: var(--figure);
 }
 
 /* Reads the scale the enclosing section published. The fallback is 1, so a

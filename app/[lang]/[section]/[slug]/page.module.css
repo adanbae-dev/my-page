@@ -185,7 +185,7 @@
 /* Small: this is a footnote to the commit list, not a crest. */
 .provenanceMark {
   inline-size: 4.5rem;
-  color: var(--fg);
+  color: var(--figure);
 }
 
 /* WCAG 2.2 SC 2.5.8 (AA) — a target is at least 24x24 CSS px.

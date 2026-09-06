@@ -106,8 +106,8 @@ export default async function PortfolioPage({
                 String(DIVISIONS.length),
               ),
               emptyLayer: d.portfolio.cartogram.emptyLayer,
-              rowHeader: d.portfolio.cartogram.listing,
-              colHeader: d.portfolio.cartogram.heading,
+              listing: d.portfolio.cartogram.listing,
+              summary: d.portfolio.cartogram.summary,
             }}
           />
 

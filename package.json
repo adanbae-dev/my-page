@@ -41,10 +41,15 @@
     "three": "0.185.1"
   },
   "devDependencies": {
+    "@types/d3-hexbin": "^0.2.5",
+    "@types/d3-scale": "^4.0.9",
     "@types/node": "22.19.2",
     "@types/react": "19.2.8",
     "@types/react-dom": "19.2.5",
     "@types/three": "0.185.4",
+    "d3-hexbin": "^0.2.2",
+    "d3-scale": "^4.0.2",
+    "d3-scale-chromatic": "^3.1.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.2",
     "typescript": "5.9.3",
