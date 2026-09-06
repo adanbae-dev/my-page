@@ -14,8 +14,38 @@
     "would publish a personal address into static HTML."
   ],
   "generatedAt": "2026-09-06",
-  "head": "51d6c10",
+  "head": "edd92b1",
   "commits": [
+    {
+      "sha": "edd92b1",
+      "date": "2026-09-06",
+      "subject": "Feat: 카토그램을 육각형으로 — D3 를 빌드 시점에만 쓴다",
+      "insertions": 273,
+      "deletions": 188,
+      "generated": 108,
+      "files": 14,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "config",
+        "generated"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a3a6053",
+      "date": "2026-09-06",
+      "subject": "Build: 기록 갱신",
+      "insertions": 288,
+      "deletions": 260,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "51d6c10",
       "date": "2026-09-06",
