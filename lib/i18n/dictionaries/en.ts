@@ -174,6 +174,8 @@ export const en = {
       'Two grounds and one accent, a machine-checked contrast contract, the type scale, the motion vocabulary, and a mark computed from the commit record.',
     practice:
       'Front-end practice split into what is claimed and what can be shown — including the claims this site has not proven yet.',
+    portfolio:
+      'Things built here. A tile cartogram of Korea, and why it ships with its values missing.',
   },
 
   weight: {
@@ -303,6 +305,56 @@ export const en = {
     contactNote:
       'One channel: GitHub. It is the only identity this site publishes. There is deliberately no phone number, address or email address, and a gate fails the build if any of the three appears on this page.',
     contactGithub: 'GitHub profile →',
+  },
+
+  /* THE PORTFOLIO PAGE. See the note in ko.ts. */
+  portfolio: {
+    heading: 'Portfolio',
+    lead:
+      'Things built here. The first is a cartogram, shipped with its values missing — an empty layer is better than a number nobody can check.',
+
+    cartogram: {
+      heading: 'A tile cartogram of Korea',
+      intro:
+        'A tile cartogram draws every unit at the same size. On a real map Seoul is a dot and Gyeongbuk is enormous, so colouring the true shapes makes the reader compare areas when the question was about the value. Equal tiles remove that.',
+      caption: '17 first-level divisions. Grid positions are placed by hand.',
+      emptyLayer: 'no values yet',
+      listing: 'See them in reading order',
+
+      limitsHead: 'Why it stops here',
+      sggTerm: '~250 districts',
+      sggWhy:
+        'The tiles would fit the budget. The positions would not: they are not checkable at a glance, and I do not have real centroids under a license that permits redistribution. Placing 250 tiles from memory would be inventing data.',
+      dongTerm: '~3,500 neighbourhoods',
+      dongWhy:
+        'Measured: this route may spend 23.4 KB of gzipped HTML, and 3,500 tiles do not fit. A 3,500-tile cartogram is also not one anybody reads.',
+      valueTerm: 'The value layer',
+      valueWhy:
+        'Still empty. It has to be 공공누리 type 1 — a visualisation is a derivative work, and types 3 and 4 forbid modification — its labels have to work in both locales, and it has to answer a question rather than exist. No dataset has cleared all three yet.',
+
+      divisions: {
+        '11': 'Seoul',
+        '26': 'Busan',
+        '27': 'Daegu',
+        '28': 'Incheon',
+        '29': 'Gwangju',
+        '30': 'Daejeon',
+        '31': 'Ulsan',
+        '36': 'Sejong',
+        '41': 'Gyeonggi',
+        '43': 'Chungbuk',
+        '44': 'Chungnam',
+        '46': 'Jeonnam',
+        '47': 'Gyeongbuk',
+        '48': 'Gyeongnam',
+        '50': 'Jeju',
+        '51': 'Gangwon',
+        '52': 'Jeonbuk',
+      },
+    },
+
+    closing:
+      'The plan this page executes against is docs/DATA-VISUALIZATION.md. One item on it is finished — this grid. The rest has no evidence yet.',
   },
 
   notFound: {

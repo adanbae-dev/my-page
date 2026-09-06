@@ -1,0 +1,110 @@
+/* Unlayered on purpose — see any other module in this repository. */
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.grid {
+  border-collapse: separate;
+  border-spacing: var(--space-3xs);
+  table-layout: fixed;
+  inline-size: 100%;
+  max-inline-size: 34rem;
+}
+
+.caption {
+  caption-side: top;
+  text-align: start;
+  color: var(--muted);
+  padding-block-end: var(--space-s);
+}
+
+.empty {
+  color: var(--accent-text);
+}
+
+.blank {
+  padding: 0;
+}
+
+.cell {
+  padding: 0;
+}
+
+/* @property so `--fill` can be interpolated rather than swapped. The same
+   registration the home page's gauge needs, for the same reason. */
+@property --fill {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+.tile {
+  --fill: 0%;
+  position: relative;
+  aspect-ratio: 1;
+  /* The accent fills from the bottom, so a column of tiles reads like a set
+     of small bars rather than a set of differently tinted squares — position
+     is easier to compare than lightness. */
+  background-image: linear-gradient(
+    to top,
+    var(--accent) 0 var(--fill),
+    transparent var(--fill) 100%
+  );
+  box-shadow: inset 0 0 0 var(--rule-w) var(--rule);
+}
+
+.tileInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  /* SC 2.5.8 — the tile IS the target, and it is well over 24px at every
+     width this grid renders at. */
+  min-inline-size: 24px;
+  min-block-size: 24px;
+}
+
+.tileInner:focus-visible {
+  outline: var(--focus-w) solid var(--focus);
+  outline-offset: 2px;
+}
+
+.abbr {
+  font-size: clamp(0.7rem, 2.2vw, 0.85rem);
+  line-height: 1;
+}
+
+.value {
+  font-size: clamp(0.55rem, 1.6vw, 0.7rem);
+  color: var(--muted);
+}
+
+.listing {
+  max-inline-size: var(--measure);
+}
+
+.summary {
+  cursor: pointer;
+  min-block-size: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.list {
+  margin-block: var(--space-s) 0;
+  padding-inline-start: var(--space-l);
+  display: grid;
+  gap: var(--space-3xs);
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+}
+
+.source {
+  margin: 0;
+}

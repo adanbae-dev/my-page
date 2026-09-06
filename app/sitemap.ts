@@ -82,6 +82,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
          to, and the only page answering the "should we work together"
          question the archive otherwise leaves open. */
       {
+        url: url(localePath(lang, '/portfolio')),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+        alternates: { languages: languages('/portfolio') },
+      },
+      {
         url: url(localePath(lang, '/practice')),
         changeFrequency: 'monthly' as const,
         priority: 0.6,

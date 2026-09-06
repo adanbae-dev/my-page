@@ -1,0 +1,75 @@
+/* Unlayered on purpose. */
+
+.hero {
+  min-block-size: 70svh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--section-y);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  inline-size: 100%;
+}
+
+.heroTitle {
+  margin-block: var(--space-xs) var(--space-s);
+}
+
+.beat {
+  padding-block: var(--section-y);
+}
+
+.beat + .beat {
+  padding-block-start: 0;
+}
+
+.beatTitle {
+  margin-block: var(--space-s) var(--space-m);
+}
+
+.note {
+  margin-block-end: var(--space-xl);
+}
+
+.limits {
+  margin-block-start: var(--space-2xl);
+  padding-block-start: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.limitsHead {
+  color: var(--muted);
+  margin-block-end: var(--space-m);
+}
+
+.limitList {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2xs) var(--space-m);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .limitList {
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+  }
+}
+
+.limitList dt {
+  color: var(--accent-text);
+}
+
+.limitList dd {
+  margin: 0 0 var(--space-s);
+}
+
+.closing {
+  padding-block: var(--section-y);
+}
+
+.closingNote {
+  margin-block-start: var(--space-l);
+}
