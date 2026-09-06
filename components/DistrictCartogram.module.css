@@ -19,31 +19,110 @@
 .svg {
   display: block;
   inline-size: 100%;
-  max-inline-size: 46rem;
+  max-inline-size: 56rem;
   block-size: auto;
 }
 
-/* The grid is scaffolding: it should be visible enough to read as a shape and
-   quiet enough that the filled hexagons are what the eye lands on. */
-.outlines use {
-  fill: none;
-  stroke: var(--rule);
-  stroke-width: 0.8;
-  /* `visiblePainted` would give a 0.8-unit stroke as the entire hit area.
-     This layer is the hover target, so the whole hexagon has to answer. */
-  pointer-events: all;
+/* ------------------------------------------------------------------ */
+/* The ramp                                                            */
+/* ------------------------------------------------------------------ */
+
+/*
+ * ONE HUE, SEVEN STEPS, mixed toward the ground rather than picked by hand.
+ *
+ * The site has one accent and this map does not get to introduce a second.
+ * A sequential ramp built by mixing the accent into the ground is a pure
+ * lightness ramp, which is the one thing colour does unambiguously — a
+ * reader never has to be told which end is more. It also survives a change
+ * of accent, because there is no hex literal here to go stale.
+ *
+ * The bottom step is 24% rather than 0: below about a fifth the hexagon
+ * stops separating from the ground and the country loses its coastline. The
+ * top step goes PAST the accent, 18% of the way to the figure colour,
+ * because a ramp whose last two steps are 87% and 100% of the same colour
+ * has no top — and the top is the thing this map is for.
+ *
+ * The classes are written as :global because the markup they style is a
+ * build-time string, not JSX — see lib/cartogram.districts.figure.ts. They
+ * are scoped by the module class around them, so `q0` cannot leak.
+ */
+.cells :global(.q0) { fill: color-mix(in oklab, var(--accent) 24%, var(--ground)); }
+.cells :global(.q1) { fill: color-mix(in oklab, var(--accent) 38%, var(--ground)); }
+.cells :global(.q2) { fill: color-mix(in oklab, var(--accent) 52%, var(--ground)); }
+.cells :global(.q3) { fill: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
+.cells :global(.q4) { fill: color-mix(in oklab, var(--accent) 85%, var(--ground)); }
+.cells :global(.q5) { fill: var(--accent); }
+.cells :global(.q6) { fill: color-mix(in oklab, var(--accent) 82%, var(--figure)); }
+
+/* A hairline of ground between neighbours. Without it two cells of the same
+   class merge and the tiling reads as a blob; with it the grid stays
+   countable and the shape still holds together. */
+.cells use {
+  stroke: var(--ground);
+  stroke-width: 1.4;
   cursor: crosshair;
 }
 
-/* Inert: the fill sits on top of the outline, so it has to let the pointer
-   through or a hover in the middle of a cell would hit nothing. */
-.fills use {
-  fill: var(--accent);
-  pointer-events: none;
+/* ------------------------------------------------------------------ */
+/* Legend                                                              */
+/* ------------------------------------------------------------------ */
+
+.legend {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--space-3xs) var(--space-2xs);
+  max-inline-size: 32rem;
 }
+
+.legendHead {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.ramp {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ramp li {
+  block-size: 1.5rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+.tick {
+  /* Under the swatch, not on it: the low classes are dark and the high ones
+     are the accent, so no single text colour is legible on all seven. */
+  translate: 0 1.35rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.legendMax {
+  margin: 0;
+  translate: 0 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.q0 { background: color-mix(in oklab, var(--accent) 24%, var(--ground)); }
+.q1 { background: color-mix(in oklab, var(--accent) 38%, var(--ground)); }
+.q2 { background: color-mix(in oklab, var(--accent) 52%, var(--ground)); }
+.q3 { background: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
+.q4 { background: color-mix(in oklab, var(--accent) 85%, var(--ground)); }
+.q5 { background: var(--accent); }
+.q6 { background: color-mix(in oklab, var(--accent) 82%, var(--figure)); }
+
+/* ------------------------------------------------------------------ */
 
 .listing {
   max-inline-size: var(--measure);
+  /* The ticks hang below the ramp. */
+  margin-block-start: var(--space-s);
 }
 
 .summaryLine {

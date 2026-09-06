@@ -94,6 +94,7 @@ export default async function DistrictsPage({
           <DistrictCartogram
             labels={{
               caption: d.districts.caption.replace('{n}', String(DISTRICTS.length)),
+              legend: d.districts.legend,
               listing: d.districts.listing,
               summary: d.districts.summary,
               source: d.districts.source,

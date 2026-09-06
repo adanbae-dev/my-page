@@ -1,8 +1,9 @@
 import { cx } from '@/lib/cx'
 import {
+  D_BREAKS,
+  D_CELLS,
   D_CELL_PATH,
-  D_FILLS,
-  D_OUTLINES,
+  D_CLASSES,
   D_RANKED,
   D_SVG_HEIGHT,
   D_SVG_WIDTH,
@@ -14,32 +15,29 @@ import styles from './DistrictCartogram.module.css'
  * 245 districts as a hexagon tiling of the country.
  *
  * A DIFFERENT KIND OF PICTURE FROM THE PROVINCE MAP, on purpose. At sixteen
- * tiles every hexagon carries its name and its number. At 245 nothing
- * legible fits inside one, so this map answers a different question: not
- * "what is Sejong's rate" but "where is the rate high". The names and the
- * numbers are in the popup, in the `<title>` behind it, and in the list
- * underneath, which is the same data in rank order.
+ * tiles every hexagon carries its name, its number and a bar that fills from
+ * the bottom. At 245 none of that survives: nothing legible fits inside a
+ * cell, and a bar this small is a smudge. So the two maps encode through
+ * different channels — the province map through length, this one through
+ * colour — and the reason is in lib/cartogram.districts.figure.ts, where the
+ * size encoding this replaced is written down next to the distribution that
+ * defeated it.
  *
- * SIZE, NOT A BAR. The province map fills each hexagon from the bottom
- * because a bar's height compares easily and leaves the label clear. Here
- * there is no label to protect and a bar this small would be a smudge, so
- * the value scales the hexagon itself. That also makes `sqrt` the right
- * scale rather than the wrong one: this shape grows in BOTH dimensions, so
- * area is proportional to the value only if the radius follows its square
- * root. The province map's linear scale and this one's square root are not
- * an inconsistency — they encode through different properties.
+ * The legend is not decoration here. Quantile classes cannot be read off a
+ * ramp the way an even scale can, so the breaks are printed.
  *
- * The geometry and the markup are both built at build time: three strings
- * from lib/cartogram.districts.figure.ts rather than five hundred elements,
- * because a Server Component ships its output twice and the second copy was
- * 70% of this page. The only thing that reaches the client is the popup —
- * one div and two listeners, in components/HexTip.tsx.
+ * The geometry and the markup are both built at build time: two strings from
+ * that same module rather than five hundred elements, because a Server
+ * Component ships its output twice and the second copy was 70% of this page.
+ * The only thing that reaches the client is the popup — one div and two
+ * listeners, in components/HexTip.tsx.
  */
 export function DistrictCartogram({
   labels,
 }: {
   labels: {
     caption: string
+    legend: string
     listing: string
     summary: string
     source: string
@@ -60,11 +58,21 @@ export function DistrictCartogram({
           <defs>
             <path id="c" d={D_CELL_PATH} />
           </defs>
-
-          <g className={styles.outlines} dangerouslySetInnerHTML={{ __html: D_OUTLINES }} />
-          <g className={styles.fills} dangerouslySetInnerHTML={{ __html: D_FILLS }} />
+          <g className={styles.cells} dangerouslySetInnerHTML={{ __html: D_CELLS }} />
         </svg>
       </HexTip>
+
+      <div className={styles.legend}>
+        <p className={cx('label', 'muted', styles.legendHead)}>{labels.legend}</p>
+        <ol className={styles.ramp}>
+          {Array.from({ length: D_CLASSES }, (_, i) => (
+            <li key={i} className={styles[`q${i}`]}>
+              <span className={cx('label', styles.tick)}>{D_BREAKS[i]?.toFixed(1)}</span>
+            </li>
+          ))}
+        </ol>
+        <p className={cx('label', 'muted', styles.legendMax)}>{D_BREAKS[D_CLASSES]?.toFixed(1)}</p>
+      </div>
 
       <details className={styles.listing}>
         <summary className={cx('label', styles.summaryLine)}>{labels.listing}</summary>
