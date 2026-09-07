@@ -182,6 +182,8 @@ export const en = {
       'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are 4.9% and 4.7%; the shares above the 5% cap are 0.2% and 30.7%.',
     prices:
       'Apartment price change by district, measured between matched complexes. A diverging cartogram on the same grid as the brokerage map.',
+    privacy:
+      'What this site learns about a visitor and where it goes. It sets no cookies at all, and that claim is checkable against the source rather than asserted.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
@@ -537,6 +539,86 @@ export const en = {
     tipPeople: ' people',
 
     back: '← Portfolio',
+  },
+
+  /* THE PRIVACY POLICY. See the note in ko.ts — this reads plainer than the
+     rest of the dictionary on purpose, and every claim in it is checkable
+     against the repository rather than asserted. */
+  privacy: {
+    heading: 'Privacy',
+    lead:
+      'What this site learns about a visitor, and where that goes. The short answer: it sets no cookies at all, and there is no account and no contact form.',
+    updatedLabel: 'Last revised',
+
+    scopeHeading: 'Scope',
+    scopeBody:
+      'This covers goldibug.com and the paths under it. Anywhere a link from this site points to keeps its own policy, which this document does not govern.',
+
+    collectHeading: 'What is collected',
+    collectNote:
+      'There is no sign-up, no login, no comment thread and no contact form here. Not one field asks for a name, an email address or a phone number, so there is no visitor-supplied personal data to hold. What follows is what opening a web page produces on its own.',
+
+    logLabel: 'Request records',
+    logBody:
+      'This site is served as static files by Cloudflare and runs no code at request time. Delivering and protecting a request leaves an IP address, a timestamp, the requested path and a browser identification string with Cloudflare. Cloudflare holds the per-request records; what reaches this site’s operator is aggregate figures.',
+
+    analyticsLabel: 'Visit counts',
+    analyticsBody:
+      'Cloudflare Web Analytics. It plants no cookie and builds no browser fingerprint; what it aggregates is the page path, the referrer, the browser and operating-system family, a country inferred from the IP address, and load timings. It does not identify an individual visitor and does not follow anyone to another site. It is here for one reason: to know which pieces get read.',
+
+    storageLabel: 'Browser storage',
+    storageBody:
+      'No cookies, no localStorage, no sessionStorage, no IndexedDB. Not even the chosen language is stored — the address carries it. That sentence is a checkable fact rather than an intention: no line in this repository touches browser storage.',
+
+    fontLabel: 'Web fonts',
+    fontBody:
+      'The typeface comes from Google Fonts, but it is downloaded at build time and served from this site’s own domain. Opening a page makes no request to a Google server, so the typeface never hands a visitor’s IP address to Google.',
+
+    thirdHeading: 'Where the data goes',
+    thirdNote:
+      'These two, and nothing else. Both are US companies, so using this site means accepting that connection data crosses borders.',
+    cloudflareLabel: 'Cloudflare, Inc.',
+    cloudflareBody:
+      'Hosting, content delivery and visit counts. The request records and the analytics above are processed here.',
+    googleLabel: 'Google LLC',
+    googleBody:
+      'This site is registered with Google AdSense. As it stands, the only thing that reaches Google is the publisher identifier that proves who owns the site — no visitor data.',
+
+    adsHeading: 'Advertising',
+    adsStatusLabel: 'As of now',
+    adsStatusBody:
+      'This site serves no ads. No ad script loads on any page, and that is enforced rather than intended: this site’s Content-Security-Policy admits exactly one external origin and it is not an ad network, so an ad script cannot execute at all.',
+    adsFutureLabel: 'If that changes',
+    adsFutureBody:
+      'This document gets revised before any ad appears, not after. What would change: Google and its advertising partners would use cookies or equivalent identifiers to select ads and measure impressions and clicks, and that can draw on an IP address, device and browser details, which pages were read here, and activity on other sites. Google processes that data; this site’s operator cannot see it at the level of an individual visitor.',
+    adsConsentLabel: 'Consent',
+    adsConsentBody:
+      'Visitors in the European Economic Area, the UK and Switzerland would be asked first, through the certified consent tool Google requires. Outside those places no consent dialog appears, and the refusals below stand in its place.',
+
+    rightsHeading: 'What can be refused, and asked for',
+    rightsNote:
+      'The three below are here against the day this site carries ads. All three already work today.',
+    optGoogleLabel: 'Google ad settings',
+    optGoogleBody: 'Personalised ads can be turned off in a Google account’s ad settings.',
+    optNaiLabel: 'Industry-wide opt-out',
+    optNaiBody:
+      'The Network Advertising Initiative and YourAdChoices opt a browser out of personalised advertising across many companies at once.',
+    optBrowserLabel: 'Block it in the browser',
+    optBrowserBody:
+      'Blocking third-party cookies in browser settings is enough. This site uses no cookies, so blocking them breaks nothing here.',
+    rightsLegalBody:
+      'You have the right to access, correct, delete and halt the processing of your personal data. What complicates that here is that this site holds nothing which identifies a visitor, so there is no record to find and erase. Data processed for advertising is held by Google and has to be claimed from Google directly.',
+    remedyBody:
+      'Under Korean law a dispute or an infringement can be reported to the Personal Information Protection Commission, taken to the Personal Information Dispute Mediation Committee, or reported to the National Office of Investigation’s cyber bureau.',
+
+    contactHeading: 'Contact',
+    contactBody:
+      'This site is run pseudonymously and publishes no email address. Questions about this policy, and requests to correct it, belong in an issue on the repository. It is a public channel, and that is worth knowing before writing in it.',
+    contactIssues: 'Ask on GitHub',
+
+    revisionHeading: 'Revisions',
+    revisionBody:
+      'Every change to this document is a commit in the repository. The date above moves only when the substance changes, never for a typo — putting a new date on an unchanged policy is a false statement about it.',
   },
 
   notFound: {

@@ -1,0 +1,125 @@
+/* Unlayered on purpose. CSS Modules are already scoped, and an
+   unlayered rule outranks every layered one — so this page's styles can
+   never be overridden by the global reset or utilities, whatever order the
+   bundler happens to emit the files in. */
+
+/* --- Hero ------------------------------------------------------------ */
+
+/* Shorter than the other pages' heroes, and deliberately: a policy page is
+   not a beat on the golden path. A full 100svh of held breath in front of a
+   document someone opened to get an answer would be theatre. */
+.hero {
+  padding-block: var(--section-y) var(--space-xl);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.heroTitle {
+  margin-block: var(--space-xs) var(--space-s);
+}
+
+.revised {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  color: var(--muted);
+  margin-block-start: var(--space-s);
+  padding-block-start: var(--space-s);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.revised dd {
+  color: var(--figure);
+}
+
+/* --- Beats ----------------------------------------------------------- */
+
+.beat {
+  padding-block: var(--section-y);
+}
+
+.beatTitle {
+  margin-block-end: var(--space-m);
+}
+
+.note {
+  margin-block-end: var(--space-l);
+}
+
+/* --- The clause list -------------------------------------------------- */
+
+/*
+ * A description list, not a stack of <h3>s.
+ *
+ * Every row here is a term and what is true about it — "Browser storage:
+ * none" — which is what <dl> is for. A screen reader then announces the
+ * pairing instead of leaving a reader to infer it from visual proximity, and
+ * the term can stay small without becoming a heading that clutters the
+ * outline of a page whose real outline is its six sections.
+ */
+.clauses {
+  display: grid;
+  gap: var(--space-l);
+}
+
+.clause {
+  display: grid;
+  gap: var(--space-xs);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 48rem) {
+  .clause {
+    grid-template-columns: minmax(8rem, 14rem) minmax(0, 1fr);
+    gap: var(--space-m);
+    align-items: baseline;
+  }
+}
+
+.clauseTerm {
+  color: var(--muted);
+}
+
+.clauseBody {
+  margin: 0;
+}
+
+/* The standing-notice idiom, shared with the entry and practice pages: an
+   accent rule on the inline start, for a sentence about what the page is NOT
+   telling you — here, that no ads are running yet. */
+.standing {
+  border-inline-start: 2px solid var(--accent);
+  padding-inline-start: var(--space-s);
+}
+
+/* --- Closing --------------------------------------------------------- */
+
+.closing {
+  padding-block: var(--section-y);
+}
+
+.closingGrid {
+  display: grid;
+  gap: var(--space-l);
+  margin-block-start: var(--space-l);
+}
+
+@media (min-width: 48rem) {
+  .closingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-xl);
+  }
+}
+
+.closingHead {
+  color: var(--muted);
+  margin-block-end: var(--space-s);
+}
+
+.closingNote {
+  margin-block-start: var(--space-s);
+}

@@ -182,7 +182,12 @@ export default async function GoldenPath({
             {site.title} · {site.name} ·{' '}
             <Link href={localePath(lang, '/portfolio')}>{d.portfolio.heading}</Link> ·{' '}
             <Link href={localePath(lang, '/practice')}>{d.practice.heading}</Link> ·{' '}
-            <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link>
+            <Link href={localePath(lang, '/art-direction')}>{d.home.artDirection}</Link> ·{' '}
+            {/* Last in the row, which is where a policy link belongs — and in
+                the row at all, because a policy only the sitemap knows about
+                is not reachable, and reachability is what AdSense actually
+                reviews. */}
+            <Link href={localePath(lang, '/privacy')}>{d.privacy.heading}</Link>
           </p>
 
           {/*

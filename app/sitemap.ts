@@ -123,6 +123,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.3,
         alternates: { languages: languages('/art-direction') },
       },
+      /* Indexed, at the lowest priority on the site. A privacy policy is a
+         page a reader goes looking for rather than one a search result
+         should lead with — but it has to be findable, because a policy
+         nobody can reach is not published. `yearly` is the honest
+         frequency: it changes when the site's data practices change, which
+         is rarely and never on a schedule.
+
+         No `lastModified`, on purpose. The page prints its own revision
+         date, moved by hand only when the substance moves (see
+         LAST_REVISED there). Deriving a sitemap timestamp from the file
+         would tell a crawler the policy changed every time a comment in it
+         was reworded. */
+      {
+        url: url(localePath(lang, '/privacy')),
+        changeFrequency: 'yearly' as const,
+        priority: 0.2,
+        alternates: { languages: languages('/privacy') },
+      },
     ]
   })
 }

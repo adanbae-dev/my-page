@@ -194,6 +194,8 @@ export const ko = {
       '갱신요구권을 쓴 전세 갱신과 안 쓴 갱신의 보증금 인상률 분포. 중앙값은 4.9% 대 4.7%로 거의 같고, 5%를 넘는 비율은 0.2% 대 30.7%입니다.',
     prices:
       '같은 단지끼리 짝지어 잰 시군구별 아파트 가격변동. 하락과 상승이 색으로 갈리는 발산형 카토그램이고, 격자는 중개사무소 지도와 같습니다.',
+    privacy:
+      '이 사이트가 방문자에 대해 무엇을 알게 되고 그것이 어디로 가는지. 쿠키는 하나도 사용하지 않으며, 그 사실은 이 사이트의 소스로 확인할 수 있습니다.',
     districts:
       '대한민국 245개 시군구의 인구 1만 명당 중개사무소 수를 육각 격자 카토그램으로. 자리가 밀린 정도와 빠진 11곳까지 적어 둡니다.',
   },
@@ -555,6 +557,96 @@ export const ko = {
     tipPeople: '명',
 
     back: '← 포트폴리오',
+  },
+
+  /* THE PRIVACY POLICY.
+
+     Plainer prose than anything else in this dictionary, and that is the
+     point rather than a lapse. Every other page here is allowed a voice; a
+     policy is read by someone who wants to know what happens to them, and
+     the site's usual register would make them work for it.
+
+     EVERY CLAIM HERE IS CHECKABLE AGAINST THE REPOSITORY. "No cookies" is
+     true because nothing in app/, components/ or lib/ touches
+     document.cookie or Web Storage — grep it. "No ad script" is true
+     because lib/csp.mjs admits exactly one external origin and it is not an
+     ad network. A policy that describes an intention rather than a build is
+     the kind that quietly stops being true. */
+  privacy: {
+    heading: '개인정보처리방침',
+    lead:
+      '이 사이트가 방문자에 대해 무엇을 알게 되고, 그것이 어디로 가는지 적어 둡니다. 결론부터: 이 사이트는 쿠키를 하나도 쓰지 않고, 계정도 문의 폼도 없습니다.',
+    updatedLabel: '최종 개정',
+
+    scopeHeading: '적용 범위',
+    scopeBody:
+      'goldibug.com과 그 하위 경로에만 적용됩니다. 이 사이트에서 밖으로 나가는 링크가 가리키는 곳은 각자의 방침을 따르며, 이 문서가 통제하지 않습니다.',
+
+    collectHeading: '무엇이 수집되는가',
+    collectNote:
+      '이 사이트에는 회원가입, 로그인, 댓글, 문의 폼이 없습니다. 이름·이메일·전화번호를 입력받는 칸이 한 곳도 없으므로 방문자가 직접 제공하는 개인정보는 존재하지 않습니다. 아래는 웹페이지를 여는 행위 자체에서 발생하는 것들입니다.',
+
+    logLabel: '접속 기록',
+    logBody:
+      '이 사이트는 Cloudflare에서 정적 파일로 서빙되며 요청 시점에 실행되는 서버 코드가 없습니다. 전송과 보안 처리 과정에서 Cloudflare 측에 IP 주소, 요청 시각, 요청 경로, 브라우저 식별 문자열이 남습니다. 요청 단위의 원본 기록은 Cloudflare가 보관하며, 이 사이트 운영자에게 제공되는 것은 집계된 지표뿐입니다.',
+
+    analyticsLabel: '방문 통계',
+    analyticsBody:
+      'Cloudflare Web Analytics를 사용합니다. 쿠키를 심지 않고 브라우저 지문도 만들지 않는 방식으로, 페이지 경로·유입 경로·브라우저와 운영체제 종류·IP에서 추정한 국가·로딩 시간이 집계됩니다. 개별 방문자를 식별하지 않고 다른 사이트로 따라가지도 않습니다. 이것을 두는 이유는 어떤 글이 읽히는지 알기 위한 것 하나입니다.',
+
+    storageLabel: '브라우저 저장소',
+    storageBody:
+      '쿠키, localStorage, sessionStorage, IndexedDB를 전혀 사용하지 않습니다. 선택한 언어조차 저장하지 않고 주소로만 구분합니다. 이 문장은 취지가 아니라 확인 가능한 사실입니다 — 저장소를 건드리는 코드가 이 저장소에 한 줄도 없습니다.',
+
+    fontLabel: '웹폰트',
+    fontBody:
+      '본문 서체는 Google Fonts에서 온 것이지만 빌드 시점에 내려받아 이 사이트의 도메인에서 함께 서빙됩니다. 페이지를 열 때 Google 서버로 나가는 요청이 없으므로, 서체 때문에 방문자의 IP가 Google에 전달되는 일은 없습니다.',
+
+    thirdHeading: '데이터가 닿는 곳',
+    thirdNote:
+      '아래 두 곳이 전부입니다. 두 곳 모두 미국에 소재하므로, 접속 정보가 국외로 이전되는 것을 전제로 이 사이트를 이용하게 됩니다.',
+    cloudflareLabel: 'Cloudflare, Inc.',
+    cloudflareBody:
+      '호스팅, 콘텐츠 전송, 방문 통계. 위의 접속 기록과 방문 통계가 여기에서 처리됩니다.',
+    googleLabel: 'Google LLC',
+    googleBody:
+      '이 사이트는 Google AdSense에 등록되어 있습니다. 현재 Google에 전달되는 것은 사이트 소유를 확인하기 위한 퍼블리셔 식별자뿐이고, 방문자에 관한 데이터는 전달되지 않습니다.',
+
+    adsHeading: '광고',
+    adsStatusLabel: '현재 상태',
+    adsStatusBody:
+      '이 문서를 쓰는 시점에 이 사이트는 광고를 게재하지 않습니다. 어느 페이지에도 광고 스크립트가 실리지 않으며, 그 상태는 의지가 아니라 이 사이트의 Content-Security-Policy가 강제하고 있습니다: 허용된 외부 출처가 정확히 하나이고 그것은 광고 사업자가 아니므로, 광고 스크립트는 실행 자체가 차단됩니다.',
+    adsFutureLabel: '게재를 시작하면',
+    adsFutureBody:
+      '광고를 게재하기로 하면 이 문서를 먼저 고칩니다. 그때 달라지는 것은 이렇습니다. Google과 그 광고 파트너가 쿠키 또는 그에 준하는 식별자로 광고를 선택하고 노출과 클릭을 측정하며, 그 과정에서 IP 주소, 기기와 브라우저 정보, 이 사이트에서 본 페이지, 그리고 다른 사이트에서의 활동 이력이 사용될 수 있습니다. 이 데이터는 Google이 처리하고, 이 사이트 운영자는 개별 방문자 수준의 데이터에 접근할 수 없습니다.',
+    adsConsentLabel: '동의',
+    adsConsentBody:
+      '유럽경제지역·영국·스위스에서 접속하는 방문자에게는 Google이 요구하는 인증 동의 관리 도구를 통해 먼저 동의를 묻습니다. 그 지역 밖에서는 동의 창이 뜨지 않으며, 아래의 거부 수단이 대신 열려 있습니다.',
+
+    rightsHeading: '거부하고 요구할 수 있는 것',
+    rightsNote:
+      '아래 세 가지는 이 사이트가 광고를 게재하게 될 때를 대비한 것이고, 지금 시점에도 이미 작동합니다.',
+    optGoogleLabel: 'Google 광고 설정',
+    optGoogleBody: 'Google 계정의 광고 설정에서 맞춤 광고를 끌 수 있습니다.',
+    optNaiLabel: '업계 공동 거부',
+    optNaiBody:
+      'Network Advertising Initiative와 YourAdChoices에서 여러 사업자의 맞춤 광고를 한 번에 거부할 수 있습니다.',
+    optBrowserLabel: '브라우저 차단',
+    optBrowserBody:
+      '브라우저 설정에서 제3자 쿠키를 차단하면 됩니다. 이 사이트는 쿠키를 쓰지 않으므로, 차단해도 여기서 깨지는 기능은 없습니다.',
+    rightsLegalBody:
+      '열람·정정·삭제·처리정지를 요구할 권리가 있습니다. 다만 이 사이트는 방문자를 식별하는 정보를 보관하지 않으므로, 특정인의 기록을 찾아 삭제할 대상이 실제로 존재하지 않습니다. 광고와 관련해 처리되는 데이터는 Google이 보유하므로 Google에 직접 행사해야 합니다.',
+    remedyBody:
+      '개인정보와 관련한 분쟁이나 침해가 있을 경우 개인정보보호위원회, 개인정보 분쟁조정위원회, 경찰청 국가수사본부 사이버수사국에 신고하거나 조정을 요청할 수 있습니다.',
+
+    contactHeading: '문의',
+    contactBody:
+      '이 사이트는 익명으로 운영되며 공개된 이메일 주소가 없습니다. 이 방침에 대한 문의나 정정 요구는 저장소의 이슈로 남겨 주시면 됩니다. 누구나 볼 수 있는 공개 채널이라는 점을 알고 쓰셔야 합니다.',
+    contactIssues: 'GitHub 이슈로 문의',
+
+    revisionHeading: '개정',
+    revisionBody:
+      '이 문서가 바뀐 이력은 저장소의 커밋으로 남습니다. 내용이 실제로 달라질 때만 위의 개정일을 고치고, 오타 수정으로는 고치지 않습니다 — 바뀌지 않은 방침에 새 날짜를 붙이는 것은 사실이 아닌 진술이기 때문입니다.',
   },
 
   notFound: {
