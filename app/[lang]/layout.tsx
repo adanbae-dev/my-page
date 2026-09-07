@@ -13,7 +13,7 @@ import {
 } from '@/lib/i18n/config'
 import { dict } from '@/lib/i18n/dictionary'
 import { alternateLanguages, websiteSchema } from '@/lib/seo'
-import { SITE_URL, site } from '@/lib/site.config'
+import { ADSENSE_CLIENT, SITE_URL, site } from '@/lib/site.config'
 import { GROUND_HEX } from '@/lib/tokens.data'
 import { boundingTone, type ToneStep } from '@/lib/tone'
 
@@ -104,6 +104,30 @@ export async function generateMetadata({
     },
     twitter: { card: 'summary_large_image' },
     robots: { index: true, follow: true },
+    /**
+     * Site verification for AdSense, and the cheapest of the three methods
+     * Google offers.
+     *
+     * The other two are a script tag — which would put a fourth external
+     * origin in a policy that asserts it has exactly one — and ads.txt,
+     * which is also here (`public/ads.txt`). Both are kept because they
+     * verify independently: ads.txt depends on the crawler fetching a file
+     * at the asset root, this depends on it parsing a page's <head>, and a
+     * verification that has one way to succeed has one way to stall with no
+     * diagnosis available.
+     *
+     * `other` rather than `verification`, and that is not a style choice.
+     * Next's `verification` key emits only the names it knows — google,
+     * yandex, yahoo, me — and `google` maps to `google-site-verification`,
+     * which is Search Console's tag and NOT this one. Routing an AdSense ID
+     * through it would ship a valid-looking tag that verifies nothing.
+     *
+     * On every page rather than only the home page. Google's own note is
+     * that an account stays inactive when the verified page gets no regular
+     * traffic, and on this site the home page is not reliably the page a
+     * reader lands on.
+     */
+    other: { 'google-adsense-account': ADSENSE_CLIENT },
   }
 }
 

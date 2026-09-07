@@ -1,0 +1,17 @@
+# Authorized Digital Sellers (IAB Tech Lab ads.txt).
+#
+# Served from the asset root: `public/` is copied into `out/` verbatim, so
+# this reaches https://goldibug.com/ads.txt with no build step of its own.
+# Same mechanism as `_headers` and `_redirects`.
+#
+# One line, and every field in it is load-bearing:
+#   google.com          the ad system's canonical domain
+#   pub-...             this site's AdSense publisher ID
+#   DIRECT              the publisher controls the account (not a reseller)
+#   f08c47fec0942fa0    Google's TAG-ID, identical for every AdSense publisher
+#
+# Google calls ads.txt strongly recommended rather than required. It is here
+# because it doubles as the site-verification method that costs nothing: no
+# script, no external origin, so the Content-Security-Policy in lib/csp.mjs
+# stays exactly as strict as it is.
+google.com, pub-6830017278110885, DIRECT, f08c47fec0942fa0

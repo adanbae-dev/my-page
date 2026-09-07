@@ -58,6 +58,48 @@ if (/const NAME = '\[name\]'/.test(configSrc)) {
   )
 }
 
+/* THE ADSENSE ID IS WRITTEN TWICE AND MUST AGREE WITH ITSELF.
+ *
+ * `ADSENSE_CLIENT` in lib/site.config.ts becomes the meta tag in every
+ * page's <head>. `public/ads.txt` carries the same publisher ID in the
+ * IAB-specified record, and cannot import a TypeScript constant — it is a
+ * plain text file read by crawlers, not by a bundler.
+ *
+ * So the two are copies, and the failure they produce is silent in the worst
+ * way: site verification simply never completes, weeks pass, and nothing in
+ * the build ever said the two files name different publishers. Grepped
+ * rather than imported for the same reason the NAME check above is — the
+ * value has to be readable from a plain script with no TypeScript in the
+ * loop.
+ *
+ * ABSENCE IS NOT A FAILURE. Google calls ads.txt strongly recommended
+ * rather than required, so a repository that has deleted it is making a
+ * legitimate choice. A file that exists and contradicts the config is the
+ * defect this catches.
+ */
+{
+  const adsTxtPath = join(ROOT, 'public', 'ads.txt')
+  const declared = /const ADSENSE_CLIENT = 'ca-(pub-\d+)'/.exec(configSrc)?.[1]
+
+  if (!declared) {
+    warnings.push('ADSENSE_CLIENT in lib/site.config.ts is not a ca-pub-… ID')
+  } else if (existsSync(adsTxtPath)) {
+    /* Comments are part of the ads.txt spec and public/ads.txt uses them, so
+       they are stripped before matching. Otherwise a publisher ID mentioned
+       in a comment would satisfy a check that is about the record. */
+    const records = readFileSync(adsTxtPath, 'utf8')
+      .split('\n')
+      .map((l) => l.replace(/#.*$/, '').trim())
+      .filter(Boolean)
+
+    if (!records.some((l) => l.includes(declared))) {
+      blockers.push(
+        `public/ads.txt does not carry ${declared} — the meta tag and ads.txt name different publishers`,
+      )
+    }
+  }
+}
+
 const origin = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 if (!origin) {
   blockers.push('NEXT_PUBLIC_SITE_URL is unset — canonical URLs, sitemap and feed would advertise localhost')

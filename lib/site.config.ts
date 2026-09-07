@@ -91,3 +91,27 @@ export const person = () => ({
   ...(LEGAL_NAME ? { alternateName: LEGAL_NAME } : {}),
   url: url('/'),
 })
+
+/**
+ * The AdSense publisher ID.
+ *
+ * WHY IT LIVES IN THIS FILE. It is an identity string — the one value that
+ * tells an ad network which account a page belongs to — and this file is
+ * where identity strings live. It appears in two places that a machine
+ * reads: the `google-adsense-account` meta tag emitted by the root layout,
+ * and `public/ads.txt`. Those two disagreeing is the exact failure this
+ * product's gates exist to catch, so `pnpm check:release` asserts that the
+ * ads.txt line carries THIS value. A typo in either one then fails a
+ * release rather than failing site verification silently, weeks later,
+ * with nothing in the build to say why.
+ *
+ * NOT A SECRET. Both surfaces are public files by design — ads.txt is
+ * specified to be world-readable, and the meta tag ships in every page's
+ * <head>. There is nothing here to keep out of the repository.
+ *
+ * WHAT THIS DOES NOT DO. It loads no script and admits no external origin,
+ * so the Content-Security-Policy in lib/csp.mjs is untouched. Serving
+ * actual ads is a separate decision with a real cost — see docs and the
+ * `frame-src` note there — and this constant does not pre-empt it.
+ */
+export const ADSENSE_CLIENT = 'ca-pub-6830017278110885'
