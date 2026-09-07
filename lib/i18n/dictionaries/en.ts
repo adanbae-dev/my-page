@@ -180,6 +180,8 @@ export const en = {
       'Brokerage density appears to explain the direct-deal rate; population explains it better. Two log-log scatter plots of 176 Korean districts against two competing explanations.',
     renewal:
       'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are 4.9% and 4.7%; the shares above the 5% cap are 0.2% and 30.7%.',
+    prices:
+      'Apartment price change by district, measured between matched complexes. A diverging cartogram on the same grid as the brokerage map.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
@@ -416,6 +418,40 @@ export const en = {
     gapTerm: 'Not every response arrived',
     gapWhy:
       'The API is called once per (district, month), so a complete window is {expected} responses. {responses} came back and {missing} did not — this gateway goes down in bursts of minutes, and the missing pairs are mostly the first month of the window for a few central Seoul districts. Those districts are computed over eleven months rather than twelve. Filling them will move the numbers slightly, which is why the correlations on this page are filled in from the data rather than written into the sentences.',
+
+    back: '← Portfolio',
+  },
+  prices: {
+    heading: 'Apartment price change · by district',
+    lead:
+      'Matched by complex and by size band, {fell} districts fell and {rose} rose. The median is {median}%, the range {min}% to {max}%. Zero is a real middle, so this map splits its colour in two directions.',
+    mapHeading: '{late}–{lateEnd} against {early}–{earlyEnd}',
+    note:
+      'A district\u2019s median sale price is the wrong thing to compare — it moves when the mix of what sold moves, so a neighbourhood that did not change appears to rise. The unit here is a (district, complex, 10 m² band) that traded at both ends of the window: {pairs} of them. Each contributes one percentage change of its price per unit area, and the district is the median of its pairs. That holds the building, the size class and the neighbourhood fixed, which is as close to repeat sales as filings without a unit identifier allow. Same 245 cells as the brokerage map, same placement — only the value differs.',
+    caption: '{measured}/{districts} districts · {pairs} matched pairs · median of per-pair change',
+    legend: 'Where each class starts, and how many districts are in it · colour splits at zero',
+    unmeasured: 'Not measurable',
+    listing: 'See all of them in rank order',
+    summary:
+      'A cartogram filling South Korea with 245 hexagons, coloured by apartment price change measured between matched complexes. Falls are teal, rises orange, and cells near zero sit close to the background.',
+    source:
+      'MOLIT apartment sale transactions · price per unit area compared within the same complex and size band · grid identical to the district map · 이용허락범위 제한 없음',
+    tipRate: 'same complexes',
+    tipPairs: ' pairs',
+
+    limitsHead: 'What this map does not hide',
+    pairsTerm: 'Not a comparison of medians',
+    pairsWhy:
+      'Measured across {pairs} pairs. Districts with fewer than {floor} are left without a value — a district resting on twenty pairs and one resting on nine hundred draw the same hexagon, so the popup carries the pair count. When a cell surprises you, read that number first.',
+    unmeasuredTerm: '{unmeasured} districts have no colour',
+    unmeasuredWhy:
+      'No complex in them traded at both ends of the window. They keep a hexagon in a neutral fill rather than becoming a hole: the country\u2019s outline is why this map is readable, and an empty cell meaning "no evidence" reads as "no change". Those are different statements.',
+    windowTerm: 'Not an annual figure',
+    windowWhy:
+      'The first three months of a twelve-month window against the last three — "{late}–{lateEnd} against {early}–{earlyEnd}". It is neither a yearly rate nor a recent trend. And the months are filing months, not signing months.',
+    divergeTerm: 'A second colour',
+    divergeWhy:
+      'This site had exactly one colour. A signed value is read by hue — that is the convention, and a reader should not have to consult a legend to learn which way a cell points — so the falling half got one of its own. It was added on the data\u2019s terms: the two ends are matched on contrast, 3.13:1 against 3.05:1 on paper and 5.76 against 5.91 on ink, because on a diverging scale a half that shouts louder is an argument rather than a measurement. The new role is measured by the same gate and published on /art-direction like every other one.',
 
     back: '← Portfolio',
   },

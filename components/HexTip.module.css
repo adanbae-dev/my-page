@@ -40,6 +40,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.negative {
+  color: var(--decline);
+}
+
 .unit {
   font-size: var(--t-label);
   font-weight: var(--wt-medium);

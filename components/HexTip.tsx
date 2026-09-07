@@ -2,6 +2,8 @@
 
 import { useRef, useState, type ReactNode } from 'react'
 
+import { cx } from '@/lib/cx'
+
 import styles from './HexTip.module.css'
 
 type Tip = { x: number; y: number; name: string; rate: string; brokers: string; pop: string }
@@ -65,15 +67,21 @@ export function HexTip({
       setTip(null)
       return
     }
-    const [brokers = '', pop = ''] = ((cell as HTMLElement).dataset['n'] ?? '').split(',')
+    /* One value or two. The brokerage map hands over offices and residents;
+       the price map has only a pair count, and rendering a second line as
+       "0" would have invented a number. */
+    const parts = ((cell as HTMLElement).dataset['n'] ?? '')
+      .split(',')
+      .filter((x) => x !== '')
+    const [brokers = '', pop = ''] = parts
     const r = frame.getBoundingClientRect()
     setTip({
       x: e.clientX - r.left,
       y: e.clientY - r.top,
       name: text.name,
       rate: text.rate,
-      brokers: Number(brokers).toLocaleString(),
-      pop: Number(pop).toLocaleString(),
+      brokers: brokers === '' ? '' : Number(brokers).toLocaleString(),
+      pop: pop === '' ? '' : Number(pop).toLocaleString(),
     })
   }
 
@@ -96,14 +104,18 @@ export function HexTip({
           aria-hidden="true"
         >
           <span className={styles.name}>{tip.name}</span>
-          <span className={styles.rate}>
+          {/* A diverging map says teal for a fall; a popup that answered in
+              accent orange would contradict the cell the pointer is on. The
+              brokerage map never produces a negative, so this costs it
+              nothing. */}
+          <span className={cx(styles.rate, tip.rate.startsWith('-') && styles.negative)}>
             {tip.rate}
             <span className={styles.unit}> {labels.rate}</span>
           </span>
           <span className={styles.counts}>
             {tip.brokers}
-            {labels.offices} · {tip.pop}
-            {labels.people}
+            {labels.offices}
+            {tip.pop === '' ? '' : ` · ${tip.pop}${labels.people}`}
           </span>
         </div>
       )}

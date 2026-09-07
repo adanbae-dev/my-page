@@ -1,0 +1,166 @@
+/* Unlayered on purpose. */
+
+.figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.caption {
+  color: var(--muted);
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 56rem;
+  block-size: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* The diverging ramp                                                  */
+/* ------------------------------------------------------------------ */
+
+/*
+ * TWO HUES, MEETING AT THE GROUND.
+ *
+ * The brokerage map runs one hue and needs no explanation: brighter is more.
+ * This value has a sign, and a sign is read from hue — a reader should not
+ * have to consult a legend to learn which direction a cell points.
+ *
+ * Both halves mix toward the GROUND rather than toward each other, so the
+ * extremes are loud and the classes nearest zero are quieter. They are not
+ * as quiet as they were: the innermost pair started at 30% and, on the map,
+ * dark teal and dark brown were the same colour — in the two classes that
+ * hold 75 of the 167 measured districts. A scale whose whole job is to show
+ * a sign cannot lose the sign where most of the data is, so the inner steps
+ * are 46%. The midpoint still needs no colour of its own.
+ *
+ * The two ends are matched on contrast, not on taste — 3.13:1 and 3.05:1
+ * against the paper, 5.76 and 5.91 against the ink. Neither direction is
+ * louder than the other, which on a diverging scale is the difference
+ * between a measurement and an argument.
+ *
+ * `:global` because the markup is a build-time string; scoped by `.cells`.
+ */
+.cells :global(.p0) { fill: var(--decline); }
+.cells :global(.p1) { fill: color-mix(in oklab, var(--decline) 70%, var(--ground)); }
+.cells :global(.p2) { fill: color-mix(in oklab, var(--decline) 46%, var(--ground)); }
+.cells :global(.p3) { fill: color-mix(in oklab, var(--accent) 46%, var(--ground)); }
+.cells :global(.p4) { fill: color-mix(in oklab, var(--accent) 64%, var(--ground)); }
+.cells :global(.p5) { fill: color-mix(in oklab, var(--accent) 82%, var(--ground)); }
+.cells :global(.p6) { fill: var(--accent); }
+.cells :global(.p7) { fill: color-mix(in oklab, var(--accent) 74%, var(--figure)); }
+
+/* Not a hue at all. "We could not measure this" has to be distinguishable
+   from every value on the scale, and the only thing that is neither rising
+   nor falling is the rule colour. */
+.cells :global(.pna) { fill: var(--rule); }
+
+.cells use {
+  stroke: var(--ground);
+  stroke-width: 1.4;
+  cursor: crosshair;
+}
+
+/* ------------------------------------------------------------------ */
+/* Legend                                                              */
+/* ------------------------------------------------------------------ */
+
+.legend {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3xs) var(--space-2xs);
+  max-inline-size: 34rem;
+}
+
+.legendHead {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.ramp,
+.scale {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ramp li {
+  block-size: 1.25rem;
+}
+
+.scale li {
+  display: flex;
+  flex-direction: column;
+  font-variant-numeric: tabular-nums;
+}
+
+.count {
+  color: var(--muted);
+}
+
+.legendMax {
+  margin: 0;
+  align-self: start;
+  color: var(--muted);
+}
+
+.unmeasured {
+  grid-column: 1 / -1;
+  margin: var(--space-2xs) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.swatch {
+  inline-size: 0.9rem;
+  block-size: 0.9rem;
+  flex: none;
+}
+
+.p0 { background: var(--decline); }
+.p1 { background: color-mix(in oklab, var(--decline) 70%, var(--ground)); }
+.p2 { background: color-mix(in oklab, var(--decline) 46%, var(--ground)); }
+.p3 { background: color-mix(in oklab, var(--accent) 46%, var(--ground)); }
+.p4 { background: color-mix(in oklab, var(--accent) 64%, var(--ground)); }
+.p5 { background: color-mix(in oklab, var(--accent) 82%, var(--ground)); }
+.p6 { background: var(--accent); }
+.p7 { background: color-mix(in oklab, var(--accent) 74%, var(--figure)); }
+.pna { background: var(--rule); }
+
+/* ------------------------------------------------------------------ */
+
+.listing {
+  max-inline-size: var(--measure);
+  margin-block-start: var(--space-s);
+}
+
+.summaryLine {
+  cursor: pointer;
+  min-block-size: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.list {
+  margin-block: var(--space-s) 0;
+  padding-inline-start: var(--space-l);
+  display: grid;
+  gap: var(--space-3xs);
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+}
+
+.list li::marker {
+  color: var(--muted);
+}
+
+.source {
+  margin: 0;
+}

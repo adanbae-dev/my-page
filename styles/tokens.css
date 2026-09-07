@@ -136,6 +136,7 @@
     --muted: #70706e; /* ink 57% over paper —  4.55:1 — AA body */
     --rule: #dbd9d5; /*  decorative hairline, no threshold */
     --accent: #ff4d00; /*  3.05:1 — fills + non-text only  */
+    --decline: #0e9aa0; /*  3.13:1 — the other end of a diverging scale */
     --accent-text: #cc3e00; /*  4.53:1 — AA body text          */
     --on-accent: #0b0b0c; /*  5.91:1 on the accent fill      */
   }
@@ -147,6 +148,7 @@
     --muted: #7a7977; /* paper 47% over ink —  4.52:1 — AA body */
     --rule: #313030; /*  decorative hairline, no threshold */
     --accent: #ff4d00; /*  5.91:1 — fills, non-text AND text */
+    --decline: #0e9aa0; /*  5.76:1 — the other end of a diverging scale */
     --accent-text: #ff4d00; /*  5.91:1 — AA body text            */
     --on-accent: #0b0b0c; /*  5.91:1 — identical in both tones */
   }

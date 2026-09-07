@@ -87,6 +87,7 @@ const CHECKS = [
   { role: 'figure', min: 7.0, against: 'ground', note: 'body + headings (AAA)' },
   { role: 'muted', min: 4.5, against: 'ground', note: 'secondary text (AA)' },
   { role: 'accent', min: 3.0, against: 'ground', note: 'fills / non-text (SC 1.4.11)' },
+  { role: 'decline', min: 3.0, against: 'ground', note: 'diverging scale, falling half' },
   { role: 'accent-text', min: 4.5, against: 'ground', note: 'accent at body size (AA)' },
   { role: 'on-accent', min: 4.5, against: 'accent', note: 'text on the accent fill (AA)' },
   { role: 'focus', min: 3.0, against: 'ground', note: 'focus ring (SC 1.4.11)' },
@@ -208,6 +209,29 @@ for (const tone of ['light', 'dark']) {
     line(`  ${ok ? '\u2713' : '\u2717'} ${role.padEnd(7)} ${ts} ${ok ? '==' : '!='} --${role} ${css}`)
   }
 }
+
+/*
+ * The two lists have to be the same list.
+ *
+ * CHECKS is what this script measures; CONTRAST_CONTRACT in
+ * lib/tokens.data.ts is what the art-direction page publishes. They were
+ * separate arrays, and a role added to the published one was silently never
+ * measured — which is exactly the failure this gate exists to prevent,
+ * happening inside the gate. Found by adding --decline to the contract and
+ * watching a deliberately wrong ratio pass.
+ */
+{
+  const measured = new Set(CHECKS.map((c) => c.role))
+  for (const tone of ['light', 'dark']) {
+    for (const role of Object.keys(recorded[tone])) {
+      if (!measured.has(role)) {
+        line(`  ✗ --${role} is published in CONTRAST_CONTRACT but never measured here`)
+        failed++
+      }
+    }
+  }
+}
+
 
 line('')
 line('  ' + '-'.repeat(68))

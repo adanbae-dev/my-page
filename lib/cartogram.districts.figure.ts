@@ -66,9 +66,18 @@ function round(n: number): number {
   return Math.round(n * 10) / 10
 }
 
-const cx0 = (d: District) =>
+/**
+ * Exported, because a second map reads the same grid.
+ *
+ * /portfolio/prices draws price change on these 245 cells. The placement is
+ * the expensive, checkable artefact — 1.2 million boundary points and a
+ * Hungarian assignment — and it belongs to the grid, not to whichever value
+ * happens to be painted on it. Two copies of this arithmetic would be two
+ * maps of Korea that slowly stopped agreeing.
+ */
+export const cx0 = (d: District) =>
   d.col * STEP_X + (d.row % 2 === 1 ? STEP_X / 2 : 0) + STEP_X / 2 + 1
-const cy0 = (d: District) => d.row * STEP_Y + Math.ceil(R) + 1
+export const cy0 = (d: District) => d.row * STEP_Y + Math.ceil(R) + 1
 
 /**
  * The five characters that change meaning inside markup.
@@ -79,7 +88,7 @@ const cy0 = (d: District) => d.row * STEP_Y + Math.ceil(R) + 1
  * what it writes, or the day the table gains a `&` is the day it stops being
  * true.
  */
-const esc = (s: string): string =>
+export const esc = (s: string): string =>
   s.replace(/[&<>"']/g, (c) =>
     c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;',
   )

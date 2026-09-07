@@ -101,6 +101,25 @@
     "rather than 35 each. A classification a reader cannot check is worse than",
     "a wider budget line.",
     "",
+    "RAISED css 10240 -> 10752 and total 303104 -> 303616 for a SECOND cartogram.",
+    "/portfolio/prices draws price change on the same 245 cells, and its scale",
+    "diverges: nine fills instead of eight, in two hues instead of one, plus the",
+    "matching legend swatches. Measured, 10,340 B against a 10,240 limit. The css",
+    "raise lifts every route's total by the same amount, which is why the total",
+    "moved with it and not for a reason of its own \u2014 /ko/portfolio/prices came",
+    "out at 303,142 B against 303,104.",
+    "",
+    "A CHEAPER FIX WAS TRIED FIRST AND MADE IT WORSE. Each ramp is written twice,",
+    "once as `fill` on the cells and once as `background` on the legend swatches,",
+    "so both modules were rewritten to declare the nine colours once as custom",
+    "properties and reference them from both places. That is 18 `color-mix()`",
+    "calls down to 9. It measured 10,445 B \u2014 105 B WORSE. gzip was already",
+    "collapsing the repeated `color-mix(in oklab, var(--accent) NN%, var(--ground))`",
+    "strings, and replacing them with nine distinct variable names traded",
+    "compressible repetition for incompressible novelty. Reverted. The",
+    "duplication stays because it is cheaper than the abstraction, which is not",
+    "the answer anyone would guess.",
+    "",
     "The exception is this route's measurement plus 934 B, not an allowance to",
     "grow into, and it leaves the global ceiling where /ko/build (23,210 B) has",
     "always had to live."
@@ -115,12 +134,12 @@
   "unit": "gzip-bytes",
   "budgets": {
     "html": 24000,
-    "css": 10240,
+    "css": 10752,
     "js": 185000,
     "js.shared": 177152,
     "js.route": 11264,
     "font": 100000,
     "deferred": 245760,
-    "total": 303104
+    "total": 303616
   }
 }
