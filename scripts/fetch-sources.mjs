@@ -68,6 +68,29 @@ const SOURCES = [
   },
 ]
 
+/**
+ * Files this script CANNOT fetch, listed so the gap is visible.
+ *
+ * 부동산중개업정보 is the office-level record — name, address, status, daily
+ * — and it is the only public source that would let the district map drill
+ * down to 읍면동, because 중개사무소 등록현황 is published as 시군구 totals
+ * and nothing finer. data.go.kr carries the dataset page but no attachment:
+ * it hands off to V-World, and V-World requires an account. Creating one is
+ * the operator's to do, not this script's.
+ *
+ * Drop the file at .rtms-cache/source/<file> and the aggregator will pick it
+ * up. Until then the drill-down does not exist, which is the honest state.
+ */
+const MANUAL = [
+  {
+    file: 'agency.raw',
+    id: '15052099',
+    what: '국토교통부 부동산중개업정보 (사무소 개별, 일간 갱신)',
+    via: 'https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?svcCde=NA&dsId=11',
+    why: 'V-World requires an account; data.go.kr has no attachment for it',
+  },
+]
+
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36'
 const line = (s) => process.stdout.write(s + '\n')
@@ -144,6 +167,15 @@ for (const s of SOURCES) {
 
 line('  ' + '-'.repeat(74))
 for (const s of SOURCES) line(`  ${s.file.padEnd(11)} ${s.id}  ${s.what}`)
+line('  ' + '-'.repeat(74))
+for (const m of MANUAL) {
+  const have = existsSync(join(OUT, m.file))
+  line(`  ${have ? '=' : '·'} ${m.file.padEnd(11)} ${m.id}  ${m.what}`)
+  if (!have) {
+    line(`      손으로 받아 ${join('.rtms-cache', 'source', m.file)} 에 두세요 — ${m.why}`)
+    line(`      ${m.via}`)
+  }
+}
 line('  ' + '-'.repeat(74))
 if (failed) {
   line(`  ✗ ${failed}개 실패`)
