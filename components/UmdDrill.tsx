@@ -165,6 +165,9 @@ export function UmdDrill({
               <svg
                 viewBox={`0 0 ${width} ${height}`}
                 className={styles.svg}
+                /* The grid's shape, handed to CSS so one hexagon can be a
+                   fixed size instead of the whole map being one. */
+                style={{ '--umd-cols': grid.c } as React.CSSProperties}
                 role="img"
                 aria-label={labels.caption
                   .replace('{name}', state.name)

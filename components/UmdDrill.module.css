@@ -36,7 +36,7 @@
 .panel {
   border: var(--rule-w) solid var(--rule);
   padding: var(--space-s) var(--space-m) var(--space-m);
-  max-inline-size: 26rem;
+  max-inline-size: 32rem;
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -66,10 +66,26 @@
   color: var(--figure);
 }
 
+/*
+ * ONE HEXAGON IS A FIXED SIZE, and the map is whatever size that makes.
+ *
+ * It was the other way round: every grid was stretched to the panel's width,
+ * so a district with five 읍면동 drew hexagons three times the size of one
+ * with seventy. The cell is the unit of meaning here — one hexagon is one
+ * 동 — and a unit that changes size between two pictures of the same kind is
+ * not a unit. So the width follows the column count and the cell stays put.
+ *
+ * 1.8rem per column fits the widest grid (서울 중구, 16 columns) inside the
+ * panel. It is smaller than the national map's cell, which lands at about
+ * 2.1rem when that map is at full width — but the national map scales with
+ * the viewport, so there is no single parent size to match. What is constant
+ * is that every 읍면동 hexagon on this site is the same size as every other.
+ */
 .svg {
   display: block;
-  inline-size: 100%;
-  max-inline-size: 22rem;
+  --umd-cell: 1.8rem;
+  inline-size: calc((var(--umd-cols, 6) + 0.5) * var(--umd-cell));
+  max-inline-size: 100%;
   block-size: auto;
 }
 
