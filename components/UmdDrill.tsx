@@ -28,7 +28,22 @@ type State =
  * the panel it renders. Nothing about the 245 national hexagons crosses to
  * the client.
  *
- * THE SCALE IS RELATIVE TO THE DISTRICT, and that is a real limitation
+ * THE SCALE IS LOGARITHMIC, and that was the second attempt. Linear on
+ * `offices / max` drew 서울 중구 as fifty-nine cells of one colour and one
+ * bright one: 신당동 has 196 offices and nothing else in the district passes
+ * 52, so everything but the outlier collapsed into the bottom class. It is
+ * the same failure the national map had with quantiles — one district
+ * owning the top of the range — and 215 grids at a median of twelve cells
+ * are too small to fit natural breaks to individually.
+ *
+ * A log scale needs no per-district fitting, so all 215 are treated
+ * identically, and it keeps magnitude meaning: a brighter cell really does
+ * have more offices, not merely a higher rank. What it costs is that equal
+ * colour steps are equal RATIOS — the distance from 2 to 5 looks like the
+ * distance from 50 to 125. The count is on every tooltip and the top three
+ * are named, because a scale like that has to be readable as a number.
+ *
+ * THE SCALE IS ALSO RELATIVE TO THE DISTRICT, and that is a real limitation
  * rather than an oversight. 읍면동 office counts run from 1 to a couple of
  * hundred; a national scale would leave every rural 동 the same black. So
  * the brightest cell is the busiest 동 IN THAT DISTRICT, and two districts'
@@ -134,6 +149,13 @@ export function UmdDrill({
 
   const grid = state.at === 'ready' ? state.grid : null
   const max = grid ? Math.max(...grid.cells.map((c) => c.o)) : 1
+  const span = Math.log(max)
+  /* Every 동 the same count leaves no scale to draw — say "all equal" with
+     one colour rather than dividing by zero. */
+  const classOf = (o: number) =>
+    span <= 0
+      ? CLASSES - 1
+      : Math.min(CLASSES - 1, Math.max(0, Math.floor((Math.log(o) / span) * CLASSES)))
   const width = grid ? Math.round((grid.c + 0.5) * STEP_X + 2) : 0
   const height = grid ? Math.round((grid.r - 1) * STEP_Y + R * 2 + 2) : 0
   const top = grid
@@ -184,7 +206,7 @@ export function UmdDrill({
                       href="#u"
                       x={Math.round(c.x * STEP_X + (c.y % 2 ? STEP_X / 2 : 0) + STEP_X / 2 + 1)}
                       y={Math.round(c.y * STEP_Y + Math.ceil(R) + 1)}
-                      className={styles[`s${Math.min(CLASSES - 1, Math.floor((c.o / max) * CLASSES))}`]}
+                      className={styles[`s${classOf(c.o)}`]}
                     >
                       <title>
                         {c.n} · {c.o}
