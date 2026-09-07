@@ -88,6 +88,16 @@ const MANUAL = [
     what: '국토교통부 부동산중개업정보 (사무소 개별, 일간 갱신)',
     via: 'https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?svcCde=NA&dsId=11',
     why: 'V-World requires an account; data.go.kr has no attachment for it',
+    /* What to pick on that page, read off it rather than guessed:
+         시·도        전체 (the nationwide extract, ~36 MB)
+         구분        전체데이터   NOT 변동데이터 (that is only the delta)
+         파일포맷유형  CSV        K-Geo ships geometry inside the CSV, the
+                                way the 시군구 boundary file does
+       Attributes update daily, geometry quarterly. Note the declared
+       coordinate system is 평면직각좌표계 (TM) on the Bessel ellipsoid, not
+       WGS84 — if the points are really Bessel TM they need a datum shift
+       before they can be laid over sgg.raw, and in Korea that shift is a few
+       hundred metres, which matters at 읍면동 scale. Check before joining. */
   },
 ]
 
