@@ -7,6 +7,7 @@ import styles from './UmdDrill.module.css'
 
 type Cell = { n: string; o: number; y: number; x: number }
 type Grid = { r: number; c: number; cells: Cell[] }
+type Tip = { x: number; y: number; name: string; offices: number; share: number }
 type State =
   | { at: 'idle' }
   | { at: 'loading'; sgg: string; name: string }
@@ -85,10 +86,13 @@ export function UmdDrill({
     top: string
     close: string
     unit: string
+    /** Carries `{share}` — this 동's percentage of the district. */
+    share: string
     relative: string
   }
 }) {
   const [state, setState] = useState<State>({ at: 'idle' })
+  const [tip, setTip] = useState<Tip | null>(null)
   const cache = useRef(new Map<string, Grid>())
   const box = useRef<HTMLDivElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -122,6 +126,50 @@ export function UmdDrill({
     }
   }, [])
 
+  /**
+   * The panel's own popup.
+   *
+   * Not HexTip, which serves the two national maps: its payload is a rate
+   * plus two raw counts and its labels are written for that. A 동 has one
+   * count and a share of its district, and the share is the thing worth
+   * saying — 신당동 being 196 offices means little until you know it is a
+   * third of 중구.
+   *
+   * The `<title>` is removed on first hover for the same reason it is on the
+   * national maps: the browser would draw its own tooltip on top of this one
+   * a second later. It stays in the markup until then, so a pointer with no
+   * JavaScript still gets the name and the count.
+   */
+  function onCellMove(e: React.PointerEvent<HTMLDivElement>) {
+    const cell = (e.target as Element).closest<SVGElement>('use[href="#u"]')
+    const frame = panel.current
+    if (!cell || !frame || !grid) {
+      setTip(null)
+      return
+    }
+    let text = cell.dataset['t']
+    if (!text) {
+      const title = cell.querySelector('title')
+      text = title?.textContent ?? ''
+      if (!text) {
+        setTip(null)
+        return
+      }
+      cell.dataset['t'] = text
+      title?.remove()
+    }
+    const [name = '', rest = ''] = text.split('·')
+    const offices = Number(rest.replace(/[^\d]/g, '')) || 0
+    const r = frame.getBoundingClientRect()
+    setTip({
+      x: e.clientX - r.left,
+      y: e.clientY - r.top,
+      name: name.trim(),
+      offices,
+      share: total > 0 ? Math.round((offices / total) * 1000) / 10 : 0,
+    })
+  }
+
   function onClick(e: React.MouseEvent<HTMLDivElement>) {
     const cell = (e.target as Element).closest<SVGElement>('use[data-sgg]')
     if (!cell) return
@@ -149,6 +197,7 @@ export function UmdDrill({
 
   const grid = state.at === 'ready' ? state.grid : null
   const max = grid ? Math.max(...grid.cells.map((c) => c.o)) : 1
+  const total = grid ? grid.cells.reduce((a, c) => a + c.o, 0) : 0
   const span = Math.log(max)
   /* Every 동 the same count leaves no scale to draw — say "all equal" with
      one colour rather than dividing by zero. */
@@ -171,7 +220,13 @@ export function UmdDrill({
       {children}
 
       {state.at !== 'idle' && (
-        <div ref={panel} className={styles.panel} aria-live="polite">
+        <div
+          ref={panel}
+          className={styles.panel}
+          aria-live="polite"
+          onPointerMove={onCellMove}
+          onPointerLeave={() => setTip(null)}
+        >
           <div className={styles.head}>
             <p className={cx('label', styles.name)}>{state.name}</p>
             <button type="button" className={cx('label', styles.close)} onClick={() => setState({ at: 'idle' })}>
@@ -218,6 +273,26 @@ export function UmdDrill({
                 </g>
               </svg>
               </div>
+
+              {tip && (
+                <div
+                  className={styles.tip}
+                  style={{ left: `${tip.x}px`, top: `${tip.y}px` }}
+                  /* The same facts are in the caption and the tooltip below;
+                     a box chasing the pointer is not something a screen
+                     reader should be asked to follow. */
+                  aria-hidden="true"
+                >
+                  <span className={styles.tipName}>{tip.name}</span>
+                  <span className={styles.tipValue}>
+                    {tip.offices.toLocaleString('en-US')}
+                    <span className={styles.tipUnit}>{labels.unit}</span>
+                  </span>
+                  <span className={styles.tipShare}>
+                    {labels.share.replace('{share}', String(tip.share))}
+                  </span>
+                </div>
+              )}
 
               <p className={cx('small', 'muted', styles.caption)}>
                 {labels.caption

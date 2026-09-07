@@ -502,6 +502,7 @@ export const en = {
     top: 'Busiest · {top}',
     close: 'Close',
     unit: '',
+    share: '{share}% of the district',
     relative:
       'Colour is relative to this district — the brightest cell is its busiest 동, and the colours cannot be compared with another district\u2019s.',
   },
