@@ -81,6 +81,22 @@
  * the viewport, so there is no single parent size to match. What is constant
  * is that every 읍면동 hexagon on this site is the same size as every other.
  */
+/*
+ * A FIXED BOX, with the grid centred in it.
+ *
+ * The cell is a constant size, so a district with five 동 draws a small
+ * picture and one with seventy draws a large one — correct, and it made the
+ * panel jump every time the reader clicked somewhere else. The largest
+ * packed grid is twelve columns by nine rows, so the box is that, always,
+ * and the grid sits in the middle of it.
+ */
+.mapBox {
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  min-block-size: 14.6rem;
+}
+
 .svg {
   display: block;
   --umd-cell: 1.8rem;

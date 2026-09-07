@@ -184,6 +184,7 @@ export function UmdDrill({
 
           {grid && (
             <>
+              <div className={styles.mapBox}>
               <svg
                 viewBox={`0 0 ${width} ${height}`}
                 className={styles.svg}
@@ -216,6 +217,7 @@ export function UmdDrill({
                   ))}
                 </g>
               </svg>
+              </div>
 
               <p className={cx('small', 'muted', styles.caption)}>
                 {labels.caption

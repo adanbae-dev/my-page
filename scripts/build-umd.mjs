@@ -33,11 +33,12 @@
  * ONE GRID PER DISTRICT, and each is small: five to seventy cells against
  * the national map's 245. The placement is the same idea as the national one
  * — centroids projected, longitude scaled by cos(latitude), then an OPTIMAL
- * assignment to cells rather than a greedy pass — but there is no land mask.
- * At this size a mask would leave a district's shape to whichever three
- * cells happened to contain a centre. Instead the grid is shaped like the
- * district's own bounding box and given half again as many cells as it
- * needs, so the outline has room to form.
+ * assignment to cells rather than a greedy pass — but there is no land mask
+ * and no spare cells. At this size a mask would leave a district's shape to
+ * whichever three cells happened to contain a centre, and spare cells leave
+ * holes a reader has to interpret. The grid is a filled block, shaped like
+ * the district's bounding box within a limit, and the assignment decides
+ * only where inside it each 동 sits.
  *
  * A FLOOR OF FIVE. Below that a hexagon grid is three shapes in a row, not a
  * map. The districts that miss it are counted and get no page, and the
@@ -74,8 +75,32 @@ const JSON_DIR = join(ROOT, 'public', 'data', 'umd')
 
 /** Cells below which a grid is not a map. */
 const FLOOR = 5
-/** Cells offered per cell needed, so a shape has somewhere to form. */
-const SLACK = 1.5
+/**
+ * NO SPARE CELLS.
+ *
+ * The grid started with half again as many cells as it needed, on the theory
+ * that a shape needs room to form. What it produced was holes: a median fill
+ * of 62%, fifty grids under 60%, and 서울 중구 spread across sixteen columns
+ * with a lone hexagon stranded at one end. At 245 cells the national map can
+ * afford to leave gaps — the gaps are the sea, and the shape is the country.
+ * At twelve cells a gap is just a gap, and a reader counting 동 has to work
+ * out whether the hole means something. It does not.
+ *
+ * With no slack every cell is used, so the grid is a filled block and the
+ * assignment decides only WHERE inside it each 동 sits. Fill goes to 92% at
+ * the median and never below 75% — the remainder is the last row, which
+ * cannot be full unless the count divides.
+ */
+const SLACK = 1.0
+
+/**
+ * How far a grid may depart from square.
+ *
+ * The bounding box still shapes it, so a coastal county stays wider than it
+ * is tall. But an extreme aspect on twelve cells gives a one-row strip, and
+ * a strip is a bar chart wearing hexagons.
+ */
+const ASPECT_LIMIT = 1.5
 
 /* The national map's geometry, so a child grid looks like its parent. */
 const STEP_X = 30
@@ -339,10 +364,13 @@ for (const [sgg, list] of [...bySgg].sort((a, b) => a[0].localeCompare(b[0]))) {
   /* Shape the grid like the district: the bounding box aspect, corrected for
      the hexagon step being wider than it is tall. A square grid would make a
      long coastal county look round. */
-  const target = Math.max(n + 1, Math.ceil(n * SLACK))
+  const target = Math.ceil(n * SLACK)
   const aspect = (w / h) * (STEP_Y / STEP_X)
-  const cols = Math.max(2, Math.round(Math.sqrt(target * aspect)))
-  let gridRows = Math.max(2, Math.ceil(target / cols))
+  const side = Math.sqrt(n)
+  const lo = Math.max(2, Math.ceil(side / ASPECT_LIMIT))
+  const hi = Math.max(2, Math.ceil(side * ASPECT_LIMIT))
+  const cols = Math.max(lo, Math.min(hi, Math.max(2, Math.round(Math.sqrt(target * aspect)))))
+  let gridRows = Math.max(1, Math.ceil(n / cols))
   while (cols * gridRows < n) gridRows++
 
   const spanX = (cols - 1) * STEP_X + STEP_X / 2
