@@ -1,6 +1,10 @@
 import { DISTRICTS } from './cartogram.districts.data'
 import { cx0, cy0, esc } from './cartogram.districts.figure'
 import { PRICE_EDGES, PRICE_VALUES } from './prices.data'
+import { UMD_DISTRICTS, UMD_SGG_BY_DISTRICT } from './umd.data'
+
+/** The same drill-down as the brokerage map — same grids, same files. */
+const DRILLABLE = new Set(UMD_DISTRICTS.map((d) => d.sgg))
 
 /**
  * Price change on the district grid.
@@ -60,9 +64,12 @@ export const P_CELLS: string = DISTRICTS.map((d) => {
   const hit = byName.get(`${d.sido}\t${d.sgg}`)
   const cls = priceClass(hit?.change ?? null)
   const value = hit ? signed(hit.change) : '—'
+  const found = UMD_SGG_BY_DISTRICT[`${d.sido} ${d.sgg}`]
+  const code = found && DRILLABLE.has(found) ? found : null
   return (
-    `<use href="#c" x="${cx0(d)}" y="${cy0(d)}" class="${cls === null ? 'pna' : `p${cls}`}"` +
-    ` data-n="${hit?.pairs ?? 0}">` +
+    `<use href="#c" x="${cx0(d)}" y="${cy0(d)}"` +
+    ` class="${cls === null ? 'pna' : `p${cls}`}${code ? '' : ' nolink'}"` +
+    ` data-n="${hit?.pairs ?? 0}"${code ? ` data-sgg="${code}"` : ''}>` +
     `<title>${esc(d.sido)} ${esc(d.sgg)} · ${value}</title></use>`
   )
 }).join('')

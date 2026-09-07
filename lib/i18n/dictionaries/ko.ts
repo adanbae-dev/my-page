@@ -510,6 +510,17 @@ export const ko = {
 
     back: '← 포트폴리오',
   },
+  drill: {
+    prompt: '육각형을 누르면 그 시군구의 읍면동 격자가 열립니다. 색이 죽은 칸은 읍면동이 다섯 곳 미만이라 격자가 없습니다.',
+    loading: '가져오는 중…',
+    error: '격자를 가져오지 못했습니다.',
+    caption: '{name} · 읍면동 {cells}곳 · 사무소 {offices}',
+    top: '많은 곳 · {top}',
+    close: '닫기',
+    unit: '곳',
+    relative:
+      '색은 이 시군구 안에서의 상대값입니다 — 가장 밝은 칸이 이 시군구에서 사무소가 가장 많은 동이고, 다른 시군구의 색과는 비교할 수 없습니다.',
+  },
   districts: {
     heading: '시군구 카토그램',
     lead:

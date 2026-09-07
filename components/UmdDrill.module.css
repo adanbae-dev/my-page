@@ -1,0 +1,106 @@
+/* Unlayered on purpose. */
+
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+/*
+ * Beside the map once there is room, and STICKY.
+ *
+ * The map is about nine hundred pixels tall. Stacked, the panel opened
+ * below the fold and a click appeared to do nothing — which is the whole
+ * interaction failing while every part of it worked. Sticky keeps it in
+ * view while the reader scrolls the country looking for the next district.
+ */
+@media (min-width: 64rem) {
+  .frame {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-l);
+  }
+
+  .panel {
+    position: sticky;
+    top: calc(var(--nav-h) + var(--space-m));
+    flex: none;
+  }
+}
+
+/*
+ * Never over the map. A panel that covered it would hide the thing the
+ * reader is choosing from, and the choice is not one click and done.
+ */
+.panel {
+  border: var(--rule-w) solid var(--rule);
+  padding: var(--space-s) var(--space-m) var(--space-m);
+  max-inline-size: 26rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-m);
+}
+
+.name {
+  margin: 0;
+}
+
+.close {
+  background: none;
+  border: 0;
+  padding: var(--space-3xs) 0;
+  color: var(--muted);
+  cursor: pointer;
+  min-block-size: 24px;
+}
+
+.close:hover {
+  color: var(--figure);
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 22rem;
+  block-size: auto;
+}
+
+/*
+ * Six steps, not the national map's eight. A district has twelve cells at
+ * the median: eight classes over twelve values gives most classes one
+ * member and reads as noise rather than as a gradient.
+ *
+ * The scale is relative to the district — the brightest cell is its busiest
+ * 동 — so these are the accent mixed toward the ground, without the
+ * past-the-accent step the national map uses. That step means "the top of
+ * the whole country", and it would be a lie here.
+ */
+.cells use {
+  stroke: var(--ground);
+  stroke-width: 1.4;
+}
+
+.s0 { fill: color-mix(in oklab, var(--accent) 26%, var(--ground)); }
+.s1 { fill: color-mix(in oklab, var(--accent) 41%, var(--ground)); }
+.s2 { fill: color-mix(in oklab, var(--accent) 56%, var(--ground)); }
+.s3 { fill: color-mix(in oklab, var(--accent) 71%, var(--ground)); }
+.s4 { fill: color-mix(in oklab, var(--accent) 86%, var(--ground)); }
+.s5 { fill: var(--accent); }
+
+.caption,
+.relative {
+  margin: 0;
+}
+
+.top {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}

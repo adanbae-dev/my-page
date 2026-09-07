@@ -91,6 +91,8 @@ export default async function DistrictsPage({
           </h2>
           <p className={cx('small', 'muted', 'measure', styles.note)}>{d.districts.note}</p>
 
+          <p className={cx('label', 'muted', styles.drillNote)}>{d.drill.prompt}</p>
+
           <DistrictCartogram
             labels={{
               caption: d.districts.caption.replace('{n}', String(DISTRICTS.length)),
@@ -98,6 +100,7 @@ export default async function DistrictsPage({
               listing: d.districts.listing,
               summary: d.districts.summary,
               source: d.districts.source,
+              drill: d.drill,
               tip: {
                 rate: d.districts.tipRate,
                 offices: d.districts.tipOffices,

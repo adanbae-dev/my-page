@@ -492,6 +492,17 @@ export const en = {
 
     back: '← Portfolio',
   },
+  drill: {
+    prompt: 'Click a hexagon to open that district\u2019s 읍면동 grid. A dimmed cell has fewer than five 읍면동 with an office, so there is no grid behind it.',
+    loading: 'Loading…',
+    error: 'Could not load that grid.',
+    caption: '{name} · {cells} 읍면동 · {offices} offices',
+    top: 'Busiest · {top}',
+    close: 'Close',
+    unit: '',
+    relative:
+      'Colour is relative to this district — the brightest cell is its busiest 동, and the colours cannot be compared with another district\u2019s.',
+  },
   districts: {
     heading: 'District cartogram',
     lead:

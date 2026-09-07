@@ -1,3 +1,4 @@
+import { UMD_DISTRICTS, UMD_SGG_BY_DISTRICT } from './umd.data'
 import {
   DISTRICTS,
   D_GRID_COLS,
@@ -218,6 +219,20 @@ const classOf = (v: number): number => {
 }
 
 /**
+ * Which districts have a 읍면동 grid to drill into.
+ *
+ * 215 of 245 do. The rest have fewer than five 읍면동 with an office, and
+ * five cells is not a map — so they carry no code, the click handler never
+ * fires on them, and the stylesheet dims them. A hexagon that looks
+ * clickable and is not is worse than one that does not.
+ */
+const DRILLABLE = new Set(UMD_DISTRICTS.map((d) => d.sgg))
+const sggOf = (d: District): string | null => {
+  const code = UMD_SGG_BY_DISTRICT[`${d.sido} ${d.sgg}`]
+  return code && DRILLABLE.has(code) ? code : null
+}
+
+/**
  * Every district, once.
  *
  * This used to be two layers — a full-size outline for the silhouette and a
@@ -235,9 +250,10 @@ const classOf = (v: number): number => {
  */
 export const D_CELLS: string = DISTRICTS.map((d) => {
   const rate = per10k(d)
+  const code = sggOf(d)
   return (
-    `<use href="#c" x="${cx0(d)}" y="${cy0(d)}" class="q${classOf(rate)}"` +
-    ` data-n="${d.brokers},${d.pop}">` +
+    `<use href="#c" x="${cx0(d)}" y="${cy0(d)}" class="q${classOf(rate)}${code ? '' : ' nolink'}"` +
+    ` data-n="${d.brokers},${d.pop}"${code ? ` data-sgg="${code}"` : ''}>` +
     `<title>${esc(d.sido)} ${esc(d.sgg)} · ${rate.toFixed(1)}</title></use>`
   )
 }).join('')

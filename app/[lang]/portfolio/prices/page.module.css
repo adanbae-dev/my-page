@@ -100,3 +100,10 @@
 .sibling {
   margin-block-start: var(--space-xl);
 }
+
+/* Said on the page, not only implied by a cursor. A reader who cannot click
+   — no pointer, no JavaScript — should learn that from a sentence rather
+   than from nothing happening. */
+.drillNote {
+  margin: var(--space-l) 0 var(--space-s);
+}

@@ -119,6 +119,8 @@ export default async function PricesPage({
             {t(d.prices.note, stats)}
           </p>
 
+          <p className={cx('label', 'muted', styles.drillNote)}>{d.drill.prompt}</p>
+
           <PriceCartogram
             labels={{
               caption: t(d.prices.caption, stats),
@@ -127,6 +129,7 @@ export default async function PricesPage({
               summary: d.prices.summary,
               source: d.prices.source,
               unmeasured: d.prices.unmeasured,
+              drill: d.drill,
               tip: {
                 rate: d.prices.tipRate,
                 offices: d.prices.tipPairs,

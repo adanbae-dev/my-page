@@ -10,6 +10,7 @@ import {
   D_SVG_WIDTH,
 } from '@/lib/cartogram.districts.figure'
 import { HexTip } from './HexTip'
+import { UmdDrill } from './UmdDrill'
 import styles from './DistrictCartogram.module.css'
 
 /**
@@ -43,14 +44,16 @@ export function DistrictCartogram({
     summary: string
     source: string
     tip: { rate: string; offices: string; people: string }
+    drill: React.ComponentProps<typeof UmdDrill>['labels']
   }
 }) {
   return (
     <figure className={styles.figure}>
       <p className={cx('small', styles.caption)}>{labels.caption}</p>
 
-      <HexTip labels={labels.tip}>
-        <svg
+      <UmdDrill labels={labels.drill}>
+        <HexTip labels={labels.tip}>
+          <svg
           viewBox={`0 0 ${D_SVG_WIDTH} ${D_SVG_HEIGHT}`}
           className={styles.svg}
           role="img"
@@ -61,7 +64,8 @@ export function DistrictCartogram({
           </defs>
           <g className={styles.cells} dangerouslySetInnerHTML={{ __html: D_CELLS }} />
         </svg>
-      </HexTip>
+        </HexTip>
+      </UmdDrill>
 
       {/* Three rows over the same eight columns: the ramp, the value each
           class starts at, and how many districts are in it. The third row is

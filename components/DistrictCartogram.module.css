@@ -62,7 +62,19 @@
 .cells use {
   stroke: var(--ground);
   stroke-width: 1.4;
-  cursor: crosshair;
+  cursor: pointer;
+}
+
+/*
+ * No 읍면동 grid behind this one, so nothing happens on click.
+ *
+ * Dimmed rather than recoloured: the value is still true and still worth
+ * reading, and washing it out would put a second meaning into the ramp. What
+ * the reader loses is the invitation, which is the honest thing to lose.
+ */
+.cells :global(.nolink) {
+  opacity: 0.45;
+  cursor: default;
 }
 
 /* ------------------------------------------------------------------ */
