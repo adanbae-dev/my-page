@@ -116,10 +116,36 @@ const digest = (buf) => createHash('sha256').update(buf).digest('hex').slice(0, 
 const check = process.argv.includes('--check')
 const force = process.argv.includes('--force')
 
-/** Read the download link off the dataset page. */
-async function resolveLink(id) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/**
+ * Read the download link off the dataset page, retrying.
+ *
+ * The portal returns 404 for pages that exist. Not once — the boundary
+ * dataset resolved and downloaded, and thirty minutes later the same URL
+ * 404ed, and so did two others that had just worked. A single attempt
+ * mistakes that for a wrong id, which is exactly the wrong conclusion: it
+ * sends you looking for a dataset that was never missing.
+ */
+async function resolveLink(id, tries = 6) {
+  let last
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await resolveOnce(id)
+    } catch (e) {
+      last = e
+      await sleep(Math.min(20_000, 1500 * 2 ** i))
+    }
+  }
+  throw last
+}
+
+async function resolveOnce(id) {
   const page = `https://www.data.go.kr/data/${id}/fileData.do`
-  const res = await fetch(page, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(60_000) })
+  const res = await fetch(page, {
+    headers: { 'user-agent': UA, referer: 'https://www.data.go.kr/' },
+    signal: AbortSignal.timeout(60_000),
+  })
   if (!res.ok) throw new Error(`데이터셋 페이지 ${id}: HTTP ${res.status}`)
   const html = await res.text()
   const m = html.match(/fileDownload\.do\?atchFileId=([A-Za-z0-9_]+)&fileDetailSn=(\d+)/)

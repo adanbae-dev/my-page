@@ -46,7 +46,7 @@
  * Run after `pnpm run umd:centroids`.
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -55,6 +55,22 @@ const AGENCY = join(ROOT, '.rtms-cache', 'source', 'agency.raw')
 const LAWD = join(ROOT, '.rtms-cache', 'source', 'lawd.raw')
 const CENTROIDS = join(ROOT, 'scripts', 'rtms', 'umd.centroids.csv')
 const OUT = join(ROOT, 'lib', 'umd.data.ts')
+/**
+ * One static JSON per district, fetched on click.
+ *
+ * The alternative was a route per district — 215 of them, 430 pages with the
+ * locales. Measured against it: all 215 grids inlined into the national map
+ * would be 32.8 KB gzip of markup and about the same again as serialized
+ * tree, on a page already at 28.3 KB. A single district is 221 bytes at the
+ * median and 708 at the worst. So the grids are files, the page fetches the
+ * one that was clicked, and the route count does not move.
+ *
+ * `public/` is copied verbatim by the export, so these are plain assets. The
+ * budget gate measures routes, not assets, so their weight is reported by
+ * this script and checked by scripts/check-umd.mjs — a payload the gate
+ * cannot see is exactly the thing this repository does not allow.
+ */
+const JSON_DIR = join(ROOT, 'public', 'data', 'umd')
 
 /** Cells below which a grid is not a map. */
 const FLOOR = 5
@@ -169,6 +185,22 @@ function resolveAddress(address) {
     }
   }
   return null
+}
+
+/* --- 시군구 name -> code, for the parent map's links ----------------- */
+
+const sggCode = new Map()
+for (const r of rows(decodeCp949(LAWD))) {
+  if (r.length < 3 || r[0] === '법정동코드') continue
+  const code = r[0].trim()
+  if (nfc(r[2]) !== '존재' || !code.endsWith('00000')) continue
+  const parts = nfc(r[1]).split(' ')
+  if (parts.length < 2) {
+    /* 세종 has no district level: the province IS the district. */
+    sggCode.set(`${parts[0]}\t세종시`, code.slice(0, 5))
+    continue
+  }
+  sggCode.set(`${parts[0]}\t${parts.slice(1).join('')}`, code.slice(0, 5))
 }
 
 /* --- offices -------------------------------------------------------- */
@@ -359,6 +391,9 @@ for (const [sgg, list] of [...bySgg].sort((a, b) => a[0].localeCompare(b[0]))) {
 
 /* --- emit ----------------------------------------------------------- */
 
+/** Districts on the national map that this table could not give a code. */
+const missingCode = []
+
 const meanDisp = Math.round((totalDisp / totalCells) * 100) / 100
 const cellCount = districts.reduce((a, d) => a + d.cells.length, 0)
 const officeCount = districts.reduce((a, d) => a + d.cells.reduce((b, c) => b + c.offices, 0), 0)
@@ -433,6 +468,34 @@ export const UMD_INTAKE = {
 /** Districts with offices but fewer than the floor — no page, dimmed cell. */
 export const UMD_SKIPPED: readonly string[] = [${skipped.map((s) => `'${s}'`).join(', ')}]
 
+/**
+ * The national map's own labels to a district code.
+ *
+ * lib/cartogram.districts.data.ts stores names, not codes, because nothing
+ * on that map needed one. The drill-down does: the code is the file it
+ * fetches. Keeping the lookup here rather than regenerating that table means
+ * the placement data and the link data can be rebuilt independently.
+ */
+export const UMD_SGG_BY_DISTRICT: Readonly<Record<string, string>> = {
+${(() => {
+  const src = readFileSync(join(ROOT, 'lib', 'cartogram.districts.data.ts'), 'utf8')
+  const out = []
+  for (const m of src.matchAll(/sido: '([^']+)', sgg: '([^']+)'/g)) {
+    /* The merged province is not in the 2025 code table under its new
+       name, so its districts are looked up under the two it replaced. */
+    const sidos = [nfc(m[1]), ...(ALIAS.get(nfc(m[1])) ?? [])]
+    let code = null
+    for (const sido of sidos) {
+      code = sggCode.get(`${sido}\t${nfc(m[2])}`)
+      if (code) break
+    }
+    if (code) out.push(`  '${m[1]} ${m[2]}': '${code}',`)
+    else missingCode.push(`${m[1]} ${m[2]}`)
+  }
+  return out.join('\n')
+})()}
+}
+
 export const UMD_DISTRICTS: readonly UmdDistrict[] = [
 ${districts
   .map(
@@ -456,6 +519,23 @@ ${d.cells
 
 writeFileSync(OUT, ts, 'utf8')
 
+/* One file per district. Rebuilt from scratch so a district that drops below
+   the floor does not leave a stale grid behind for the page to fetch. */
+rmSync(JSON_DIR, { recursive: true, force: true })
+mkdirSync(JSON_DIR, { recursive: true })
+let jsonBytes = 0
+for (const d of districts) {
+  /* Short keys. These are read by one function in one component, and at 215
+     files the difference between `name` and `n` is real. */
+  const body = JSON.stringify({
+    r: d.rows,
+    c: d.cols,
+    cells: d.cells.map((c) => ({ n: c.name, o: c.offices, y: c.row, x: c.col })),
+  })
+  writeFileSync(join(JSON_DIR, `${d.sgg}.json`), body, 'utf8')
+  jsonBytes += Buffer.byteLength(body)
+}
+
 line('')
 line('  UMD GRIDS')
 line('  ' + '-'.repeat(70))
@@ -469,6 +549,10 @@ line(
 )
 line(`  평균 이동 ${meanDisp}칸 · 최대 ${Math.round(worst.d * 100) / 100} (${worst.name ?? '?'})`)
 line(`  격자 크기  중앙 ${sizes[sizes.length >> 1]} · 최소 ${sizes[0]} · 최대 ${sizes[sizes.length - 1]}`)
+line(
+  `  정적 JSON ${districts.length}개 · 합 ${(jsonBytes / 1024).toFixed(1)} KB` +
+    ` · 한 곳 평균 ${Math.round(jsonBytes / districts.length)} B`,
+)
 line('  ' + '-'.repeat(70))
-line('  wrote lib/umd.data.ts')
+line('  wrote lib/umd.data.ts + public/data/umd/*.json')
 line('')
