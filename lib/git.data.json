@@ -13,9 +13,359 @@
     "single-author repository, so the field carries no information, and it",
     "would publish a personal address into static HTML."
   ],
-  "generatedAt": "2026-09-06",
-  "head": "48062da",
+  "generatedAt": "2026-09-07",
+  "head": "6549c3b",
   "commits": [
+    {
+      "sha": "6549c3b",
+      "date": "2026-09-08",
+      "subject": "Content: 개인정보처리방침 — 확인할 수 있는 것만 적는다",
+      "insertions": 639,
+      "deletions": 1,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "132d8b3",
+      "date": "2026-09-08",
+      "subject": "SEO: 애드센스가 이 사이트를 확인하는 두 경로",
+      "insertions": 108,
+      "deletions": 1,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "app",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "4530fd1",
+      "date": "2026-09-08",
+      "subject": "Portfolio: 읍면동 격자를 붙이고 박스를 고정한다",
+      "insertions": 3604,
+      "deletions": 3544,
+      "generated": 0,
+      "files": 220,
+      "areas": [
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "9ef5a63",
+      "date": "2026-09-08",
+      "subject": "Portfolio: 읍면동 색을 로그 척도로",
+      "insertions": 327,
+      "deletions": 305,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "components",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "2358fe3",
+      "date": "2026-09-08",
+      "subject": "Content: 3분의 1을 찍었다 — 네 판",
+      "insertions": 153,
+      "deletions": 0,
+      "generated": 0,
+      "files": 4,
+      "areas": [
+        "content"
+      ],
+      "entries": [
+        {
+          "chapter": "live",
+          "slug": "guessed-one-third"
+        }
+      ]
+    },
+    {
+      "sha": "f14aee1",
+      "date": "2026-09-08",
+      "subject": "Portfolio: 육각형 하나가 고정 크기다",
+      "insertions": 307,
+      "deletions": 260,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "components",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "67c02da",
+      "date": "2026-09-08",
+      "subject": "Portfolio: 육각형을 누르면 읍면동 격자가 열린다",
+      "insertions": 996,
+      "deletions": 312,
+      "generated": 0,
+      "files": 18,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "d355718",
+      "date": "2026-09-08",
+      "subject": "Portfolio: 라우트 430개 대신 정적 JSON 215개",
+      "insertions": 586,
+      "deletions": 5,
+      "generated": 0,
+      "files": 218,
+      "areas": [
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "b1678c9",
+      "date": "2026-09-07",
+      "subject": "Portfolio: 시군구마다 읍면동 격자 하나",
+      "insertions": 5504,
+      "deletions": 0,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "a75475b",
+      "date": "2026-09-07",
+      "subject": "Tooling: 읍면동 중심점 5,007개",
+      "insertions": 5296,
+      "deletions": 0,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "8ce218f",
+      "date": "2026-09-07",
+      "subject": "Tooling: 읍면동 경계를 출처 목록에 넣는다",
+      "insertions": 6,
+      "deletions": 0,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "f36d4c3",
+      "date": "2026-09-07",
+      "subject": "Tooling: 브이월드에서 무엇을 고를지 적어 둔다",
+      "insertions": 10,
+      "deletions": 0,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "388d02c",
+      "date": "2026-09-07",
+      "subject": "Tooling: 받을 수 없는 자료를 목록에 남긴다",
+      "insertions": 32,
+      "deletions": 0,
+      "generated": 0,
+      "files": 1,
+      "areas": [
+        "scripts"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "74d469e",
+      "date": "2026-09-07",
+      "subject": "Portfolio: 같은 격자에 가격변동 — 색이 하나 늘었다",
+      "insertions": 1827,
+      "deletions": 430,
+      "generated": 0,
+      "files": 21,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "styles",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "9cfbc3d",
+      "date": "2026-09-07",
+      "subject": "Data: 12개월 창을 완결하고, 두 페이지의 본문이 낡지 않게 했다",
+      "insertions": 323,
+      "deletions": 309,
+      "generated": 0,
+      "files": 6,
+      "areas": [
+        "app",
+        "lib"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "2f70b01",
+      "date": "2026-09-07",
+      "subject": "Portfolio: 직거래율 — 내 가설은 맞았고, 더 나은 설명이 있었다",
+      "insertions": 1697,
+      "deletions": 254,
+      "generated": 0,
+      "files": 14,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "9840e77",
+      "date": "2026-09-06",
+      "subject": "Portfolio: 계약갱신청구권 5% 상한이 실제로 하는 일",
+      "insertions": 1707,
+      "deletions": 391,
+      "generated": 0,
+      "files": 15,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "fc580dd",
+      "date": "2026-09-06",
+      "subject": "Tooling: 실거래가 수집기와 시군구 코드표",
+      "insertions": 1526,
+      "deletions": 0,
+      "generated": 0,
+      "files": 3,
+      "areas": [
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "e59a82c",
+      "date": "2026-09-06",
+      "subject": "Portfolio: 19.3 과 39.8 이 같은 색이던 것을 고쳤다",
+      "insertions": 384,
+      "deletions": 279,
+      "generated": 0,
+      "files": 7,
+      "areas": [
+        "components",
+        "lib",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "c4657db",
+      "date": "2026-09-06",
+      "subject": "Portfolio: 시군구 지도를 크기가 아니라 색으로 읽게 했다",
+      "insertions": 737,
+      "deletions": 618,
+      "generated": 0,
+      "files": 10,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "81bcb85",
+      "date": "2026-09-06",
+      "subject": "Portfolio: 시군구 지도를 국토 모양으로 깔고, 올리면 팝업이 뜬다",
+      "insertions": 947,
+      "deletions": 598,
+      "generated": 0,
+      "files": 15,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "793bb8f",
+      "date": "2026-09-06",
+      "subject": "Portfolio: 시군구 245곳을 육각 격자에 올렸다",
+      "insertions": 1381,
+      "deletions": 398,
+      "generated": 0,
+      "files": 14,
+      "areas": [
+        "app",
+        "components",
+        "lib",
+        "scripts",
+        "config"
+      ],
+      "entries": []
+    },
+    {
+      "sha": "7f04969",
+      "date": "2026-09-06",
+      "subject": "Build: 기록 갱신",
+      "insertions": 297,
+      "deletions": 268,
+      "generated": 0,
+      "files": 2,
+      "areas": [
+        "lib"
+      ],
+      "entries": []
+    },
     {
       "sha": "48062da",
       "date": "2026-09-06",
