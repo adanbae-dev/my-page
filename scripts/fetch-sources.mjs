@@ -49,6 +49,12 @@ const SOURCES = [
     sha: 'a881637c18c8',
   },
   {
+    file: 'umd.raw',
+    id: '15123128',
+    what: '국토지리정보원 공간정보공동활용 읍면동 경계 (WKB)',
+    sha: '',
+  },
+  {
     file: 'pop.raw',
     id: '15097972',
     what: '행정안전부 주민등록 인구',
