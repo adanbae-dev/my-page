@@ -32,6 +32,7 @@
     "check:direct": "node scripts/check-direct.mjs",
     "check:prices": "node scripts/check-prices.mjs",
     "build:prices": "node scripts/build-prices.mjs",
+    "umd:centroids": "node scripts/umd-centroids.mjs",
     "build:direct": "node scripts/build-direct.mjs",
     "build:renewal": "node scripts/build-renewal.mjs",
     "fetch:sources": "node scripts/fetch-sources.mjs"
