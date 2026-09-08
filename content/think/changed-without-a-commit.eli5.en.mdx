@@ -1,0 +1,72 @@
+---
+title: Nobody edited it, and the setting had changed
+summary: The value deciding where visitor counts are sent lives in an admin screen, not in my code. A value that never passes through my hands gives no signal when it changes.
+authored: false
+---
+
+Every page of this site carries a small piece of code that counts visitors.
+Inside it is one value that decides **where those counts are sent.**
+
+One day that value had changed. **I had not touched it.**
+
+## How that was possible
+
+The place that decides the value is not my code. It is the **service's admin screen.**
+
+My code records who changed what, and when, every single time. Admin-screen settings
+keep no such record. So there is no signal when one changes, and once you notice,
+there is nobody to ask why.
+
+## But that arrangement was on purpose
+
+This site runs on a rule that says **it connects to nowhere it has not permitted.**
+Exactly one place is permitted.
+
+If I shipped the counting code myself, I would have to permit **one more** address —
+the one the counts are sent to. So the current arrangement stays. It was chosen to keep
+the security rule one notch narrower.
+
+**Narrow was not free.** The price of keeping the rule narrow is that one setting lives
+outside my records.
+
+## Things that exist only in the admin screen
+
+A few more sit in the same place: the rule that tidies addresses before sending them
+on, the analytics account attachment, and which account that attachment points at.
+
+My code records all three **only as instructions** — do this, then this. Whether it is
+currently done is not written anywhere. No automated check can catch it either: the
+checker reads my code, not the admin screen.
+
+So what I can do here is not write down the answer, but write down **how to check.**
+
+## The same thing happened twice more that week
+
+**Data that has to be downloaded by hand.** Drilling the map down further needs one
+dataset, and the provider requires a login. Creating an account is not a program's job.
+
+So instead of deleting it from the list, it moved to a list of **what cannot be
+fetched.** Now every run says: this file is missing, download it and put it here, and
+this is why it cannot be automatic.
+
+Delete it and the research gets redone in six months. **It has already been done
+twice.** The first time it lived only in a conversation and was lost.
+
+**A tidy-up that failed and was undone.** The same list of colours was written in two
+places in the code, so I rewrote it to be declared once. Normally that makes the file
+smaller.
+
+**It grew by 105 bytes.** Compression was already folding the repeated parts, and the
+nine new names introduced by the tidy-up traded well-compressing repetition for new
+text that does not compress. I undid it, and **wrote that number into the file.**
+
+Without the number written down, the same tidy-up gets attempted again. Nobody can
+guess in advance that duplication is cheaper than tidying.
+
+## What is left
+
+If one switch on an admin screen can change the actual page, it should be treated as
+code, not as a setting.
+
+For what cannot be brought in, leave at least one line saying **how to check it.**
+And make absences and reversions say so themselves.

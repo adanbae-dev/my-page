@@ -1,0 +1,91 @@
+---
+title: A value changed without a commit
+date: 2026-09-08
+summary: Automatic injection keeps the CSP narrow and leaves the analytics attachment in the dashboard. What the repository does not hold changes unannounced.
+topics: [process, tooling]
+tags: [cloudflare, csp, analytics, verification, ai-agent]
+---
+
+> This is the record of **a session run with an AI agent (Claude)**. The commit
+> hashes and quotations below are verifiable in this repository. That the token
+> actually changed once is an observation from the session, and it is nowhere in
+> the code — which is the subject of this note.
+
+`lib/csp.mjs` says this:
+
+```
+connect-src deliberately gets nothing. Under Cloudflare's AUTOMATIC
+injection the beacon reports to the site's own domain, which 'self'
+already covers. (...) automatic injection is not a convenience here,
+it is the reason the second hole stays shut.
+```
+
+This site runs a CSP that permits no destination it has not named, and it names
+exactly **one** external origin: the host that serves the analytics beacon. Shipping
+that beacon myself would mean naming a second one — the address its report goes to.
+So automatic injection stays. It was chosen to keep the policy one name narrower, and
+that is a deliberate trade.
+
+What the comment does not say is the price.
+
+## A value the repository does not hold changes without notice
+
+Under automatic injection the token that reaches the HTML — the value naming which
+analytics site to report to — belongs to whichever site the dashboard has attached to
+this hostname. **The repository has no record of that attachment.**
+
+So the value can change without a commit. And it did, once.
+
+No diff, no author, no timestamp. With no record in the code there is no signal that
+it moved, and once noticed there is nobody to ask why. The policy stayed narrow, and
+one value now lives outside every diff. **That is what the narrow policy cost.**
+
+## State that exists only in the dashboard
+
+Three more sit in the same place: the redirect that sends `www` to the canonical host,
+the analytics attachment itself, and which site that attachment points at.
+
+`docs/PRODUCTION.md` records all three as **procedure only**. Add a proxied `AAAA`
+record pointing at `100::`, send a 301 from Redirect Rules — what to do is written
+down. Whether it is currently done is not.
+
+This is not the kind of thing a gate can catch. `pnpm check:release` inspects the
+policy and headers this repository generates, and a dashboard toggle is not something
+it can read. So the minimum available here is to leave behind **not a conclusion but a
+way to check.**
+
+## The same shape came up twice more that week
+
+**A dataset that cannot be fetched.** Drilling the map down to the neighbourhood level
+needs one dataset whose provider requires an account, and creating an account is not a
+script's job. Instead of dropping it from the list, it moved to a list of what cannot
+be fetched, so every run prints its absence, where to put it once downloaded by hand,
+and why automation cannot (`388d02c`, `f36d4c3`).
+
+Delete it and the research gets redone in six months. **It has already been done
+twice** — the first time it lived only in a conversation and was lost.
+
+**A reverted refactor.** The CSS ramps were written twice, once as `fill` on the cells
+and once as `background` on the legend swatches, so both modules were rewritten to
+declare the nine colours once as custom properties. That took 18 `color-mix()` calls
+down to 9, and measured **10,445 B — 105 B worse.** gzip was already collapsing the
+repeated strings, and nine distinct variable names traded compressible repetition for
+incompressible novelty. Reverted, with the measurement written into `perf.budget.json`
+(`74d469e`).
+
+Leave the number out and the same refactor gets attempted again. That duplication is
+cheaper than abstraction is not something anyone can guess.
+
+## What to take from it
+
+All three are the same shape. When a value lives outside the repository, when data has
+to pass through a pair of hands, when the result contradicts instinct — what the
+repository can hold is not the conclusion but **the way to check it.**
+
+1. **Pull in the state you can.** If one dashboard toggle can change production HTML,
+   that is not configuration — it is code.
+2. **Where you cannot, keep the procedure instead.** Even for state no gate can read,
+   one line saying how to verify it belongs in the repository.
+3. **Make absences and reversions print themselves.** A file that must be fetched by
+   hand, and the measurement from a refactor that failed, both get re-researched unless
+   they are written down.
