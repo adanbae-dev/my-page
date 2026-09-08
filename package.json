@@ -38,6 +38,7 @@
     "check:bi:regen": "node scripts/check-bi-regen.mjs",
     "build:roster": "node scripts/build-roster.mjs",
     "build:bi": "node scripts/build-bi.mjs",
+    "build:slice": "node scripts/build-bi-slice.mjs",
     "umd:centroids": "node scripts/umd-centroids.mjs",
     "build:umd": "node scripts/build-umd.mjs",
     "build:direct": "node scripts/build-direct.mjs",

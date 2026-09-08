@@ -1,0 +1,355 @@
+/**
+ * The instrument's chrome.
+ *
+ * Unlike RevenueBoard.module.css, nothing here needs `:global()`: every mark
+ * on this page is a React element rather than a string built at build time,
+ * so CSS Modules can hash the class the normal way. That is the one real
+ * upside of moving the figures to the client — the styling and the markup
+ * are checked against each other by the compiler instead of by a gate.
+ *
+ * SAME TWO COLOURS. `--accent` for subscription and every bar, `--decline`
+ * for usage, both measured against both grounds by `pnpm check:contrast`.
+ * The filters are ordinary form controls wearing the chart chrome, which is
+ * what the interaction spec asks for — a select that looks like a chart mark
+ * is a select nobody recognises.
+ */
+
+.board {
+  --gap: clamp(0.75rem, 2vw, 1.5rem);
+  width: min(100% - 2rem, 84rem);
+  margin-inline: auto;
+  padding-block: clamp(1rem, 3vh, 2rem) clamp(2rem, 6vh, 4rem);
+}
+
+.state {
+  width: min(100% - 2rem, 84rem);
+  margin: 3rem auto;
+}
+
+/* ---- one filter row ------------------------------------------------ */
+
+/**
+ * A single row above everything it scopes, wrapping rather than scrolling.
+ *
+ * Never inside a chart, never per-chart: the tiles, the four figures and the
+ * table all describe the same rectangle, and a control that scoped only one
+ * of them would make two numbers on one screen disagree for a reason the
+ * reader cannot see.
+ */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem var(--gap);
+  border-block: var(--rule-w) solid var(--rule);
+  padding-block: 0.75rem;
+}
+
+.presets {
+  display: flex;
+  gap: 2px;
+}
+
+/* 24px minimum, which is the hit target the interaction spec asks for. */
+.preset,
+.reset,
+.sortBtn {
+  min-height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+  border: var(--rule-w) solid var(--rule);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.preset:hover,
+.reset:hover,
+.sortBtn:hover {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+/* Selection is a fill, not a border — a border reads as focus. */
+.presetOn,
+.presetOn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+.sortBtn[aria-pressed='true'] {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.select,
+.input {
+  min-height: 1.75rem;
+  max-width: 11rem;
+  border: var(--rule-w) solid var(--rule);
+  background: none;
+  color: var(--figure);
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.125rem 0.25rem;
+}
+
+.searchField {
+  flex: 1 1 9rem;
+}
+
+.input {
+  max-width: none;
+  width: 100%;
+}
+
+.reset {
+  margin-inline-start: auto;
+}
+
+.matched {
+  margin: 0.75rem 0 0;
+}
+
+/* ---- tiles --------------------------------------------------------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--gap);
+  margin: var(--gap) 0 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+}
+
+.tile {
+  min-width: 0;
+}
+
+/* Proportional figures: these stand alone, and tabular digits read loose
+   at display size. `tabular-nums` is on the table below, where they align. */
+.tileValue {
+  margin: 0.125rem 0 0;
+  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+  font-weight: 700;
+  font-variant-numeric: proportional-nums;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* ---- blocks -------------------------------------------------------- */
+
+.seriesBlock,
+.barsBlock,
+.tableBlock {
+  min-width: 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+  margin-block-start: var(--gap);
+}
+
+.blockTitle {
+  margin: 0;
+}
+
+.blockNote {
+  margin: 0.375rem 0 0.5rem;
+  max-width: 68ch;
+}
+
+.trio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--gap);
+}
+
+.foot {
+  margin: 0.5rem 0 0;
+}
+
+/* ---- the time series ----------------------------------------------- */
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  touch-action: none;
+}
+
+.gridline {
+  stroke: var(--rule);
+  stroke-width: 1;
+  fill: none;
+}
+
+.subFill {
+  fill: color-mix(in oklab, var(--accent) 20%, var(--ground));
+}
+
+.subLine {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.useLine {
+  fill: none;
+  stroke: var(--decline);
+  stroke-width: 2;
+}
+
+/* The crosshair finds the X. It snaps to a month, so the reader aims at a
+   date instead of at a two-pixel line. */
+.cross {
+  stroke: var(--muted);
+  stroke-width: 1;
+}
+
+.dotSub {
+  fill: var(--accent);
+  stroke: var(--ground);
+  stroke-width: 2;
+}
+
+.dotUse {
+  fill: var(--decline);
+  stroke: var(--ground);
+  stroke-width: 2;
+}
+
+.tick {
+  fill: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/**
+ * The readout is text outside the SVG.
+ *
+ * Selectable, and a live region a screen reader announces — a tooltip drawn
+ * inside the picture would be neither. `min-height` holds the line so the
+ * page does not jump when the pointer enters and leaves the plot.
+ */
+.readout {
+  min-height: 1.5rem;
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- bars ---------------------------------------------------------- */
+
+.bars {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.barName,
+.barValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barTrack {
+  display: block;
+  height: 0.625rem;
+  background: color-mix(in oklab, var(--rule) 60%, var(--ground));
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+/* ---- the table ----------------------------------------------------- */
+
+.tableScroll {
+  overflow-x: auto;
+  max-height: 30rem;
+  overflow-y: auto;
+  margin-block-start: 0.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  text-align: start;
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  border-block-end: var(--rule-w) solid var(--rule);
+  white-space: nowrap;
+}
+
+.table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--ground);
+  color: var(--muted);
+  font-weight: 500;
+  padding-block: 0.25rem;
+}
+
+.num {
+  text-align: end;
+}
+
+.table td.num,
+.table th.num {
+  text-align: end;
+}
+
+.nameCell {
+  font-weight: 400;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Lines, because both series are lines. A legend mirrors its mark. */
+.key {
+  width: 0.875rem;
+  height: 2px;
+  flex: none;
+}
+
+.keySub { background: var(--accent); }
+.keyUse { background: var(--decline); }

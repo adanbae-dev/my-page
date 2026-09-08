@@ -186,6 +186,8 @@ export const en = {
       'What this site learns about a visitor and where it goes. It sets no cookies at all, and that claim is checkable against the source rather than asserted.',
     revenue:
       'A BI dashboard for apartment management app revenue. The complex roster and its geography are real filings; every contract, price, invoice and salesperson is generated from a fixed seed.',
+    bi:
+      'A dashboard that filters apartment management app revenue by month range, province, size, management type, service and complex name. Every figure recomputes against the same slice.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
@@ -754,6 +756,91 @@ export const en = {
     },
 
     back: 'Back to the portfolio',
+  },
+
+  /* THE FILTERABLE DASHBOARD. See the note in ko.ts. */
+  bi: {
+    heading: 'Revenue dashboard · filtered',
+    scope:
+      '{complexes} contracted complexes over {months} months. The denominator is the {tam} complexes filed with 국토교통부, and that is the only number here that was counted — the contracts and the revenue are generated from a fixed seed.',
+    static: 'The same data, read without a script',
+    needsScript:
+      'The filters on this page run in JavaScript. To read the same data without one, go here —',
+    back: 'Back to the portfolio',
+
+    synthetic:
+      'Complex names, provinces, districts, 법정동 and completion years are as filed with 국토교통부. Household counts are not in the filings and are estimated. Contracts, prices, invoices, cancellations, the sales organisation and management type are generated and correspond to nothing that happened.',
+    loading: 'Fetching the per-complex series…',
+    failed: 'The data did not load. Try a refresh, and if it keeps failing read the version that needs no script.',
+
+    filters: 'Filters',
+    range: 'Range',
+    presetAll: 'All',
+    preset12: 'Last 12 months',
+    preset6: 'Last 6 months',
+    preset3: 'Last 3 months',
+    from: 'From',
+    to: 'To',
+    sido: 'Province',
+    tier: 'Size',
+    mgmt: 'Management',
+    mgmtDelegated: 'Delegated',
+    mgmtSelf: 'Self-managed',
+    service: 'Service',
+    search: 'Complex · district',
+    searchHint: 'e.g. Raemian, Gangnam',
+    reset: 'Reset filters',
+    any: 'Any',
+    matched: '{n} of {total} complexes match · {from} to {to}',
+    matchedNone: 'No complexes match. Try widening the filters.',
+
+    kpiMrr: 'Monthly recurring revenue',
+    kpiGrowth: 'Change over range',
+    kpiComplexes: 'Billing in final month',
+    kpiArpu: 'Per household',
+    kpiUsage: 'Usage share',
+
+    chartSeries: 'Subscription and usage',
+    chartSeriesNote:
+      'One axis. Usage is a few per cent of subscription, so a second axis would inflate it to the same height and invent a correlation. It is drawn small, and that is the true shape — the share is a number in the tiles above. The crosshair snaps to a month, so you never have to aim at a line.',
+    legendSub: 'Subscription',
+    legendUsage: 'Usage',
+    chartService: 'Complexes holding each service',
+    chartTier: 'By size',
+    chartSido: 'By province (top 9)',
+
+    tableTitle: 'Complexes',
+    tableMore: '{n} more below — narrow the filters or change the sort',
+    colName: 'Complex',
+    colDistrict: 'District',
+    colTier: 'Size',
+    colHouseholds: 'Households',
+    colMgmt: 'Mgmt',
+    colServices: 'Services',
+    colMrr: 'Subscription',
+    colUsage: 'Usage total',
+    estimated: 'Household counts are not in the filings and are estimated',
+
+    services: {
+      parking: 'Parking control',
+      visitor: 'Visitor vehicles',
+      access: 'Resident access',
+      cctv: 'CCTV feed',
+      billing: 'Fee collection',
+      notice: 'Notices',
+      community: 'Facility booking',
+      defect: 'Defect intake',
+      locker: 'Parcel lockers',
+      vote: 'Resident voting',
+      sms: 'SMS fallback',
+    },
+    tiers: {
+      sub: 'Under 150',
+      small: '150–400',
+      mid: '400–900',
+      large: '900–2,000',
+      xlarge: '2,000 and over',
+    },
   },
 
   notFound: {

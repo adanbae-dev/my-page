@@ -198,6 +198,8 @@ export const ko = {
       '이 사이트가 방문자에 대해 무엇을 알게 되고 그것이 어디로 가는지. 쿠키는 하나도 사용하지 않으며, 그 사실은 이 사이트의 소스로 확인할 수 있습니다.',
     revenue:
       '아파트 관리앱 매출 BI 대시보드. 단지 명부와 위치는 국토부 실거래가에서 온 실제 데이터이고, 계약·단가·매출·영업조직은 시드를 고정해 생성한 합성 데이터입니다.',
+    bi:
+      '아파트 관리앱 매출을 기간·시도·규모·관리방식·서비스·단지명으로 걸러 보는 대시보드. 필터가 지표와 도표와 표를 전부 같은 조건으로 다시 계산합니다.',
     districts:
       '대한민국 245개 시군구의 인구 1만 명당 중개사무소 수를 육각 격자 카토그램으로. 자리가 밀린 정도와 빠진 11곳까지 적어 둡니다.',
   },
@@ -786,6 +788,94 @@ export const ko = {
     },
 
     back: '포토폴리오로',
+  },
+
+  /* THE FILTERABLE DASHBOARD.
+     Prose and labels only. Every number is computed in the browser from
+     public/data/bi/slice.json, so `pnpm check:bi` cannot check a percentage
+     in a sentence here against the data — which is why there are none. */
+  bi: {
+    heading: '매출 대시보드 · 필터',
+    scope:
+      '계약 단지 {complexes}곳, {months}개월. 분모는 국토교통부에 신고된 {tam}개 단지이고 그 숫자만 세어 본 것입니다 — 계약과 매출은 시드를 고정해 생성한 것입니다.',
+    static: '같은 데이터를 스크립트 없이 읽는 쪽',
+    needsScript:
+      '이 페이지의 필터는 자바스크립트로 동작합니다. 스크립트 없이 같은 데이터를 읽으려면 이쪽입니다 —',
+    back: '포토폴리오로',
+
+    synthetic:
+      '단지 이름·시도·시군구·법정동·준공연도는 국토교통부 신고 그대로입니다. 세대수는 신고에 없어 추정했습니다. 계약·단가·청구·이탈·영업조직·관리방식은 생성한 것이고 어떤 실제 거래에도 대응하지 않습니다.',
+    loading: '단지별 시계열을 받고 있습니다…',
+    failed: '데이터를 받지 못했습니다. 새로 고침해 보시고, 계속 안 되면 스크립트 없는 쪽을 보세요.',
+
+    filters: '조건',
+    range: '기간',
+    presetAll: '전체',
+    preset12: '최근 12개월',
+    preset6: '최근 6개월',
+    preset3: '최근 3개월',
+    from: '시작',
+    to: '종료',
+    sido: '시도',
+    tier: '규모',
+    mgmt: '관리방식',
+    mgmtDelegated: '위탁',
+    mgmtSelf: '자치',
+    service: '서비스',
+    search: '단지명 · 시군구',
+    searchHint: '예: 래미안, 강남구',
+    reset: '조건 초기화',
+    any: '전체',
+    matched: '조건에 맞는 단지 {n} / {total} · {from} ~ {to}',
+    matchedNone: '조건에 맞는 단지가 없습니다. 조건을 넓혀 보세요.',
+
+    kpiMrr: '월 반복 매출',
+    kpiGrowth: '기간 내 증감',
+    kpiComplexes: '마지막 달 청구 단지',
+    kpiArpu: '세대당',
+    kpiUsage: '사용량 비중',
+
+    chartSeries: '구독과 사용량',
+    chartSeriesNote:
+      '축이 하나입니다. 사용량은 구독의 몇 퍼센트라 두 번째 축을 주면 같은 높이로 부풀어 없는 상관을 만듭니다. 그래서 작게 그려져 있고, 그게 실제 모양입니다 — 비중은 위 지표에 숫자로 있습니다. 십자선은 달에 붙으므로 선을 겨눌 필요가 없습니다.',
+    legendSub: '구독',
+    legendUsage: '사용량',
+    chartService: '서비스 보유 단지',
+    chartTier: '규모별',
+    chartSido: '시도별 (상위 9)',
+
+    tableTitle: '단지',
+    tableMore: '아래로 {n}곳 더 — 조건을 좁히거나 정렬을 바꾸세요',
+    colName: '단지',
+    colDistrict: '시군구',
+    colTier: '규모',
+    colHouseholds: '세대',
+    colMgmt: '관리',
+    colServices: '서비스',
+    colMrr: '구독',
+    colUsage: '사용량 합',
+    estimated: '세대수는 신고에 없어 추정한 값입니다',
+
+    services: {
+      parking: '주차관제',
+      visitor: '방문차량',
+      access: '입주민 인증',
+      cctv: 'CCTV 연동',
+      billing: '관리비 수납',
+      notice: '알림',
+      community: '커뮤니티 예약',
+      defect: '하자보수 접수',
+      locker: '무인택배',
+      vote: '주민투표',
+      sms: 'SMS 대체발송',
+    },
+    tiers: {
+      sub: '150 미만',
+      small: '150–400',
+      mid: '400–900',
+      large: '900–2,000',
+      xlarge: '2,000 이상',
+    },
   },
 
   notFound: {

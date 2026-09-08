@@ -1,0 +1,37 @@
+/**
+ * Route chrome only. The board brings its own grid, the same way
+ * /portfolio/revenue does — and to the same width, so moving between the two
+ * routes does not resize the content.
+ */
+
+.route {
+  padding-block: clamp(1.5rem, 4vh, 3rem) 0;
+}
+
+.head,
+.foot,
+.noscript {
+  width: min(100% - 2rem, 84rem);
+  margin-inline: auto;
+}
+
+.title {
+  margin: 0.25rem 0 0;
+}
+
+.scope {
+  margin: 0.5rem 0 0.75rem;
+  max-width: 68ch;
+}
+
+/* Only ever seen with scripting off, so it carries its own emphasis rather
+   than relying on a class the rest of the page shares. */
+.noscript {
+  border-inline-start: 3px solid var(--accent);
+  padding: 0.75rem 0 0.75rem 0.875rem;
+  margin-block: 1rem;
+}
+
+.foot {
+  padding-block: 0 clamp(2rem, 6vh, 4rem);
+}

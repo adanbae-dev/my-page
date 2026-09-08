@@ -164,6 +164,18 @@ export default async function PortfolioPage({
             </Link>
           </p>
 
+          {/* Same data, opposite premise. The one above is an argument in a
+              fixed order with no controls; this one has no argument and
+              recomputes everything against whatever the reader filters to.
+              Two routes rather than one page with a toggle, because a page
+              that argues while its numbers move is the commonest bad
+              dashboard. */}
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/bi-dashboard')}>
+              {d.bi.heading} →
+            </Link>
+          </p>
+
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>
               {d.portfolio.cartogram.limitsHead}

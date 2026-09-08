@@ -37,7 +37,19 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const line = (s) => process.stdout.write(s + '\n')
 const problems = []
 
-/** Routes whose figures are built as markup rather than drawn by a script. */
+/**
+ * Routes whose figures are built as markup rather than drawn by a script.
+ *
+ * /portfolio/bi-dashboard IS ABSENT ON PURPOSE and the gap is worth naming.
+ * Its charts are React elements rendered in the browser after the data
+ * arrives, so the built HTML holds no geometry for this gate to measure —
+ * there is nothing in `out/` to read. What protects that page instead is the
+ * compiler: its marks are JSX with hashed CSS Module classes, so a class
+ * that stops existing is a type error rather than a silent no-op, which is
+ * the failure this gate exists to catch on the string-built figures. Label
+ * collisions there are not covered by anything, and that is a real hole
+ * rather than a solved problem.
+ */
 const PAGES = [
   'ko/portfolio/revenue.html',
   'en/portfolio/revenue.html',

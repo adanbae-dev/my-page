@@ -41,6 +41,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const line = (s) => process.stdout.write(s + '\n')
 const problems = []
 const notes = []
+const nfk = (v) => Number(v).toLocaleString('ko-KR')
 
 /**
  * Problems carry their section, and the report shows a few from each.
@@ -861,6 +862,153 @@ section('H 코호트·영업·본문')
         }
       }
     }
+  }
+}
+
+/* ==== I. the browser's copy ======================================== */
+
+section('I 클라이언트 슬라이스')
+
+/**
+ * public/data/bi/slice.json is a THIRD copy of the same numbers, and that is
+ * the whole reason it needs checking.
+ *
+ * lib/bi.data.ts holds aggregates, public/data/bi/series/ holds the base
+ * rows, and this holds the base rows again — denormalised, run-length
+ * encoded and folded together with the roster and the invented per-customer
+ * attributes so the browser makes one request instead of four. Every
+ * transformation in that sentence is a place the copy can quietly stop
+ * agreeing with its sources, and the page that reads it does all of its
+ * arithmetic in the browser where no gate can watch.
+ *
+ * So the RLE is expanded and compared month by month against the series
+ * files. If the two ever disagree, the filterable dashboard is reporting
+ * different revenue from the static one for the same slice, which is the
+ * worst failure either page has available.
+ */
+{
+  const path = join(ROOT, 'public', 'data', 'bi', 'slice.json')
+  const custPath = join(ROOT, 'public', 'data', 'bi', 'customers.json')
+  if (!existsSync(path) || !existsSync(custPath)) {
+    bad('public/data/bi/slice.json 또는 customers.json 이 없습니다 — build-bi-slice.mjs 를 돌리세요')
+  } else {
+    const sl = JSON.parse(readFileSync(path, 'utf8'))
+    const cust = new Map(JSON.parse(readFileSync(custPath, 'utf8')).map((c) => [c.i, c]))
+
+    if (sl.m.length !== T || sl.m[0] !== MONTHS[0] || sl.m[T - 1] !== MONTHS[T - 1]) {
+      bad(`슬라이스의 창 ${sl.m[0]}..${sl.m[sl.m.length - 1]} 이 BI_MONTHS 와 다릅니다`)
+    }
+    if (sl.sv.length !== B.services.length) {
+      bad(`슬라이스 서비스 ${sl.sv.length}종 ≠ 카탈로그 ${B.services.length}종`)
+    }
+    if (sl.tr.length !== R.tiers.length) bad(`슬라이스 티어 ${sl.tr.length} ≠ ${R.tiers.length}`)
+    if (sl.dt.length !== R.districts.length) bad(`슬라이스 시군구 ${sl.dt.length} ≠ ${R.districts.length}`)
+    if (sl.ad !== R.addressable) bad(`슬라이스 판매가능 하한 ${sl.ad} ≠ ${R.addressable}`)
+
+    /* Every complex that billed in the window has to be in the slice, and
+       nothing else may be. */
+    const billed = new Set()
+    for (const rows of series) for (const r of rows) billed.add(r.i)
+    if (sl.cx.length !== billed.size) {
+      bad(`슬라이스 단지 ${sl.cx.length} ≠ 창 안에서 청구된 단지 ${billed.size}`)
+    }
+
+    const expand = (pairs) => {
+      const out = []
+      for (const [v, n] of pairs) for (let k = 0; k < n; k++) out.push(v)
+      return out
+    }
+    const tierOfIdx = (hh) => R.tiers.findIndex((t) => t.to === 'Infinity' || hh < t.to)
+
+    let months = 0
+    for (const c of sl.cx) {
+      const home = roster.get(c.i)
+      if (!home) { bad(`슬라이스의 ${c.i} 가 명부에 없습니다`); continue }
+      if (!billed.has(c.i)) { bad(`슬라이스의 ${c.i} 는 창 안에서 청구되지 않았습니다`); continue }
+      if (c.h !== home.h) bad(`${c.i}: 세대수 ${c.h} ≠ 명부 ${home.h}`)
+      if (c.n !== home.n) bad(`${c.i}: 이름이 명부와 다릅니다`)
+      if (sl.dt[c.d]?.c !== home.code) bad(`${c.i}: 시군구 색인이 명부의 ${home.code} 를 가리키지 않습니다`)
+      if (c.t !== tierOfIdx(home.h)) bad(`${c.i}: 티어 색인 ${c.t} 가 ${home.h}세대와 안 맞습니다`)
+      const inv = cust.get(c.i)
+      if (!inv) bad(`${c.i}: customers.json 에 없습니다`)
+      else {
+        if (c.g !== inv.g) bad(`${c.i}: 관리방식 ${c.g} ≠ customers.json ${inv.g}`)
+        if (sl.rp[c.r] !== inv.r) bad(`${c.i}: 담당 색인이 ${inv.r} 을 가리키지 않습니다`)
+      }
+
+      const sub = expand(c.s)
+      if (sub.length !== c.u.length) bad(`${c.i}: 구독 ${sub.length}개월 ≠ 사용량 ${c.u.length}개월`)
+      for (let k = 0; k < sub.length; k++) {
+        const m = c.f + k
+        if (m >= T) { bad(`${c.i}: ${k}번째 값이 창을 넘어갑니다`); break }
+        const row = series[m].find((r) => r.i === c.i)
+        const wantS = row ? row.s : 0
+        const wantU = row ? row.u : 0
+        if (sub[k] !== wantS) bad(`${MONTHS[m]}: ${c.i} 슬라이스 구독 ${sub[k]} ≠ 행 ${wantS}`)
+        if (c.u[k] !== wantU) bad(`${MONTHS[m]}: ${c.i} 슬라이스 사용량 ${c.u[k]} ≠ 행 ${wantU}`)
+        months++
+        if (problems.length > 200) break
+      }
+      /* And nothing outside [f, f+len) may have billed — otherwise the dense
+         array silently drops a month the reader would never see. */
+      for (let m = 0; m < T; m++) {
+        const inArr = m >= c.f && m < c.f + sub.length
+        const inRows = series[m].some((r) => r.i === c.i)
+        if (inRows && !inArr) bad(`${MONTHS[m]}: ${c.i} 이 청구됐는데 슬라이스 배열 밖입니다`)
+      }
+      if (problems.length > 200) break
+    }
+
+    for (const c of sl.cx) {
+      for (const [svc, a, b] of c.k) {
+        if (svc < 0 || svc >= sl.sv.length) { bad(`${c.i}: 서비스 색인 ${svc}`); break }
+        if (a > b && b >= 0) bad(`${c.i}: 계약 구간 ${a}..${b} 가 뒤집혔습니다`)
+      }
+    }
+    /**
+     * The unfiltered slice has to reproduce the published aggregate.
+     *
+     * This is the check that matters most, because it is the one a reader can
+     * perform themselves: open /portfolio/bi-dashboard with no filters set
+     * and the headline MRR has to be the number /portfolio/revenue prints for
+     * the same month. Two pages built from the same data reporting different
+     * revenue for the same slice is the worst failure either of them has
+     * available, and nothing else here would catch it — the aggregates are
+     * checked against the series, and the slice is checked against the
+     * series, but the ARITHMETIC THE BROWSER DOES is checked by nothing.
+     *
+     * So it is done the way the browser does it: expand every RLE, sum the
+     * default view, compare against BI_MOVEMENT.
+     */
+    const monthly = new Array(T).fill(0)
+    const usage = new Array(T).fill(0)
+    const live = new Array(T).fill(0)
+    for (const c of sl.cx) {
+      const sub = expand(c.s)
+      for (let k = 0; k < sub.length; k++) {
+        const m = c.f + k
+        if (m >= T) break
+        if (sub[k] === 0 && (c.u[k] ?? 0) === 0) continue
+        monthly[m] += sub[k]
+        usage[m] += c.u[k] ?? 0
+        live[m] += 1
+      }
+    }
+    for (let m = 0; m < T; m++) {
+      const row = B.movement[m]
+      if (monthly[m] !== row.end) {
+        bad(`${MONTHS[m]}: 필터 없는 슬라이스 합 ${monthly[m]} ≠ BI_MOVEMENT.end ${row.end}`)
+      }
+      if (usage[m] !== row.usage) {
+        bad(`${MONTHS[m]}: 슬라이스 사용량 합 ${usage[m]} ≠ BI_MOVEMENT.usage ${row.usage}`)
+      }
+      if (live[m] !== row.complexes) {
+        bad(`${MONTHS[m]}: 슬라이스 청구 단지 ${live[m]} ≠ BI_MOVEMENT.complexes ${row.complexes}`)
+      }
+    }
+
+    notes.push(`슬라이스 ${nfk(sl.cx.length)}단지 · ${nfk(months)}개월분을 RLE 풀어 행과 대조`)
+    notes.push(`필터 없는 슬라이스 합이 ${T}개월 전부에서 BI_MOVEMENT 와 일치`)
   }
 }
 
