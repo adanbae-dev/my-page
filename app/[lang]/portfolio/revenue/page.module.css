@@ -1,0 +1,26 @@
+/**
+ * Route chrome only. The board brings its own grid.
+ *
+ * Wider than `.wrap`, which is one measure of text: a dashboard read by
+ * scanning needs the columns, and constraining it to reading width would
+ * stack nine figures into a single file and lose the one thing the layout is
+ * for. The width lives in RevenueBoard.module.css beside the grid it bounds.
+ */
+
+.route {
+  padding-block: clamp(1.5rem, 4vh, 3rem) 0;
+}
+
+.head,
+.foot {
+  width: min(100% - 2rem, 84rem);
+  margin-inline: auto;
+}
+
+.title {
+  margin: 0.25rem 0 0;
+}
+
+.foot {
+  padding-block: 0 clamp(2rem, 6vh, 4rem);
+}

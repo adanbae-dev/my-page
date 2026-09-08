@@ -45,6 +45,12 @@
     "There is no cheap win there — only a design concession, which is a",
     "different decision from this one.",
     "",
+    "ADDED a named exception for /portfolio/revenue: html 45056, total 323584. It is",
+    "the heaviest route on the site by a wide margin — 43.5 KB against the 31.5 KB",
+    "districts exception — and the first one whose weight is not a map. Nine figures",
+    "and 617 table cells is what a dashboard costs; the exception is named rather",
+    "than the shared budget being raised, so no other route inherits the room.",
+    "",
     "`total` was deliberately NOT raised. /ko/build sits at 292.5 KB of 296 and",
     "the css raise costs it about 0.8 KB, so it still fits. The ceiling stays",
     "where it is and the next thing that wants weight has to argue for itself.",
@@ -152,6 +158,13 @@
       "$why": "245 districts x (name, cell, brokers, population) drawn as a hexagon tiling of the country, the same 245 rows listed again in rank order, and a code per cell for the 읍면동 drill-down. The page IS the data. See the measurements in $comment above.",
       "html": 32256,
       "total": 314368
+    },
+    "/portfolio/revenue": {
+      "$why": "Nine figures on one route, and the route IS the figures. Measured, not predicted: html 43.5 KB gzip on /ko, total 316.1 KB. The ceilings are 44 and 318 KB — about a kilobyte and a half of headroom each, which is one more figure, not one more page. What is in it — 36 months of stepped MRR and its movement decomposition, 36 monthly rows in one table, 11 small multiples over 36 points each, the 245-cell district tiling with a title per cell, a 12-quarter cohort triangle drawn twice, 19 quota bars, and a table under every figure because a value reachable only by pointing at a mark is not reachable. About 62% of the raw bytes are the RSC flight payload, which duplicates the markup for client-side navigation and is not something this page chooses.",
+      "$cut": "Three things were cut before asking for this exception rather than after. Monthly cohorts became quarterly: 1,433 marks to 257, and the curves went from resting on ~25 accounts each to ~75, so it was a statistics fix that happened to be a weight fix. The MRR panel and the movement panel merged into one, which removed a second copy of the same 36-row table (288 cells) and is the better reading anyway — the columns only argue anything while the line is in view. The cohort cells kept their titles because the table under them holds only each cohort's last column.",
+      "$kept": "The 245 titles on the map and the 617 table cells stayed. Both are the page's only non-pointer path to its values, and this site has a text alternative for every figure it has ever shipped.",
+      "html": 45056,
+      "total": 325632
     },
     "/portfolio/prices": {
       "$why": "The same 245-cell tiling under a diverging scale, plus its legend and the drill-down codes. Nine fills in two hues instead of eight in one.",

@@ -1,0 +1,496 @@
+/**
+ * The dashboard's own layout, which is not this site's layout.
+ *
+ * Every other page here is a column: one measure of text wide, a figure at a
+ * time, vertical rhythm doing the work. This is a GRID, because the page is
+ * read by scanning rather than by reading — the question a dashboard answers
+ * is usually "is anything wrong", and that is answered by seeing eight
+ * figures at once, not by arriving at each in turn.
+ *
+ * WHAT DOES NOT CHANGE is the palette, the type scale and the rules. Two
+ * colours, both measured against both grounds by `pnpm check:contrast`. The
+ * ramp below is `color-mix` toward `--ground` rather than a second set of
+ * dark-mode values, so it inverts with the tone instead of being maintained
+ * twice — the same arrangement PriceCartogram.module.css uses, and for the
+ * same reason.
+ *
+ * CLASSES INSIDE `:global()` ARE ON MARKUP BUILT IN lib/bi.figure.ts. CSS
+ * Modules cannot hash a class name that was written into a string at build
+ * time, so the marks are styled through their container. Renaming one here
+ * without renaming it there fails silently — which is why the container
+ * classes are specific (`.svg`, `.cells`, `.smSvg`) rather than one shared
+ * wrapper.
+ */
+
+.board {
+  --panel-gap: clamp(0.75rem, 2vw, 1.5rem);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--panel-gap);
+  align-items: start;
+  width: min(100% - 2rem, 84rem);
+  margin-inline: auto;
+  padding-block: clamp(1rem, 3vh, 2rem) clamp(2rem, 6vh, 4rem);
+}
+
+/* ---- the band that says what is real ------------------------------ */
+
+/**
+ * Full width, at the top, in the accent.
+ *
+ * Not a footnote and not a tooltip. Every number below it is invented, and
+ * the one failure this page cannot survive is a reader taking it for a real
+ * company's revenue. `pnpm check:bi` asserts the three strings exist; this is
+ * what makes the first one impossible to miss.
+ */
+.banner {
+  grid-column: 1 / -1;
+  border-inline-start: 3px solid var(--accent);
+  padding: 0.75rem 0 0.75rem 0.875rem;
+}
+
+.bannerHead {
+  color: var(--accent-text);
+  margin: 0;
+}
+
+.bannerBody {
+  margin: 0.25rem 0 0;
+  max-width: 62ch;
+}
+
+/* ---- the five numbers --------------------------------------------- */
+
+.tiles {
+  grid-column: 1 / -1;
+}
+
+.asOf {
+  margin: 0 0 0.5rem;
+}
+
+.tileRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--panel-gap);
+  margin: 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+}
+
+.tile {
+  min-width: 0;
+}
+
+.tileTerm {
+  margin: 0;
+}
+
+/**
+ * Proportional figures, not tabular.
+ *
+ * These sit alone rather than in a column, and equal-width digits make a
+ * short number read loose at this size. `tabular-nums` is on the tables and
+ * the axis ticks below, where digits do line up.
+ */
+.tileValue {
+  margin: 0.125rem 0 0;
+  font-size: clamp(1.5rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  font-variant-numeric: proportional-nums;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.tileFoot {
+  margin: 0.125rem 0 0;
+}
+
+/* ---- a panel ------------------------------------------------------ */
+
+.panel {
+  min-width: 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.panelTitle {
+  margin: 0;
+}
+
+.panelNote {
+  margin: 0.375rem 0 0.75rem;
+  max-width: 68ch;
+}
+
+.subTitle,
+.footNote {
+  margin: 0.5rem 0 0.25rem;
+}
+
+/* The second and third figures inside one panel. A rule rather than a size
+   step: they are peers of the figure above them, not subordinate to it. */
+.subHead {
+  margin: 1.25rem 0 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--panel-gap);
+}
+
+/* ---- figures ------------------------------------------------------- */
+
+.svg,
+.svgShort,
+.map,
+.grid {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Recessive, solid, one shade off the surface. Never dashed. */
+.svg :global(.gridline),
+.svg :global(.zero) {
+  stroke: var(--rule);
+  stroke-width: 1;
+  fill: none;
+}
+
+.svg :global(.zero) {
+  stroke: var(--muted);
+}
+
+.svg :global(.tick) {
+  fill: var(--muted);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+.svg :global(.lead) {
+  fill: var(--figure);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Subscription: a filled step, thin line on top. */
+.svg :global(.mrrFill) {
+  fill: color-mix(in oklab, var(--accent) 22%, var(--ground));
+  stroke: none;
+}
+
+.svg :global(.mrrLine) {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.svgShort :global(.usageLine) {
+  fill: none;
+  stroke: var(--decline);
+  stroke-width: 2;
+}
+
+.svgShort :global(.usageDot) {
+  fill: var(--decline);
+}
+
+.svgShort :global(.tick) {
+  fill: var(--muted);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Polarity. The only two hues the site has, on either side of a real zero. */
+.svg :global(.gain) {
+  fill: var(--accent);
+}
+
+.svg :global(.loss) {
+  fill: var(--decline);
+}
+
+.svg :global(.ladder) {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+/**
+ * The second ladder is the same colour, dashed.
+ *
+ * Two series and one hue: identity comes from the dash and from the label at
+ * each line's end, not from colour. A second hue was available — `--decline`
+ * — and was not used, because it is spoken for: on this page it means the
+ * losing half of a diverging scale, and reusing it here for "the other
+ * bundle" would make the same colour mean two things on one screen.
+ */
+.svg :global(.ladder.l1) {
+  stroke-dasharray: 5 3;
+}
+
+.svg :global(.ladderDot) {
+  fill: var(--accent);
+  stroke: var(--ground);
+  stroke-width: 2;
+}
+
+.svg :global(.ladderLabel) {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.svg :global(.tierBar) {
+  fill: var(--accent);
+}
+
+.svg :global(.tierName) {
+  fill: var(--figure);
+}
+
+.svg :global(.tierValue) {
+  fill: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- eleven small multiples --------------------------------------- */
+
+.multiples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.75rem var(--panel-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.multiple {
+  min-width: 0;
+}
+
+.mName,
+.mValue {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.smSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.smSvg :global(.smFill) {
+  fill: color-mix(in oklab, var(--accent) 20%, var(--ground));
+}
+
+.smSvg :global(.smLine) {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+/* ---- the map and the cohort grids --------------------------------- */
+
+/**
+ * Magnitude: one hue, six steps, mixed toward the ground.
+ *
+ * Six and not eight. Past about seven classes adjacent bins stop being
+ * separable and the reader falls back on the tooltip, which is the point at
+ * which the colour has stopped doing work. `.bna` is the neutral rule colour
+ * and means "nothing here to sell to" — a class, not a hole: the country's
+ * outline is what makes the grid legible, and cutting cells out of it to
+ * mean "no market" reads as "no sales".
+ */
+.cells :global(.b0) { fill: color-mix(in oklab, var(--accent) 14%, var(--ground)); }
+.cells :global(.b1) { fill: color-mix(in oklab, var(--accent) 32%, var(--ground)); }
+.cells :global(.b2) { fill: color-mix(in oklab, var(--accent) 50%, var(--ground)); }
+.cells :global(.b3) { fill: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
+.cells :global(.b4) { fill: color-mix(in oklab, var(--accent) 86%, var(--ground)); }
+.cells :global(.b5) { fill: var(--accent); }
+.cells :global(.bna) { fill: var(--rule); }
+
+.grid :global(.b0) { fill: color-mix(in oklab, var(--accent) 14%, var(--ground)); }
+.grid :global(.b1) { fill: color-mix(in oklab, var(--accent) 32%, var(--ground)); }
+.grid :global(.b2) { fill: color-mix(in oklab, var(--accent) 50%, var(--ground)); }
+.grid :global(.b3) { fill: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
+.grid :global(.b4) { fill: color-mix(in oklab, var(--accent) 86%, var(--ground)); }
+.grid :global(.b5) { fill: var(--accent); }
+
+.map {
+  max-width: 26rem;
+}
+
+/* The legend swatches — the same six steps, as blocks. */
+.rampBlock {
+  margin-block-start: 0.75rem;
+}
+
+.ramp,
+.rampScale {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ramp li {
+  height: 0.5rem;
+}
+
+.rampScale li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.b0 { background: color-mix(in oklab, var(--accent) 14%, var(--ground)); }
+.b1 { background: color-mix(in oklab, var(--accent) 32%, var(--ground)); }
+.b2 { background: color-mix(in oklab, var(--accent) 50%, var(--ground)); }
+.b3 { background: color-mix(in oklab, var(--accent) 68%, var(--ground)); }
+.b4 { background: color-mix(in oklab, var(--accent) 86%, var(--ground)); }
+.b5 { background: var(--accent); }
+.bna { background: var(--rule); }
+
+/* ---- legends ------------------------------------------------------- */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.key {
+  width: 0.75rem;
+  height: 0.5rem;
+  flex: none;
+}
+
+.keyGain { background: var(--accent); }
+.keyLoss { background: var(--decline); }
+
+/* The two ladders are one hue apart only by dash, so the keys are too. */
+.keyEntry {
+  height: 2px;
+  background: var(--accent);
+}
+
+.keyCore {
+  height: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--accent) 0 5px,
+    transparent 5px 8px
+  );
+}
+
+/* ---- the table under every figure --------------------------------- */
+
+/**
+ * `<details>`, which the browser implements.
+ *
+ * Every figure on this page has a table twin, because a value reachable only
+ * by pointing at a mark is not reachable. Open by default they would be most
+ * of the page's markup and all of its scroll; behind a disclosure they cost
+ * one element and no script. The route's JavaScript budget is 11 KB of gzip
+ * and none of it is spent here.
+ */
+.table {
+  margin-block-start: 0.75rem;
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.tableSummary {
+  padding-block: 0.5rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.tableSummary:hover {
+  color: var(--accent-text);
+}
+
+.tableScroll {
+  overflow-x: auto;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.dataTable :global(th),
+.dataTable :global(td) {
+  text-align: end;
+  padding: 0.25rem 0.5rem 0.25rem 0;
+  border-block-end: var(--rule-w) solid var(--rule);
+  white-space: nowrap;
+}
+
+.dataTable :global(th[scope='row']) {
+  text-align: start;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.dataTable :global(thead) :global(th) {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--ground);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.dataTable :global(thead) :global(th:first-child) {
+  text-align: start;
+}
+
+.num {
+  text-align: end;
+}
+
+.provenance {
+  grid-column: 1 / -1;
+  margin: 0;
+  border-block-start: var(--rule-w) solid var(--rule);
+  padding-block-start: 0.75rem;
+}
+
+/* ---- motion ------------------------------------------------------- */
+
+/**
+ * The figures do not animate.
+ *
+ * styles/interaction.css gives this site a reveal vocabulary and it is used
+ * on the essay pages, where a figure arrives once as part of an argument. A
+ * dashboard is opened repeatedly to check something, and a chart that has to
+ * finish drawing before it can be read is a chart that wastes the reader's
+ * time on every visit. Nothing here is behind a transition.
+ */

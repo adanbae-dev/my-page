@@ -184,6 +184,8 @@ export const en = {
       'Apartment price change by district, measured between matched complexes. A diverging cartogram on the same grid as the brokerage map.',
     privacy:
       'What this site learns about a visitor and where it goes. It sets no cookies at all, and that claim is checkable against the source rather than asserted.',
+    revenue:
+      'A BI dashboard for apartment management app revenue. The complex roster and its geography are real filings; every contract, price, invoice and salesperson is generated from a fixed seed.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
   },
@@ -620,6 +622,138 @@ export const en = {
     revisionHeading: 'Revisions',
     revisionBody:
       'Every change to this document is a commit in the repository. The date above moves only when the substance changes, never for a typo — putting a new date on an unchanged policy is a false statement about it.',
+  },
+
+  /* THE REVENUE DASHBOARD. See the note in ko.ts — the same gate reads both
+     locales, and it fails the build if a percentage here is not a value the
+     data holds or if one of the three `synthetic*` keys goes missing. */
+  revenue: {
+    heading: 'Apartment management app revenue',
+    syntheticHero: 'The roster and its geography are real. The contracts and the revenue are not.',
+    syntheticChart:
+      'Complex names, provinces, districts, 법정동 and completion years are copied from 국토교통부 apartment transaction filings. Household counts are not in the filings and are estimated. Contracts, prices, invoices, cancellations and the sales organisation are generated from a fixed seed and correspond to nothing that happened — what a management app charges a complex does not exist in public form. Which is why the denominator of the penetration rate is the one figure here that was counted.',
+    syntheticPanel: 'Contracts and revenue are generated; the complexes and the household denominator are filed and estimated',
+    asOf: 'As of',
+
+    kpiMrr: 'Monthly recurring revenue',
+    kpiGrowth: 'Year over year',
+    kpiPenetration: 'Penetration of addressable',
+    kpiChurn: 'Gross revenue churn',
+    kpiCoverage: 'New against churned',
+    kpiNote: 'The five headline figures',
+
+    mrrTitle: 'Monthly recurring revenue',
+    mrrNote:
+      'A step, not a line. A per-household fee times a household count that does not change is the same number every month until the contract changes, and joining the points with straight segments draws a climb through values the business never billed. That growth arrives in discrete signings is what the step carries.',
+    mrrSummary:
+      'Thirty-six months of subscription revenue as a stepped area. It rises in every month, with usage billings on their own scale beneath it.',
+    usageTitle: 'Usage billings, on their own scale',
+
+    flowTitle: 'Revenue movement',
+    flowNote:
+      'The line above cannot lie about its own shape but it can hide what is under it. Subscription revenue rises in all thirty-six months while a substantial share of the closing balance left over the same window. New business covers it every month. How much left is what these columns say.',
+    flowSummary:
+      'Monthly revenue movement as columns above and below zero: gains above, contraction and churn below.',
+    flowGain: 'New · winback · expansion',
+    flowLoss: 'Contraction · churn',
+
+    ladderTitle: 'Price per household falls as complexes grow',
+    ladderNote:
+      'The bundle is held fixed and only household count varies. The realised tier averages cannot carry this claim: they mix the price structure with whatever those complexes happen to hold, and the largest tier has fewer than twenty accounts, so its average moves when one complex adds a service. Each bundle is therefore indexed to its own list price. The question is not what a bundle costs; it is how far, and in which direction, what a complex actually pays departs from the price list.',
+    ladderSummary:
+      'Two reference bundles priced up a household ladder, each as a share of its own list rate. Both fall monotonically.',
+    ladderEntry: 'entry · notices only (list 150/household)',
+    ladderCore: 'core · notices, collection, parking (list 950/household)',
+    ladderFloored: 'Dots mark where the monthly floor, not the rate card, set the price · x-axis is households',
+
+    tierTitle: 'What the tiers actually billed',
+    tierNote:
+      'Per complex on the left, per household on the right. The two run in opposite directions. A tier that departs from the ladder beside it is buying more or less than the reference bundle, which is a different finding and needs its own sample size — so the account count sits in the table.',
+    tierPerComplex: 'Monthly revenue per complex',
+    tierPerHousehold: 'Monthly revenue per household',
+
+    attachTitle: 'Attach rate by service',
+    attachNote:
+      'Eleven panels rather than eleven hues. The site has two colours; eleven series on one axis would need nine more, and generating them puts pairs on the chart that a colourblind reader — or a monochrome printer — cannot separate. Faceting costs the ability to read one service against another at a glance and buys the ability to read each shape at all. The scale is the same in every panel: per-panel scaling would make a service almost nobody holds and one that more than half of them hold draw identical curves.',
+    attachSummary:
+      'Attach rate over time for eleven services, faceted into eleven small panels on one shared scale.',
+
+    penTitle: 'Penetration by district',
+    penNote:
+      'The same 245 hexagons the brokerage and price maps use, borrowed rather than recomputed: the one thing a reader should be able to assume about two maps on one site is that the same shape means the same place. The denominator is not every filed complex but the ones large enough to have a management office.',
+    penSummary:
+      'Contracted complexes as a share of the addressable market, on a 245-cell hexagon cartogram in one hue and six classes.',
+    penLegend: 'Class edges (%) and districts in each',
+    penNone: 'None to sell to',
+
+    cohortTitle: 'Cohort retention',
+    cohortNote:
+      'A triangle rather than a grid, because that is the shape of the data: a cohort that signed two months before the window ends has two months of history and no more, and filling the rest with anything would invent it. Complexes still billing on the left; revenue against the cohort\'s own first month on the right. The two come apart, because the survivors buy more, and one grid cannot hold that gap.',
+    cohortKept: 'Complexes still billing',
+    cohortValue: 'Revenue against first month',
+
+    attainTitle: 'Quota attainment',
+    attainNote:
+      'The bars grow from the 100 line rather than from the left edge. From the left edge a rep just short of quota and one just past it draw almost the same bar and the sign disappears, which is the only thing the chart is for.',
+    attainSummary:
+      'Quota attainment per salesperson, as bars either side of the 100 per cent line.',
+
+    tableOpen: 'Read as numbers',
+    colMonth: 'Month',
+    colMrr: 'Subscription',
+    colUsage: 'Usage',
+    colComplexes: 'Complexes',
+    colNew: 'New',
+    colWinback: 'Winback',
+    colExpansion: 'Expansion',
+    colContraction: 'Contraction',
+    colChurn: 'Churn',
+    colHouseholds: 'Households',
+    colPerComplex: 'Per complex',
+    colPerHousehold: 'Per household',
+    colFloored: 'Floored',
+    colTier: 'Tier',
+    colService: 'Service',
+    colFirst: 'First',
+    colLast: 'Last',
+    colContracts: 'Contracts',
+    colDistrict: 'District',
+    colSido: 'Province',
+    colAddressable: 'Addressable',
+    colRate: 'Rate',
+    colCohort: 'Cohort',
+    colSize: 'Size',
+    colKept: 'Kept',
+    colValue: 'Value',
+    colRep: 'Rep',
+    colRank: 'Rank',
+    colRegion: 'Region',
+    colAccounts: 'Accounts',
+    colQuota: 'Quota',
+    colAttainment: 'Attainment',
+
+    services: {
+      parking: 'Parking control',
+      visitor: 'Visitor vehicles',
+      access: 'Resident access',
+      cctv: 'CCTV feed',
+      billing: 'Fee collection',
+      notice: 'Notices',
+      community: 'Facility booking',
+      defect: 'Defect intake',
+      locker: 'Parcel lockers',
+      vote: 'Resident voting',
+      sms: 'SMS fallback',
+    },
+    tiers: {
+      sub: 'Under 150',
+      small: '150–400',
+      mid: '400–900',
+      large: '900–2,000',
+      xlarge: '2,000 and over',
+    },
+
+    back: 'Back to the portfolio',
   },
 
   notFound: {

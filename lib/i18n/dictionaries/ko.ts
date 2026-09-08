@@ -196,6 +196,8 @@ export const ko = {
       '같은 단지끼리 짝지어 잰 시군구별 아파트 가격변동. 하락과 상승이 색으로 갈리는 발산형 카토그램이고, 격자는 중개사무소 지도와 같습니다.',
     privacy:
       '이 사이트가 방문자에 대해 무엇을 알게 되고 그것이 어디로 가는지. 쿠키는 하나도 사용하지 않으며, 그 사실은 이 사이트의 소스로 확인할 수 있습니다.',
+    revenue:
+      '아파트 관리앱 매출 BI 대시보드. 단지 명부와 위치는 국토부 실거래가에서 온 실제 데이터이고, 계약·단가·매출·영업조직은 시드를 고정해 생성한 합성 데이터입니다.',
     districts:
       '대한민국 245개 시군구의 인구 1만 명당 중개사무소 수를 육각 격자 카토그램으로. 자리가 밀린 정도와 빠진 11곳까지 적어 둡니다.',
   },
@@ -648,6 +650,142 @@ export const ko = {
     revisionHeading: '개정',
     revisionBody:
       '이 문서가 바뀐 이력은 저장소의 커밋으로 남습니다. 내용이 실제로 달라질 때만 위의 개정일을 고치고, 오타 수정으로는 고치지 않습니다 — 바뀌지 않은 방침에 새 날짜를 붙이는 것은 사실이 아닌 진술이기 때문입니다.',
+  },
+
+  /* THE REVENUE DASHBOARD.
+     Prose only. Every number the page shows is computed in lib/bi.data.ts and
+     lib/bi.figure.ts, and `pnpm check:bi` fails the build if a percentage in
+     a sentence here is not a value the data holds — so the sentences below
+     carry no percentages at all except 100, which is the rate card's own
+     baseline. The three `synthetic*` keys are the places the page says which
+     half is real; the same gate fails if one of them disappears. */
+  revenue: {
+    heading: '아파트 관리앱 매출',
+    syntheticHero: '명부와 위치는 실제 · 계약과 매출은 전부 만든 것',
+    syntheticChart:
+      '단지 이름·시도·시군구·법정동·준공연도는 국토교통부 아파트 실거래 신고에서 그대로 옮긴 것입니다. 세대수는 신고에 없어서 추정했습니다. 계약·단가·청구·이탈·영업조직은 시드를 고정해 생성한 것이고 어떤 실제 거래에도 대응하지 않습니다 — 관리앱이 단지에 받는 금액은 공개된 형태로 존재하지 않기 때문입니다. 그래서 침투율의 분모만이 세어 본 숫자입니다.',
+    syntheticPanel: '계약·매출은 합성 · 단지와 세대수 분모는 실측·추정',
+    asOf: '기준 시점',
+
+    kpiMrr: '월 반복 매출',
+    kpiGrowth: '전년 동월 대비',
+    kpiPenetration: '판매가능 단지 침투율',
+    kpiChurn: '매출 이탈률',
+    kpiCoverage: '이탈 대비 신규',
+    kpiNote: '이 대시보드의 머리 숫자 다섯 개',
+
+    mrrTitle: '월 반복 매출',
+    mrrNote:
+      '선이 아니라 계단입니다. 세대당 요금 × 변하지 않는 세대수는 계약이 바뀔 때까지 매달 같은 금액이고, 점을 직선으로 이으면 회사가 청구한 적 없는 값을 지나갑니다. 성장이 서명 단위로 도착한다는 사실이 그 계단에 있습니다.',
+    mrrSummary:
+      '36개월 구독 매출을 계단 면적으로 그린 도표. 한 달도 내려가지 않고 오르며, 아래 별도 축에 사용량 과금을 함께 둡니다.',
+    usageTitle: '사용량 과금 · 별도 축척',
+
+    flowTitle: '매출 이동',
+    flowNote:
+      '위 선은 자기 모양에 대해서는 거짓말할 수 없지만 그 아래에 무엇이 있는지는 가립니다. 구독 매출은 36개월 내내 오르는데, 같은 기간에 떠난 매출은 기말 잔액의 상당 부분입니다. 신규가 매달 그것을 덮습니다. 얼마가 떠났는지는 이 기둥들이 말합니다.',
+    flowSummary:
+      '월별 매출 증감을 0선 위아래로 그린 기둥 도표. 위는 신규·윈백·확장, 아래는 축소·이탈입니다.',
+    flowGain: '신규 · 윈백 · 확장',
+    flowLoss: '축소 · 이탈',
+
+    ladderTitle: '규모가 커지면 세대당 단가가 내려간다',
+    ladderNote:
+      '번들을 고정하고 세대수만 올린 것입니다. 티어별 실현 평균으로는 이 주장을 할 수 없습니다 — 그 평균은 가격 구조와 그 단지들이 마침 무엇을 쓰는지를 섞고, 최상위 티어는 계좌가 스무 개도 안 되어 한 단지가 서비스를 하나 더하면 움직입니다. 그래서 각 번들을 자기 정가로 지수화했습니다. 질문은 번들이 얼마인지가 아니라, 단지가 실제로 내는 값이 정가에서 어느 방향으로 얼마나 벗어나는지입니다.',
+    ladderSummary:
+      '두 개의 참조 번들을 세대수 사다리 위에서 각자의 정가 대비 비율로 그린 선 도표. 둘 다 단조 하락합니다.',
+    ladderEntry: 'entry · 알림만 (정가 150원/세대)',
+    ladderCore: 'core · 알림+수납+주차 (정가 950원/세대)',
+    ladderFloored: '점 = 월 최소요금이 가격을 결정한 구간 · 가로축은 세대수',
+
+    tierTitle: '티어가 실제로 청구한 것',
+    tierNote:
+      '왼쪽은 단지당, 오른쪽은 세대당입니다. 두 막대는 반대 방향으로 갑니다. 옆의 사다리와 어긋나는 티어는 참조 번들보다 더 사거나 덜 사고 있는 것이고, 그건 다른 발견이라 자기 표본 크기가 따로 필요합니다. 그래서 표에 단지 수를 함께 둡니다.',
+    tierPerComplex: '단지당 월 매출',
+    tierPerHousehold: '세대당 월 매출',
+
+    attachTitle: '서비스별 부착율',
+    attachNote:
+      '색조 열한 개가 아니라 칸 열한 개입니다. 이 사이트가 가진 색은 두 개이고, 한 축에 열한 계열을 올리려면 아홉 개를 만들어야 하는데 그러면 색각 이상이나 흑백 인쇄에서 구별되지 않는 짝이 도표에 올라갑니다. 칸을 나누면 서비스끼리 한눈에 비교하는 것을 잃고 각각의 모양을 읽는 것을 얻습니다. 축척은 모든 칸이 같습니다 — 칸마다 따로 맞추면 거의 안 쓰이는 서비스와 절반 넘는 단지가 쓰는 서비스가 같은 곡선으로 그려집니다.',
+    attachSummary:
+      '서비스 열한 종의 부착율 추이를 같은 축척의 작은 칸 열한 개로 나눠 그린 도표.',
+
+    penTitle: '시군구별 침투율',
+    penNote:
+      '중개사무소 지도와 가격 지도가 쓰는 245개 육각 격자를 그대로 가져왔습니다. 배치를 다시 계산하지 않은 이유는, 한 사이트의 두 지도에 대해 독자가 당연히 기대할 수 있는 것은 같은 모양이 같은 곳을 뜻한다는 것이기 때문입니다. 분모는 신고된 전체 단지가 아니라 관리사무소를 둘 만한 규모의 단지입니다.',
+    penSummary:
+      '판매가능 단지 대비 계약 단지 비율을 245개 시군구 육각 격자에 단일 색조 여섯 계급으로 그린 카토그램.',
+    penLegend: '계급 경계 (%) 와 시군구 수',
+    penNone: '대상 없음',
+
+    cohortTitle: '코호트 리텐션',
+    cohortNote:
+      '격자가 아니라 삼각형인 이유는 데이터가 그 모양이기 때문입니다. 창이 끝나기 두 달 전에 계약한 코호트는 두 달의 이력을 가지고 그게 전부이며, 나머지를 무엇으로든 채우면 그건 만들어낸 것입니다. 왼쪽은 남아 있는 단지 비율, 오른쪽은 그 코호트의 첫 달 대비 매출입니다. 둘은 갈라집니다 — 살아남은 쪽이 더 사기 때문입니다. 그 격차가 하나의 격자에는 담기지 않습니다.',
+    cohortKept: '남아 있는 단지',
+    cohortValue: '첫 달 대비 매출',
+
+    attainTitle: '영업 할당 달성',
+    attainNote:
+      '막대가 왼쪽 끝이 아니라 100선에서 자랍니다. 왼쪽에서 자라면 할당에 조금 못 미친 사람과 조금 넘긴 사람이 거의 같은 막대를 그리고 부호가 사라지는데, 이 도표는 그 부호만 보기 위한 것입니다.',
+    attainSummary:
+      '영업사원별 할당 달성률을 100% 기준선 양쪽으로 그린 막대 도표.',
+
+    tableOpen: '숫자로 보기',
+    colMonth: '월',
+    colMrr: '구독 매출',
+    colUsage: '사용량',
+    colComplexes: '단지',
+    colNew: '신규',
+    colWinback: '윈백',
+    colExpansion: '확장',
+    colContraction: '축소',
+    colChurn: '이탈',
+    colHouseholds: '세대',
+    colPerComplex: '단지당',
+    colPerHousehold: '세대당',
+    colFloored: '최소요금',
+    colTier: '티어',
+    colService: '서비스',
+    colFirst: '처음',
+    colLast: '마지막',
+    colContracts: '계약',
+    colDistrict: '시군구',
+    colSido: '시도',
+    colAddressable: '판매가능',
+    colRate: '침투율',
+    colCohort: '코호트',
+    colSize: '규모',
+    colKept: '잔존',
+    colValue: '매출비',
+    colRep: '담당',
+    colRank: '직급',
+    colRegion: '본부',
+    colAccounts: '담당 단지',
+    colQuota: '할당',
+    colAttainment: '달성',
+
+    services: {
+      parking: '주차관제',
+      visitor: '방문차량',
+      access: '입주민 인증',
+      cctv: 'CCTV 연동',
+      billing: '관리비 수납',
+      notice: '알림',
+      community: '커뮤니티 예약',
+      defect: '하자보수 접수',
+      locker: '무인택배',
+      vote: '주민투표',
+      sms: 'SMS 대체발송',
+    },
+    tiers: {
+      sub: '150세대 미만',
+      small: '150–400',
+      mid: '400–900',
+      large: '900–2,000',
+      xlarge: '2,000 이상',
+    },
+
+    back: '포토폴리오로',
   },
 
   notFound: {

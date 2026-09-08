@@ -153,6 +153,17 @@ export default async function PortfolioPage({
             </Link>
           </p>
 
+          {/* The only one of these that is not built on public filings, and
+              it says so in its first line. It is here because a portfolio
+              that only holds maps of open data holds one kind of problem —
+              and because the revenue a product actually earns is the shape
+              of question this archive otherwise has no example of. */}
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/revenue')}>
+              {d.revenue.heading} →
+            </Link>
+          </p>
+
           <div className={styles.limits}>
             <p className={cx('label', styles.limitsHead)}>
               {d.portfolio.cartogram.limitsHead}
