@@ -45,6 +45,14 @@
     "There is no cheap win there — only a design concession, which is a",
     "different decision from this one.",
     "",
+    "RAISED /build html to 25600 as a NAMED exception, not a shared raise. Measured",
+    "24,842 B on /ko against 24,000. The page had been over the gate at HEAD for some",
+    "time before it was noticed, which is worth recording: this gate only runs after a",
+    "build, and the route that reports the repository's own health was the one quietly",
+    "failing it. Its self-cap (ROW_CHAR_BUDGET, already lowered from 2600 to 1900) is",
+    "spent — the remaining weight is the perf table, the phases and the prose, so",
+    "lowering the dial again would delete the commit record to pay for something else.",
+    "",
     "ADDED a named exception for /portfolio/revenue: html 45056, total 323584. It is",
     "the heaviest route on the site by a wide margin — 43.5 KB against the 31.5 KB",
     "districts exception — and the first one whose weight is not a map. Nine figures",
@@ -154,6 +162,12 @@
     "always had to live."
   ],
   "overrides": {
+    "/build": {
+      "$why": "Measured: html 24,842 B gzip on /ko and 24,815 B on /en, against a 24,000 B budget — over by 842 B, about 3.5%. `total` is 295.3 KB of 303.6 and is NOT raised; only html moves. The ceiling is 25,600 B, which is 758 B of headroom rather than a round-up: the page's own record is capped by ROW_CHAR_BUDGET, so it does not creep, and the next thing that wants room here still has to argue for it.",
+      "$whyNotTheDial": "app/[lang]/build/page.tsx caps its commit record and the cap has already been spent. Its comment records the history: a row COUNT lowered 90 to 64 to 52 to 38, failing this gate in between, then replaced by a CHARACTER budget because a row's weight is its subject and its links and those vary fourfold. That budget was set at 2600 and is now 1900. Turning it down a third time would strip the commit record — which is the page's whole subject — to pay for weight that is no longer in the commit record. The remainder is the perf table, the phase roster and the prose, none of which has a dial.",
+      "$whyNotGlobal": "A named exception rather than raising `budgets.html`. Over 130 essay routes fit the 24,000 B budget with room (the eli5 pages run 9 to 17 KB); raising the shared ceiling would hand every one of them a kilobyte nobody asked for, which is the ratchet the note below refuses for `total`.",
+      "html": 25600
+    },
     "/portfolio/districts": {
       "$why": "245 districts x (name, cell, brokers, population) drawn as a hexagon tiling of the country, the same 245 rows listed again in rank order, and a code per cell for the 읍면동 drill-down. The page IS the data. See the measurements in $comment above.",
       "html": 32256,
