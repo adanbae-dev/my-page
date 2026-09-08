@@ -412,23 +412,43 @@ for (const region of REGIONS) {
 /**
  * Which complexes ever sign, and when.
  *
- * Selection is by score within tier rather than uniformly at random: a
- * delegated complex is far likelier to sign than a self-managed one of the
- * same size, and inside a tier the bigger complexes go first. The tier
- * targets then fix how many of each are taken, so the resulting penetration
- * curve by size is a stated intention rather than an emergent accident.
+ * WEIGHTED SAMPLING, NOT A RANKING, and the difference was a defect worth
+ * recording. The first version scored every complex — delegated management
+ * worth 1.9x, bigger worth more, times a random factor in a 0.55 to 1.45
+ * band — sorted by that score and took the top N of each tier. The
+ * multiplier was 1.9 and the random band only spanned 2.6x, so delegated
+ * complexes swept the top of every tier: the customer book came out
+ * 1,240 delegated and ZERO self-managed. Which made CHURN_SELF_MULT, the
+ * declared 2x churn for resident-council management, dead code that had
+ * never once fired, and would have given the filterable dashboard a
+ * management filter with one permanently empty option.
+ *
+ * A ranking with noise is not a sample. Efraimidis-Spirakis fixes it in one
+ * line: key each complex `u^(1/w)` for a uniform `u`, take the top N by key,
+ * and the result is a weighted draw WITHOUT replacement. Appeal now shifts
+ * the probability of signing instead of deciding it, so the book keeps a
+ * real minority of self-managed complexes — and every mechanism that keys
+ * off management type has something to act on.
+ *
+ * The tier targets still fix how many of each size are taken, so the
+ * penetration curve by size stays a stated intention rather than an
+ * emergent accident.
  */
 const customers = []
 for (const tier of TIERS) {
   const pool = roster.filter((c) => c.tier === tier.id)
   const target = Math.min(TIER_TARGET[tier.id] ?? 0, pool.length)
-  const scored = pool.map((c) => {
+  const keyed = pool.map((c) => {
     const rnd = streamFor(`pick|${c.id}`)
-    const appeal = (c.mgmt === 'delegated' ? 1.9 : 1) * Math.log(c.hh + 40) * between(rnd, 0.55, 1.45)
-    return { c, appeal }
+    const weight = (c.mgmt === 'delegated' ? 1.9 : 1) * Math.log(c.hh + 40)
+    /* u^(1/w). Computed as exp(log(u)/w) because u^(1/w) underflows to 0 for
+       small u and large w, and a field of zeroes would sort by the id
+       tiebreak instead of by weight. */
+    const u = Math.max(1e-12, rnd())
+    return { c, key: Math.exp(Math.log(u) / weight) }
   })
-  scored.sort((a, b) => b.appeal - a.appeal || (a.c.id < b.c.id ? -1 : 1))
-  for (const { c } of scored.slice(0, target)) customers.push(c)
+  keyed.sort((a, b) => b.key - a.key || (a.c.id < b.c.id ? -1 : 1))
+  for (const { c } of keyed.slice(0, target)) customers.push(c)
 }
 
 /**
@@ -1045,6 +1065,25 @@ const contractsJson = JSON.stringify(
   contracts.map((k) => ({ i: k.complex, k: k.service, f: k.from, t: k.to, s: k.setup, r: k.rep })),
 )
 writeFileSync(join(OUT_DIR, 'contracts.json'), contractsJson, 'utf8')
+/**
+ * The invented per-customer attributes, in their own file.
+ *
+ * `mgmt` — whether a management company runs the complex or its residents'
+ * council does — is generated here and was, until the filterable dashboard
+ * needed it, nowhere on disk. It could not go into the roster: that file's
+ * whole premise is that everything in it was filed with 국토교통부, and
+ * putting an invented field beside the real ones would make the premise
+ * false for the sake of one filter. So it goes here, with the rep, in the
+ * half of the dataset that is already labelled invented.
+ */
+const customersJson = JSON.stringify(
+  customers
+    .filter((c) => spans.get(c.id).some((v, m) => v && m >= W0))
+    .map((c) => ({ i: c.id, g: c.mgmt === 'self' ? 1 : 0, r: c.rep }))
+    .sort((a, b) => (a.i < b.i ? -1 : 1)),
+)
+writeFileSync(join(OUT_DIR, 'customers.json'), customersJson, 'utf8')
+
 const pipelineJson = JSON.stringify(
   pipelineOut.map((p) => ({ i: p.complex, r: p.rep, o: p.opened, c: p.closed, s: p.stage })),
 )
@@ -1454,6 +1493,7 @@ export const BI_INTAKE = {
   seriesBytes: ${seriesBytes},
   contractsBytes: ${Buffer.byteLength(contractsJson)},
   pipelineBytes: ${Buffer.byteLength(pipelineJson)},
+  customersBytes: ${Buffer.byteLength(customersJson)},
 } as const
 
 /** Churn and seasonality parameters, published so the shape can be argued. */
