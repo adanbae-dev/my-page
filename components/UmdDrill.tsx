@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { cx } from '@/lib/cx'
+import tip$ from './HexTip.module.css'
 import styles from './UmdDrill.module.css'
 
 type Cell = { n: string; o: number; y: number; x: number }
@@ -129,11 +130,13 @@ export function UmdDrill({
   /**
    * The panel's own popup.
    *
-   * Not HexTip, which serves the two national maps: its payload is a rate
-   * plus two raw counts and its labels are written for that. A 동 has one
-   * count and a share of its district, and the share is the thing worth
-   * saying — 신당동 being 196 offices means little until you know it is a
-   * third of 중구.
+   * The BEHAVIOUR is its own; the LOOK is HexTip's, imported. HexTip serves
+   * the two national maps and its payload is theirs — a rate plus two raw
+   * counts, with labels written for that. A 동 has one count and a share of
+   * its district, and the share is the line worth reading: 신당동 being 196
+   * offices means little until you know it is a third of 중구. So the logic
+   * lives here and the stylesheet is borrowed rather than copied, because
+   * two popups that look different would be two gestures.
    *
    * The `<title>` is removed on first hover for the same reason it is on the
    * national maps: the browser would draw its own tooltip on top of this one
@@ -276,19 +279,19 @@ export function UmdDrill({
 
               {tip && (
                 <div
-                  className={styles.tip}
+                  className={tip$.tip}
                   style={{ left: `${tip.x}px`, top: `${tip.y}px` }}
                   /* The same facts are in the caption and the tooltip below;
                      a box chasing the pointer is not something a screen
                      reader should be asked to follow. */
                   aria-hidden="true"
                 >
-                  <span className={styles.tipName}>{tip.name}</span>
-                  <span className={styles.tipValue}>
+                  <span className={tip$.name}>{tip.name}</span>
+                  <span className={tip$.rate}>
                     {tip.offices.toLocaleString('en-US')}
-                    <span className={styles.tipUnit}>{labels.unit}</span>
+                    <span className={tip$.unit}>{labels.unit}</span>
                   </span>
-                  <span className={styles.tipShare}>
+                  <span className={tip$.counts}>
                     {labels.share.replace('{share}', String(tip.share))}
                   </span>
                 </div>

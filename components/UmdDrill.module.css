@@ -127,61 +127,6 @@
 .s4 { fill: color-mix(in oklab, var(--accent) 86%, var(--ground)); }
 .s5 { fill: var(--accent); }
 
-/* ------------------------------------------------------------------ */
-/* The cell popup                                                      */
-/* ------------------------------------------------------------------ */
-
-/*
- * Its own, not HexTip's.
- *
- * HexTip serves the two national maps and its shape is theirs: a rate and
- * two raw counts. A 동 has one count and a share of its district, and the
- * share is the line worth reading — 196 offices means little until it is a
- * third of 중구. The visual language is the same because they are the same
- * gesture; the payload is not, so the component is not shared.
- */
-.tip {
-  position: absolute;
-  z-index: 2;
-  translate: 14px calc(-100% - 14px);
-  pointer-events: none;
-
-  display: grid;
-  gap: var(--space-3xs);
-  padding: var(--space-2xs) var(--space-xs);
-  border: var(--rule-w) solid var(--rule);
-  background: var(--ground);
-  box-shadow: 0 4px 18px rgb(0 0 0 / 0.35);
-  white-space: nowrap;
-}
-
-.tipName {
-  font-size: var(--t-small);
-  font-weight: var(--wt-bold);
-  line-height: var(--lh-snug);
-}
-
-.tipValue {
-  font-size: var(--t-h3);
-  font-weight: var(--wt-black);
-  line-height: var(--lh-tight);
-  color: var(--accent-text);
-  font-variant-numeric: tabular-nums;
-}
-
-.tipUnit {
-  font-size: var(--t-label);
-  font-weight: var(--wt-medium);
-  letter-spacing: var(--tr-label);
-  color: var(--muted);
-}
-
-.tipShare {
-  font-size: var(--t-label);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .caption,
 .relative {
   margin: 0;
