@@ -57,6 +57,7 @@ const PAGES = [
   'ko/portfolio/prices.html',
   'ko/portfolio/renewal.html',
   'ko/portfolio/direct.html',
+  'ko/portfolio/reach.html',
 ]
 
 /** Slack, in user units. A hairline may sit on the frame. */

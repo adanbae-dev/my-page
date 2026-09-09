@@ -190,6 +190,8 @@ export const en = {
       'A dashboard that filters apartment management app revenue by month range, province, size, management type, service and complex name. Every figure recomputes against the same slice.',
     districts:
       'Brokerages per 10,000 residents across 245 Korean districts as a hexagon-grid cartogram, with the displacement and the eleven absences stated.',
+    reach:
+      '{national}% of apartment sales are brokered from an office in the same district as the property. Why the flow map was measured and then not drawn, and what replaced it across {measured} districts.',
   },
 
   weight: {
@@ -461,6 +463,59 @@ export const en = {
 
     back: '← Portfolio',
   },
+  reach: {
+    heading: 'How far brokerage reaches',
+    lead:
+      'Of {legs} brokerage legs on apartment sales, {national}% were handled by an office in the same district as the property. The median district is at {median}%. The {externalShare}% that does cross a boundary has a median distance of {distMedian} km and {within20}% of it stays within 20 km — not flows, the district next door.',
+
+    dotsHeading: 'One dot per district',
+    note:
+      'Not a histogram. The shares run from {min}% to {max}% and the 5th percentile of the {measured} districts is already {p5}% \u2014 nineteen in twenty sit above it. Any bin scheme wide enough to make that mass legible collects everything below into one bucket — and this page\u2019s only real exception lives in that bucket. A dot per district has nowhere to hide it. The axis runs the full 0 to 100 rather than cropping to where the data is: cropping would spread the hump out and make it look like a distribution with a spread. The empty left half is the finding.',
+    caption: 'Same-district share, {measured} districts with {floor} legs or more',
+    summary:
+      'A dot per district on a 0-to-100 axis of the same-district brokerage share. Most of the {measured} districts crowd the right-hand end of the axis; the median is {median}%, the 5th percentile {p5}% and the 95th {p95}%. The lowest sits alone at {min}%.',
+    source: 'MOLIT apartment sale filings, brokerage office district, {from} to {to}',
+    medianLabel: 'median',
+    dot: '{rate}%',
+
+    distanceHeading: 'Crossing a line is not going far',
+    distanceWhy:
+      'The distance of the {external} legs that crossed a district boundary. Median {distMedian} km, 90th percentile {distP90} km, longest {distMax} km. Distance is the great-circle span between district centroids, and a centroid is the mean of that district\u2019s sub-district centroids.',
+    bandsCaption: 'Distance of the {external} external legs, cumulative',
+    bandTerm: 'Distance',
+    bandShare: 'Cumulative',
+    bandRow: 'within {to} km',
+
+    lowHeading: 'The exceptions are adjacency, with one exception',
+    lowWhy:
+      'The twelve lowest of the {measured} measured districts. Read the inflow column and it is almost always a district that touches: another ward of the same city, or the city across the boundary. One does not fit. {sgg} sits at {rate}% and {originShare}% of the brokerage that came in came from {origin}, {originKm} km away. It is the only row distance does not explain, and this table exists to make that one row visible.',
+    lowCaption: 'The twelve lowest same-district shares, with the largest source of inbound brokerage',
+    colDistrict: 'District',
+    colRate: 'Same-district',
+    colLegs: 'Legs',
+    colOrigin: 'Largest inflow',
+    colKm: 'km',
+
+    limitsHead: 'What this page did not do',
+    arcTerm: 'No flow map',
+    arcWhy:
+      'Every sale filing names the district its brokerage sits in, so the origin-destination matrix falls out of the data and the figure that suggests itself is arcs across the country. It was measured and then not drawn: there are {flows} distinct external pairs and the ten thickest carry {topTen}% of the external volume, with the rest spread thin. Five thousand lines drawn to show {externalShare}% of the whole would leave a reader believing they had watched brokerage move around the country. A beautiful figure answering a question the data cannot answer is worse than no figure.',
+    coTerm: 'Not a co-brokerage rate',
+    coWhy:
+      '{coPairs} filings name two districts in the office field, {coShare}% of the total. Of those, {coCross} name two DIFFERENT districts and {coSame} name the same one twice. A field recording offices would show same-district pairs in bulk — two offices on one street co-brokering a sale is ordinary. So what it records is the set of districts involved, and {coShare}% is not the co-brokerage rate but the rate at which co-brokerage crosses a district line; the same-district kind cannot be counted from this source. These are counts rather than a share for a reason: {coSame}/{coPairs} rounds to 100.0% at one decimal place, and that 100 was once read as "not one of them". Counts cannot round.',
+    legTerm: 'Legs, not deals',
+    legWhy:
+      'The unit is {legs} legs, not {records} filings. Where the office field is comma separated, each entry is one leg. Counting deals would credit a co-brokered sale to whichever office was listed first, which understates how often brokerage crosses a line.',
+    floorTerm: '{belowFloor} not plotted',
+    floorWhy:
+      '{belowFloor} districts with fewer than {floor} legs, and {noLegs} with no brokered sale at all, get no dot. A share resting on forty legs and one resting on three thousand draw the same dot, so the table carries the leg count beside the rate.',
+    centroidTerm: 'Centroids are approximate',
+    centroidWhy:
+      'A district centroid here is the unweighted mean of its sub-district centroids. Without area weighting, a city with dense wards downtown and large rural townships around them pulls toward downtown. That is where the offices are, so it suits this page — but the km column is the distance between districts, not between offices.',
+
+    back: '\u2190 Portfolio',
+  },
+
   renewal: {
     heading: 'The renewal right and the 5% cap',
     lead:

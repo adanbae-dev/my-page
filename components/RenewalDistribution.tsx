@@ -12,17 +12,26 @@ import styles from './RenewalDistribution.module.css'
  * Two histograms of the same thing, mirrored across one axis.
  *
  * WHY MIRRORED AND NOT SIDE BY SIDE. The finding is that the two
- * distributions agree in the middle and disagree at the top: the medians are
- * 4.9% and 4.7%, and the 90th percentiles are 5.0% and 15.5%. Side by side
- * that is two similar-looking shapes a reader has to hold in their head.
- * Across one axis it is a single silhouette — a wall on one side and a tail
- * on the other — and the comparison happens in the eye rather than in memory.
+ * distributions agree in the middle and disagree at the top: the medians sit
+ * within a point of each other and the 90th percentiles are three times
+ * apart. Side by side that is two similar-looking shapes a reader has to hold
+ * in their head. Across one axis it is a single silhouette — a wall on one
+ * side and a tail on the other — and the comparison happens in the eye
+ * rather than in memory.
  *
- * ONE SCALE, NOT TWO. The upper series has 91,939 contracts and the lower
- * 80,638, so both are drawn as a share of their own series; and both use the
- * same pixels-per-point, so a bar twice as tall is twice as common. Giving
- * each half its own scale would have filled the picture more evenly and made
- * the 47% spike look like the 27% one.
+ * NO FIGURE FROM THE DATA IS QUOTED IN THIS COMMENT, and that is a
+ * correction rather than a style. It used to name both medians, both 90th
+ * percentiles, both series sizes and both peaks. Every one of those six
+ * numbers moved when 광주·전남 filings arrived — 27 districts that had been
+ * queried under region codes the API had retired — and the comment went on
+ * asserting the old ones. A stale comment beside correct code is worse than
+ * no comment: it is the version a reader believes.
+ *
+ * ONE SCALE, NOT TWO. The two series have different sizes, so both are drawn
+ * as a share of their own series; and both use the same pixels-per-point, so
+ * a bar twice as tall is twice as common. Giving each half its own scale
+ * would have filled the picture more evenly and made the smaller series'
+ * spike look like the larger one's.
  *
  * NOT BUILT AS A STRING, unlike the district map next door. That one was 490
  * elements and the serialized copy of it cost more than the markup; this is

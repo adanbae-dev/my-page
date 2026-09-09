@@ -153,6 +153,16 @@ export default async function PortfolioPage({
             </Link>
           </p>
 
+          {/* The question this one asked got the answer no, which is why it is
+              in a portfolio rather than in a drawer. It was going to be a flow
+              map; the data said do not draw one, and the page publishes that
+              instead of the picture. */}
+          <p className={cx('label', styles.deeper)}>
+            <Link href={localePath(lang, '/portfolio/reach')}>
+              {d.reach.heading} →
+            </Link>
+          </p>
+
           {/* The only one of these that is not built on public filings, and
               it says so in its first line. It is here because a portfolio
               that only holds maps of open data holds one kind of problem —

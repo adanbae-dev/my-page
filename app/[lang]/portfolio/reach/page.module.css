@@ -1,0 +1,142 @@
+/* Unlayered on purpose. */
+
+.hero {
+  min-block-size: 70svh;
+  display: flex;
+  align-items: center;
+  padding-block: var(--section-y);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  inline-size: 100%;
+}
+
+.heroTitle {
+  margin-block: var(--space-xs) var(--space-s);
+}
+
+.beat {
+  padding-block: var(--section-y);
+}
+
+.beatTitle {
+  margin-block: var(--space-s) var(--space-m);
+}
+
+.subheading {
+  margin-block: var(--space-2xl) var(--space-2xs);
+}
+
+.note {
+  margin-block-end: var(--space-l);
+}
+
+.tableCaption {
+  color: var(--muted);
+  text-align: start;
+  margin-block-end: var(--space-s);
+}
+
+.bands,
+.low {
+  inline-size: 100%;
+  border-collapse: collapse;
+  margin-block-start: var(--space-s);
+}
+
+.bands th,
+.bands td,
+.low th,
+.low td {
+  text-align: start;
+  padding: var(--space-2xs) var(--space-s) var(--space-2xs) 0;
+  border-block-end: var(--rule-w) solid var(--rule);
+  font-weight: 400;
+  vertical-align: baseline;
+}
+
+.bands thead th,
+.low thead th {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+/* The bar is drawn inside the value cell rather than as a figure beside the
+   table, so there is no picture a screen reader is locked out of: the number
+   is the content and the bar is its width. */
+.bands td {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.bar {
+  display: block;
+  block-size: 0.5rem;
+  min-inline-size: 1px;
+  background: var(--accent);
+  flex: none;
+}
+
+.barValue {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  flex: none;
+}
+
+/* Five columns do not fit a phone. Scrolls in its own box rather than
+   pushing the page sideways. */
+.low {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.limits {
+  margin-block-start: var(--space-2xl);
+  padding-block-start: var(--space-m);
+  border-block-start: var(--rule-w) solid var(--rule);
+}
+
+.limitsHead {
+  color: var(--muted);
+  margin-block-end: var(--space-m);
+}
+
+.limitList {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2xs) var(--space-m);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 40rem) {
+  .limitList {
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+  }
+}
+
+.limitList dt {
+  color: var(--accent-text);
+}
+
+.limitList dd {
+  margin: 0 0 var(--space-s);
+}
+
+.sibling {
+  margin-block-start: var(--space-xl);
+}
+
+.closing {
+  padding-block: var(--section-y);
+}
