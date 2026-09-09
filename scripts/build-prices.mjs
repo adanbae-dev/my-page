@@ -128,10 +128,12 @@ const classOf = (v) => {
 
 const values = []
 let thin = 0
+let nopairs = 0
 for (const g of grid) {
   const list = perDistrict.get(`${g.sido}\t${g.sgg}`)
   if (!list || list.length < FLOOR) {
     if (list) thin++
+    else nopairs++
     continue
   }
   values.push({ sido: g.sido, sgg: g.sgg, change: round(median(list)), pairs: list.length })
@@ -204,6 +206,15 @@ export const PRICE_INTAKE = {
   measured: ${values.length},
   /** Had pairs, but fewer than the floor. */
   thin: ${thin},
+  /**
+   * Had no matched pair at all — a different thing from a thin one, and the
+   * distinction is the one that went wrong on this site once already. A
+   * district can reach zero pairs by trading briskly in buildings that never
+   * repeat, or by filing nothing whatsoever. scripts/check-coverage.mjs is
+   * what separates those two: it fails the build if any district's whole
+   * window is empty and the emptiness is not declared.
+   */
+  nopairs: ${nopairs},
 } as const
 
 export const PRICE_STATS = {
@@ -226,7 +237,7 @@ process.stdout.write(`
   PRICE CHANGE
   ${'-'.repeat(70)}
   ${rows.toLocaleString('en-US')} sales in the two ends - ${months[0]}..${months[2]} vs ${months[months.length - 3]}..${months[months.length - 1]}
-  matched pairs ${pairs.toLocaleString('en-US')} - measured ${values.length}/${grid.length} (thin ${thin})
+  matched pairs ${pairs.toLocaleString('en-US')} - measured ${values.length}/${grid.length} (thin ${thin}, no pair ${nopairs})
   median ${round(median(changes))}% - range ${sorted[0]}% .. ${sorted[sorted.length - 1]}% - fell ${fell} rose ${rose}
   classes ${counts.join(' / ')}
   ${'-'.repeat(70)}

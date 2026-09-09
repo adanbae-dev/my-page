@@ -122,6 +122,22 @@ for (const p of points) {
   allowed.add(Math.round(p.rate))
 }
 
+/* The counts a sentence on this page is allowed to name, and `plotted - 1`
+   with them: the note says "the other N pile into a smudge", which is every
+   plotted district but the one in the corner. */
+const counts = new Set([
+  intake.districts,
+  intake.rows,
+  intake.deals,
+  intake.direct,
+  intake.plotted,
+  intake.plotted - 1,
+  intake.belowFloor,
+  intake.offGrid,
+  points.length,
+  FLOOR,
+])
+
 for (const locale of ['ko', 'en']) {
   const dict = readFileSync(join(ROOT, 'lib', 'i18n', 'dictionaries', `${locale}.ts`), 'utf8')
   const block = /\n {2}direct: \{([\s\S]*?)\n {2}\},/.exec(dict)?.[1]
@@ -142,6 +158,17 @@ for (const locale of ['ko', 'en']) {
       const v = Number(`${sign}${raw}`)
       if (![R.density, R.pop, R.both].includes(v)) {
         problems.push(`${locale}.ts: 본문의 r = ${v} 가 데이터에 없는 값입니다`)
+      }
+    }
+    /* BARE COUNTS, because only percentages were checked and a count went
+       stale behind the check. The search description said 176 시군구 while
+       the chart drew 191: the refetch that added 광주·전남 moved the count,
+       every percentage in the same sentence was still valid, and the gate
+       passed. Three digits with no decimal point, no comma and no % is a
+       district count on this page, and there are only a few it can be. */
+    for (const [, raw] of text.matchAll(/(?<![\d.,%])(\d{3})(?![\d.,%])/g)) {
+      if (!counts.has(Number(raw))) {
+        problems.push(`${locale}.ts: 본문의 ${raw} 이 데이터에 없는 개수입니다`)
       }
     }
   }

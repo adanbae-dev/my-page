@@ -177,9 +177,9 @@ export const en = {
     portfolio:
       'Things built here. A tile cartogram of Korea, and why it ships with its values missing.',
     direct:
-      'Brokerage density appears to explain the direct-deal rate; population explains it better. Two log-log scatter plots of 176 Korean districts against two competing explanations.',
+      'Brokerage density appears to explain the direct-deal rate; population explains it better. Two log-log scatter plots of {plotted} Korean districts against two competing explanations.',
     renewal:
-      'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are 4.9% and 4.7%; the shares above the 5% cap are 0.2% and 30.7%.',
+      'How jeonse deposits moved on renewal, with and without the statutory renewal right. The medians are {medianUp}% and {medianDown}%; the shares above the 5% cap are {overCapUp}% and {overCapDown}%.',
     prices:
       'Apartment price change by district, measured between matched complexes. A diverging cartogram on the same grid as the brokerage map.',
     privacy:
@@ -392,10 +392,10 @@ export const en = {
       'Districts with more brokerage offices per resident have fewer sales done without a broker. r = {rDensity}. But population explains the same rate better — r = {rPop} — and the two explanations are tangled with each other at {rBoth}.',
     chartHeading: 'The same 176 districts, two different explanations',
     note:
-      'Two panels rather than one, because the finding is not a correlation but a comparison of correlations. Publishing the left panel alone would be true and misleading. With the same y axis and the same points, the left panel\u2019s story is visibly still there in the right one — which is what "partly a proxy" looks like. Both axes are logarithmic. The rate runs from {minRate}% to {maxRate}% and the population across an order of magnitude, so on linear axes one district sits alone in a corner and the other 175 pile into a smudge, and every correlation quoted becomes a statement about that district rather than about the country. There is no trend line: a line would read as a claim about cause, and the point of the page is that neither panel establishes one.',
+      'Two panels rather than one, because the finding is not a correlation but a comparison of correlations. Publishing the left panel alone would be true and misleading. With the same y axis and the same points, the left panel\u2019s story is visibly still there in the right one — which is what "partly a proxy" looks like. Both axes are logarithmic. The rate runs from {minRate}% to {maxRate}% and the population across an order of magnitude, so on linear axes one district sits alone in a corner and the other {others} pile into a smudge, and every correlation quoted becomes a statement about that district rather than about the country. There is no trend line: a line would read as a claim about cause, and the point of the page is that neither panel establishes one.',
     caption: '{plotted} districts · {deals} apartment sales · filed {from} – {to}',
     summary:
-      'Two log-log scatter plots of the direct-deal rate across 176 Korean districts. The left explains it by brokerage offices per 10,000 residents, the right by population. The right correlation is the stronger one.',
+      'Two log-log scatter plots of the direct-deal rate across {plotted} Korean districts. The left explains it by brokerage offices per 10,000 residents, the right by population. The right correlation is the stronger one.',
     source:
       'MOLIT apartment sale transactions · share filed as a direct deal · office and population counts from the same table as the district map · 이용허락범위 제한 없음',
     density: 'Offices per 10,000 residents',
@@ -451,7 +451,7 @@ export const en = {
       'Measured across {pairs} pairs. Districts with fewer than {floor} are left without a value — a district resting on twenty pairs and one resting on nine hundred draw the same hexagon, so the popup carries the pair count. When a cell surprises you, read that number first.',
     unmeasuredTerm: '{unmeasured} districts have no colour',
     unmeasuredWhy:
-      'No complex in them traded at both ends of the window. They keep a hexagon in a neutral fill rather than becoming a hole: the country\u2019s outline is why this map is readable, and an empty cell meaning "no evidence" reads as "no change". Those are different statements.',
+      'No complex in them traded at both ends of the window. {thin} had pairs but fewer than {floor} of them; {nopairs} had no pair at all — their sales happened in buildings that never repeated, which is not the same as nothing being filed. A retired region code also answers with a valid response and zero rows, so the build fails if any district\u2019s whole window is empty. They keep a hexagon in a neutral fill rather than becoming a hole: the country\u2019s outline is why this map is readable, and an empty cell meaning "no evidence" reads as "no change". Those are different statements.',
     windowTerm: 'Not an annual figure',
     windowWhy:
       'The first three months of a twelve-month window against the last three — "{late}–{lateEnd} against {early}–{earlyEnd}". It is neither a yearly rate nor a recent trend. And the months are filing months, not signing months.',

@@ -159,7 +159,20 @@
     "",
     "The exception is this route's measurement plus 934 B, not an allowance to",
     "grow into, and it leaves the global ceiling where /ko/build (23,210 B) has",
-    "always had to live."
+    "always had to live.",
+    "",
+    "RAISED the prices exception 26,624 -> 26,880 B html because THE COUNTRY GOT",
+    "BIGGER. 27 시군구 — 광주·전남, 11% of the map and 3.16M residents — had been",
+    "fetched under region codes the API retired when the two provinces merged.",
+    "data.go.kr answers a retired LAWD_CD with HTTP 200, resultCode 000 and",
+    "totalCount 0, which is indistinguishable from a district that filed nothing,",
+    "so 648 empty cache files looked like a quiet market and this page published",
+    "them in its \"표본 부족\" class. With the region fetched, measured districts",
+    "went 167 -> 179 and the page went 19 B over its own exception. Weight that",
+    "arrives because a hole was filled is the one kind this file should never",
+    "argue with; scripts/check-coverage.mjs now fails the build on any district",
+    "whose whole window is empty, so the next such hole costs a build, not a",
+    "budget line."
   ],
   "overrides": {
     "/build": {
@@ -182,8 +195,9 @@
     },
     "/portfolio/prices": {
       "$why": "The same 245-cell tiling under a diverging scale, plus its legend and the drill-down codes. Nine fills in two hues instead of eight in one.",
-      "html": 26624,
-      "total": 308224
+      "$raised": "26,112 -> 26,624 -> 26,880 B html and 307,712 -> 308,224 -> 309,248 B total, and the last step is 12 more districts holding a value rather than a design that grew. 광주·전남 had been queried under region codes the API retired at the merger, so 27 districts returned zero rows and 12 of them cleared the pair floor once the data arrived. Measured: /ko 26,643 B against 26,624 — over by 19 bytes. The data alone accounts for more than that: the rank list went 7,931 -> 8,492 B raw and 1,375 -> 1,446 B gzip, the 12 cells' data-n grew 19 B and their titles 49 B. The prose was tightened in the same commit and came out roughly neutral, so the overrun is entirely values. The new ceiling is 237 B of headroom on html — about four more districts crossing the floor, not room to design in.",
+      "html": 26880,
+      "total": 309248
     }
   },
   "unit": "gzip-bytes",

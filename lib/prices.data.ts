@@ -5,18 +5,18 @@
  *
  * NOT a comparison of medians. A district's median sale price moves when the
  * mix of what sold moves, so the unit here is a (district, complex, 10 m2
- * band) that traded in both ends of the window — 22,718 of
+ * band) that traded in both ends of the window — 24,322 of
  * them. Each contributes one percentage change of its median price per unit
  * area and the district is the median of its pairs, which holds the
  * building, the size class and the neighbourhood fixed.
  *
- * THE SCALE DIVERGES because the data does: 42 districts fell and 118
+ * THE SCALE DIVERGES because the data does: 49 districts fell and 123
  * rose, from -7.4% to 21.3%. Zero is a real
  * midpoint rather than a convenience, and that is why the class edges are
  * chosen round numbers instead of quantiles or natural breaks — a diverging
  * scale cannot put its midpoint wherever the data would prefer.
  *
- * 167 of 245 districts are measured. The rest did not
+ * 179 of 245 districts are measured. The rest did not
  * have the same complexes trading at both ends.
  */
 
@@ -47,23 +47,32 @@ export const PRICE_FLOOR = 20
 export const PRICE_EDGES: readonly number[] = [-5, -2, 0, 2, 5, 10, 15]
 
 /** Districts per class, in the same order. */
-export const PRICE_COUNTS: readonly number[] = [4, 11, 27, 48, 29, 18, 14, 16]
+export const PRICE_COUNTS: readonly number[] = [5, 13, 31, 50, 31, 18, 15, 16]
 
 export const PRICE_INTAKE = {
-  rows: 232380,
-  pairs: 22718,
+  rows: 248534,
+  pairs: 24322,
   districts: 245,
-  measured: 167,
+  measured: 179,
   /** Had pairs, but fewer than the floor. */
-  thin: 47,
+  thin: 61,
+  /**
+   * Had no matched pair at all — a different thing from a thin one, and the
+   * distinction is the one that went wrong on this site once already. A
+   * district can reach zero pairs by trading briskly in buildings that never
+   * repeat, or by filing nothing whatsoever. scripts/check-coverage.mjs is
+   * what separates those two: it fails the build if any district's whole
+   * window is empty and the emptiness is not declared.
+   */
+  nopairs: 5,
 } as const
 
 export const PRICE_STATS = {
   median: 1.7,
   min: -7.4,
   max: 21.3,
-  fell: 42,
-  rose: 118,
+  fell: 49,
+  rose: 123,
 } as const
 
 export const PRICE_VALUES: readonly PriceChange[] = [
@@ -83,16 +92,17 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '서울특별시', sgg: '서대문구', change: 15.6, pairs: 139 },
   { sido: '서울특별시', sgg: '중구', change: 15.2, pairs: 51 },
   { sido: '서울특별시', sgg: '성동구', change: 15, pairs: 103 },
-  { sido: '서울특별시', sgg: '종로구', change: 14.7, pairs: 26 },
   { sido: '서울특별시', sgg: '강동구', change: 14.7, pairs: 189 },
   { sido: '서울특별시', sgg: '관악구', change: 14.7, pairs: 104 },
   { sido: '서울특별시', sgg: '송파구', change: 14.1, pairs: 217 },
+  { sido: '서울특별시', sgg: '종로구', change: 13.2, pairs: 30 },
   { sido: '서울특별시', sgg: '구로구', change: 12.5, pairs: 210 },
   { sido: '경기도', sgg: '수원시영통구', change: 12.1, pairs: 222 },
   { sido: '서울특별시', sgg: '광진구', change: 11.7, pairs: 73 },
   { sido: '서울특별시', sgg: '노원구', change: 11.4, pairs: 299 },
   { sido: '서울특별시', sgg: '양천구', change: 11.2, pairs: 154 },
   { sido: '강원특별자치도', sgg: '삼척시', change: 11.1, pairs: 33 },
+  { sido: '전남광주통합특별시', sgg: '무안군', change: 10.9, pairs: 44 },
   { sido: '서울특별시', sgg: '강북구', change: 10.6, pairs: 62 },
   { sido: '서울특별시', sgg: '중랑구', change: 10.6, pairs: 135 },
   { sido: '서울특별시', sgg: '마포구', change: 10.4, pairs: 142 },
@@ -124,6 +134,8 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '경기도', sgg: '용인시처인구', change: 3.5, pairs: 120 },
   { sido: '경상북도', sgg: '경주시', change: 3.4, pairs: 135 },
   { sido: '경기도', sgg: '부천시소사구', change: 3.3, pairs: 108 },
+  { sido: '전남광주통합특별시', sgg: '순천시', change: 3.3, pairs: 165 },
+  { sido: '전남광주통합특별시', sgg: '목포시', change: 3.1, pairs: 142 },
   { sido: '충청남도', sgg: '서산시', change: 2.8, pairs: 106 },
   { sido: '대구광역시', sgg: '서구', change: 2.7, pairs: 42 },
   { sido: '울산광역시', sgg: '울주군', change: 2.6, pairs: 143 },
@@ -150,8 +162,10 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '대전광역시', sgg: '서구', change: 1.8, pairs: 251 },
   { sido: '경상남도', sgg: '양산시', change: 1.8, pairs: 229 },
   { sido: '부산광역시', sgg: '부산진구', change: 1.8, pairs: 230 },
+  { sido: '전남광주통합특별시', sgg: '화순군', change: 1.8, pairs: 25 },
   { sido: '충청남도', sgg: '계룡시', change: 1.7, pairs: 23 },
   { sido: '충청남도', sgg: '논산시', change: 1.7, pairs: 51 },
+  { sido: '전남광주통합특별시', sgg: '나주시', change: 1.7, pairs: 46 },
   { sido: '대구광역시', sgg: '남구', change: 1.6, pairs: 49 },
   { sido: '대구광역시', sgg: '동구', change: 1.5, pairs: 186 },
   { sido: '울산광역시', sgg: '북구', change: 1.5, pairs: 145 },
@@ -208,6 +222,8 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '경기도', sgg: '안성시', change: -1.1, pairs: 93 },
   { sido: '충청남도', sgg: '천안시동남구', change: -1.1, pairs: 155 },
   { sido: '대구광역시', sgg: '달성군', change: -1.2, pairs: 161 },
+  { sido: '전남광주통합특별시', sgg: '광산구', change: -1.3, pairs: 232 },
+  { sido: '전남광주통합특별시', sgg: '서구', change: -1.3, pairs: 168 },
   { sido: '경기도', sgg: '고양시일산동구', change: -1.4, pairs: 125 },
   { sido: '충청남도', sgg: '홍성군', change: -1.4, pairs: 44 },
   { sido: '경상남도', sgg: '사천시', change: -1.4, pairs: 63 },
@@ -219,12 +235,16 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '충청북도', sgg: '진천군', change: -1.7, pairs: 59 },
   { sido: '경상남도', sgg: '창녕군', change: -1.7, pairs: 20 },
   { sido: '경기도', sgg: '파주시', change: -1.8, pairs: 197 },
+  { sido: '전남광주통합특별시', sgg: '광양시', change: -1.8, pairs: 92 },
+  { sido: '전남광주통합특별시', sgg: '동구', change: -1.9, pairs: 62 },
   { sido: '전북특별자치도', sgg: '군산시', change: -2.1, pairs: 174 },
+  { sido: '전남광주통합특별시', sgg: '남구', change: -2.1, pairs: 128 },
   { sido: '경상남도', sgg: '거제시', change: -2.1, pairs: 133 },
   { sido: '경기도', sgg: '동두천시', change: -2.3, pairs: 59 },
   { sido: '경상남도', sgg: '창원시진해구', change: -2.3, pairs: 85 },
   { sido: '경기도', sgg: '여주시', change: -2.5, pairs: 48 },
   { sido: '충청남도', sgg: '아산시', change: -2.7, pairs: 238 },
+  { sido: '전남광주통합특별시', sgg: '북구', change: -2.7, pairs: 265 },
   { sido: '부산광역시', sgg: '강서구', change: -2.7, pairs: 57 },
   { sido: '충청북도', sgg: '증평군', change: -2.9, pairs: 23 },
   { sido: '경기도', sgg: '고양시일산서구', change: -3.2, pairs: 206 },
@@ -233,5 +253,6 @@ export const PRICE_VALUES: readonly PriceChange[] = [
   { sido: '충청북도', sgg: '음성군', change: -5.1, pairs: 56 },
   { sido: '강원특별자치도', sgg: '속초시', change: -5.2, pairs: 61 },
   { sido: '경상북도', sgg: '포항시남구', change: -5.3, pairs: 87 },
+  { sido: '전남광주통합특별시', sgg: '여수시', change: -5.6, pairs: 110 },
   { sido: '경기도', sgg: '이천시', change: -7.4, pairs: 109 },
 ]

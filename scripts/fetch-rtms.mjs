@@ -13,6 +13,17 @@
  * the questions this data answers is still moving, and re-deriving from disk
  * is free while re-fetching is not.
  *
+ * THE CODE TABLE IS PART OF THE QUERY, AND IT GOES STALE. A retired
+ * LAWD_CD is not an error: data.go.kr answers it with HTTP 200, resultCode
+ * 000 and totalCount 0, which is byte-for-byte what a district with no
+ * filings looks like. 광주·전남 merged into 전남광주통합특별시 and the API
+ * moved all 27 of its districts to 시도코드 12; this fetcher kept asking for
+ * 29xxx and 46xxx, cached 648 empty files, and three pages published the
+ * silence as a market finding. scripts/check-coverage.mjs now fails the
+ * build on any district whose whole window is empty, and compares the table
+ * against the district names the API itself writes into 중개사무소 소재지.
+ * If you widen the window or add an endpoint, run it.
+ *
  * THE KEY IS NEVER PRINTED. It is read from .env.local (gitignored), sent as
  * a query parameter because that is the only thing the API accepts, and
  * redacted out of every error message before it reaches a log.

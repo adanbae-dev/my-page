@@ -67,6 +67,12 @@ export default async function PricesPage({
     measured: n(PRICE_INTAKE.measured),
     districts: n(PRICE_INTAKE.districts),
     unmeasured: n(PRICE_INTAKE.districts - PRICE_INTAKE.measured),
+    /* Two reasons a district has no colour, kept apart: too few matched
+       pairs, and none at all. The second one used to include 27 districts
+       whose region code the API had retired, and the page called that a
+       thin market. */
+    thin: n(PRICE_INTAKE.thin),
+    nopairs: n(PRICE_INTAKE.nopairs),
     floor: n(PRICE_FLOOR),
     early: ym(PRICE_WINDOW.early),
     earlyEnd: ym(PRICE_WINDOW.earlyEnd),

@@ -18,11 +18,38 @@ import styles from './page.module.css'
  * 계약갱신청구권, on its own route.
  *
  * The first page on this site whose subject is a DISTRIBUTION rather than a
- * place. It exists because the summary statistic lies: the median renewal
- * rose 4.9% with the right invoked and 4.7% without it, and a page that
- * reported those two numbers would have said the cap does nothing. The 90th
- * percentiles are 5.0% and 15.5%.
+ * place. It exists because the summary statistic lies: the two medians sit
+ * within a point of each other, so a page that reported only them would have
+ * said the cap does nothing. The whole effect is in the upper tail, which is
+ * why the figure is a distribution and not two numbers.
+ *
+ * NO FIGURE FROM THE DATA IS WRITTEN INTO THIS FILE, including into this
+ * comment. The medians moved when 광주·전남 filings arrived — 27 districts
+ * that had been queried under codes the API had retired — and every sentence
+ * that had quoted them was wrong at that moment. `stats` below is the only
+ * place the numbers enter, the prose takes them as placeholders, and
+ * scripts/check-renewal.mjs fails the build if a percentage appears in the
+ * prose that the data does not hold.
  */
+
+const [up, down] = RENEWAL_SERIES
+
+/* Filled in rather than written into the sentence. Another month of filings
+   moves every one of these, and a paragraph that quotes them is wrong the
+   moment the chart under it is regenerated — which is not hypothetical: the
+   search description on this page kept two medians that a refetch had
+   already changed. Module scope so `generateMetadata` reads the same
+   numbers the body does. */
+const stats = {
+  medianUp: up?.median ?? 0,
+  medianDown: down?.median ?? 0,
+  p90Up: up?.p90?.toFixed(1) ?? '',
+  p90Down: down?.p90?.toFixed(1) ?? '',
+  overCapUp: up?.overCap?.toFixed(1) ?? '',
+  overCapDown: down?.overCap?.toFixed(1) ?? '',
+  peakUp: Math.round(Math.max(...(up?.bins ?? [0]))),
+  peakDown: Math.round(Math.max(...(down?.bins ?? [0]))),
+}
 
 export async function generateMetadata({
   params,
@@ -36,11 +63,12 @@ export async function generateMetadata({
     lang,
     path: '/portfolio/renewal',
     title: d.renewal.heading,
-    description: d.seo.renewal,
+    description: t(d.seo.renewal, stats),
   })
 }
 
 const n = (v: number) => v.toLocaleString('en-US')
+
 
 export default async function RenewalPage({
   params,
@@ -50,19 +78,6 @@ export default async function RenewalPage({
   const { lang } = await params
   if (!isLocale(lang)) notFound()
   const d = dict(lang)
-  const [up, down] = RENEWAL_SERIES
-
-  /* Filled in rather than written into the sentence. Another month of
-     filings moves every one of these, and a paragraph that quotes them is
-     wrong the moment the chart under it is regenerated. */
-  const stats = {
-    medianUp: up?.median ?? 0,
-    medianDown: down?.median ?? 0,
-    p90Up: up?.p90?.toFixed(1) ?? '',
-    p90Down: down?.p90?.toFixed(1) ?? '',
-    peakUp: Math.round(Math.max(...(up?.bins ?? [0]))),
-    peakDown: Math.round(Math.max(...(down?.bins ?? [0]))),
-  }
 
   return (
     <>

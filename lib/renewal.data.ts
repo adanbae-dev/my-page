@@ -9,15 +9,15 @@
  * would have to invent.
  *
  * WHAT THE NUMBERS SAY, and why the chart is a distribution rather than a
- * pair of bars: the medians are 4.9% and 4.7%. On an
+ * pair of bars: the medians are 4.9% and 3.9%. On an
  * average, invoking the right changes almost nothing. The difference is
- * entirely in the ceiling — p90 is 5% against 15.5%, and
- * 0.2% of invoked renewals exceeded 5% against 30.7%
+ * entirely in the ceiling — p90 is 5% against 14.6%, and
+ * 0.2% of invoked renewals exceeded 5% against 27.8%
  * of the rest. A bar chart of means would have shown two bars the same
  * height and been read as "the cap does nothing".
  *
  * Every share below is a percentage OF ITS OWN SERIES. The groups differ by
- * 11,220 contracts.
+ * 3,386 contracts.
  */
 
 export type RenewalSeries = {
@@ -53,40 +53,40 @@ export const RENEWAL_WINDOW = { from: '2025-09', to: '2026-08' } as const
 
 /** What was read, and what was set aside doing it. */
 export const RENEWAL_INTAKE = {
-  rows: 933951,
-  renewals: 315490,
+  rows: 988823,
+  renewals: 333408,
   /** 갱신 rows where either side had a monthly rent. */
-  mixed: 140439,
+  mixed: 146440,
   /** 갱신 rows with no usable previous deposit. */
-  unusable: 931,
-  kept: 174120,
+  unusable: 1012,
+  kept: 185956,
 } as const
 
 export const RENEWAL_SERIES: readonly RenewalSeries[] = [
   {
     key: 'used',
-    n: 92670,
+    n: 94671,
     median: 4.9,
-    p25: 3,
+    p25: 2.9,
     p75: 5,
     p90: 5,
-    cut: 2.6,
-    frozen: 16.6,
-    atCap: 62.8,
+    cut: 2.7,
+    frozen: 17.3,
+    atCap: 62,
     overCap: 0.2,
-    bins: [1.7, 0.3, 0.2, 0.2, 0.1, 0.1, 16.9, 1, 4.1, 6, 22.2, 47.1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    bins: [1.7, 0.3, 0.2, 0.2, 0.1, 0.1, 17.8, 1.1, 4.1, 6, 21.9, 46.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   },
   {
     key: 'notUsed',
-    n: 81450,
-    median: 4.7,
+    n: 91285,
+    median: 3.9,
     p25: 0,
-    p75: 6.9,
-    p90: 15.5,
-    cut: 5.2,
-    frozen: 24,
-    atCap: 20.7,
-    overCap: 30.7,
-    bins: [3.7, 0.5, 0.4, 0.2, 0.2, 0.3, 26.5, 4.9, 5.2, 3.6, 16.7, 10.3, 2.5, 2.3, 2.1, 1.7, 2.3, 1.8, 1.5, 1.2, 1.2, 1.2, 1.1, 0.8, 0.7, 0.5, 0.5, 5.9],
+    p75: 5.9,
+    p90: 14.6,
+    cut: 5,
+    frozen: 27.3,
+    atCap: 18.8,
+    overCap: 27.8,
+    bins: [3.6, 0.4, 0.4, 0.2, 0.2, 0.3, 30.4, 6.2, 5.5, 3.3, 15.3, 9.4, 2.3, 2.1, 1.9, 1.6, 2.1, 1.6, 1.4, 1.1, 1.1, 1.1, 1, 0.7, 0.7, 0.5, 0.5, 5.3],
   },
 ]

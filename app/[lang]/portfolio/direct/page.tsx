@@ -25,14 +25,39 @@ import styles from './page.module.css'
  * 직거래율, and the explanation that beat the one this page set out to test.
  *
  * It began as a follow-up to the district map: if a place has more brokerage
- * offices per resident, are fewer of its sales done without a broker? Yes —
- * r = -0.58. The page exists because that is not the best available answer.
- * Population predicts the same rate at -0.63, and population and broker
- * density move together at +0.55, so part of what the first correlation
- * measures is broker density standing in for "small town".
+ * offices per resident, are fewer of its sales done without a broker? Yes,
+ * and the page exists because that is not the best available answer.
+ * Population predicts the same rate more strongly, and population and broker
+ * density move together, so part of what the first correlation measures is
+ * broker density standing in for "small town".
  *
  * Publishing the second scatter next to the first is the whole product.
+ *
+ * THE THREE COEFFICIENTS ARE NOT WRITTEN DOWN ANYWHERE IN THIS FILE, this
+ * comment included. All three moved when 광주·전남 filings arrived — 27
+ * districts that had been queried under codes the API had retired — and the
+ * district count moved with them. Everything the prose quotes comes from
+ * `stats`, and scripts/check-direct.mjs recomputes the coefficients from the
+ * published points and fails the build if a sentence holds a number the data
+ * does not.
  */
+
+/* Filled in rather than written into the sentence: the three correlations,
+   the observed range and the number of districts on the chart are all
+   regenerated whenever another month of filings lands. Module scope so
+   `generateMetadata` reads the same numbers the body does — the search
+   description used to carry its own district count, and that count was
+   fifteen districts stale. */
+const stats = {
+  rDensity: DIRECT_R.density,
+  rPop: DIRECT_R.pop,
+  rBoth: `+${DIRECT_R.both}`,
+  minRate: DIRECT_RATE_RANGE.min,
+  maxRate: DIRECT_RATE_RANGE.max,
+  plotted: DIRECT_INTAKE.plotted,
+  /* "the other N": every plotted district but the one in the corner. */
+  others: DIRECT_INTAKE.plotted - 1,
+}
 
 export async function generateMetadata({
   params,
@@ -46,7 +71,7 @@ export async function generateMetadata({
     lang,
     path: '/portfolio/direct',
     title: d.direct.heading,
-    description: d.seo.direct,
+    description: t(d.seo.direct, stats),
   })
 }
 
@@ -60,17 +85,6 @@ export default async function DirectPage({
   const { lang } = await params
   if (!isLocale(lang)) notFound()
   const d = dict(lang)
-
-  /* The three correlations and the observed range are regenerated whenever
-     another month of filings lands. They are filled in rather than written
-     into the sentence, so the prose cannot go stale behind the chart. */
-  const stats = {
-    rDensity: DIRECT_R.density,
-    rPop: DIRECT_R.pop,
-    rBoth: `+${DIRECT_R.both}`,
-    minRate: DIRECT_RATE_RANGE.min,
-    maxRate: DIRECT_RATE_RANGE.max,
-  }
 
   return (
     <>
