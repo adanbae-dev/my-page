@@ -799,6 +799,10 @@ export const en = {
     kpiComplexes: 'Billing in final month',
     kpiArpu: 'Per household',
     kpiUsage: 'Usage share',
+    kpiChurn: 'Departures in range',
+    deltaTitle: 'Against the same complexes over the preceding window',
+    legendPrev: 'Preceding window',
+    chipClear: 'Clear:',
 
     chartSeries: 'Subscription and usage',
     chartSeriesNote:

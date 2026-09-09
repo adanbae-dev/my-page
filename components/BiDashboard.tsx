@@ -100,6 +100,10 @@ export type BiLabels = {
   readonly kpiComplexes: string
   readonly kpiArpu: string
   readonly kpiUsage: string
+  readonly kpiChurn: string
+  readonly deltaTitle: string
+  readonly legendPrev: string
+  readonly chipClear: string
   readonly chartSeries: string
   readonly chartSeriesNote: string
   readonly legendSub: string
@@ -231,20 +235,66 @@ export function BiDashboard({ labels: d, src }: { labels: BiLabels; src: string 
         live[m - lo] += 1
       }
     }
-    const endSub = sub[n - 1] ?? 0
-    const startSub = sub[0] ?? 0
-    const endLive = live[n - 1] ?? 0
-    const hhAt = matched.reduce((t, c) => {
-      const at = hi - c.f
-      return at >= 0 && at < c.sub.length && c.sub[at]! > 0 ? t + c.h : t
-    }, 0)
+    /* Households and departures per month, so every tile can carry its own
+       shape rather than a single number. `gone` counts accounts that billed
+       last month and not this one — churn inside the filtered set. */
+    const hh = new Array(n).fill(0)
+    const gone = new Array(n).fill(0)
+    for (const c of matched) {
+      for (let m = lo; m <= hi; m++) {
+        const at = m - c.f
+        const on = at >= 0 && at < c.sub.length && (c.sub[at]! > 0 || (c.u[at] ?? 0) > 0)
+        if (on) hh[m - lo] += c.h
+        const was = m - 1 - c.f
+        const before = was >= 0 && was < c.sub.length && (c.sub[was]! > 0 || (c.u[was] ?? 0) > 0)
+        if (before && !on && m > lo) gone[m - lo] += 1
+      }
+    }
+    const arpu = sub.map((v, i) => (hh[i] > 0 ? v / hh[i] : 0))
+    const share = sub.map((v, i) => (v + use[i] > 0 ? (use[i] / (v + use[i])) * 100 : 0))
+    return { n, sub, use, live, hh, gone, arpu, share }
+  }, [matched, lo, hi])
+
+  /**
+   * The same complexes, the window before this one.
+   *
+   * Every delta on this page is like-for-like: the previous period is scored
+   * over the CURRENT filter's complexes, not over whoever happened to match
+   * back then. Re-filtering would mix a change in the business with a change
+   * in the composition of the set, which is the same error
+   * scripts/build-prices.mjs refuses when it pairs complexes instead of
+   * comparing medians. Null when there is not a full window behind this one —
+   * a partial comparison is worse than none.
+   */
+  const prev = useMemo(() => {
+    const n = hi - lo + 1
+    const plo = lo - n
+    if (plo < 0) return null
+    const sub = new Array(n).fill(0)
+    const use = new Array(n).fill(0)
+    const live = new Array(n).fill(0)
+    const hh = new Array(n).fill(0)
+    for (const c of matched) {
+      for (let m = plo; m < lo; m++) {
+        const at = m - c.f
+        if (at < 0 || at >= c.sub.length) continue
+        const sv = c.sub[at]!
+        const uv = c.u[at] ?? 0
+        if (sv === 0 && uv === 0) continue
+        sub[m - plo] += sv
+        use[m - plo] += uv
+        live[m - plo] += 1
+        hh[m - plo] += c.h
+      }
+    }
+    const last = n - 1
     return {
-      n, sub, use, live,
-      endSub, endLive,
-      growth: startSub > 0 ? ((endSub - startSub) / startSub) * 100 : 0,
-      arpu: hhAt > 0 ? endSub / hhAt : 0,
-      usageShare: endSub + (use[n - 1] ?? 0) > 0 ? ((use[n - 1] ?? 0) / (endSub + (use[n - 1] ?? 0))) * 100 : 0,
-      households: hhAt,
+      sub,
+      endSub: sub[last] ?? 0,
+      endLive: live[last] ?? 0,
+      arpu: (hh[last] ?? 0) > 0 ? (sub[last] ?? 0) / hh[last]! : 0,
+      share: (sub[last] ?? 0) + (use[last] ?? 0) > 0 ? ((use[last] ?? 0) / ((sub[last] ?? 0) + (use[last] ?? 0))) * 100 : 0,
+      gone: 0,
     }
   }, [matched, lo, hi])
 
@@ -407,6 +457,53 @@ export function BiDashboard({ labels: d, src }: { labels: BiLabels; src: string 
         </button>
       </form>
 
+      {/* ---- what is actually applied, and how to drop it ---------- */}
+      {/**
+        * Six controls is enough that a reader loses track of what is on. A
+        * chip per active filter says the state in one line and clears that
+        * one filter on click — the row of selects can say what a filter IS
+        * but not, at a glance, which ones are doing anything.
+        *
+        * The range is deliberately not a chip. It is always set to something,
+        * so a chip for it would never be dismissable and would only ever add
+        * a permanent object to a row whose whole job is to be empty when
+        * nothing is applied.
+        */}
+      {(() => {
+        const chips: { key: string; text: string; clear: () => void }[] = []
+        if (sido >= 0) chips.push({ key: 's', text: slice.sd[sido] ?? '', clear: () => setSido(-1) })
+        if (tier >= 0) {
+          const id = slice.tr[tier] ?? ''
+          chips.push({ key: 't', text: d.tiers[id] ?? id, clear: () => setTier(-1) })
+        }
+        if (mgmt >= 0) {
+          chips.push({ key: 'm', text: mgmt === 1 ? d.mgmtSelf : d.mgmtDelegated, clear: () => setMgmt(-1) })
+        }
+        if (svc >= 0) {
+          const id = slice.sv[svc] ?? ''
+          chips.push({ key: 'v', text: d.services[id] ?? id, clear: () => setSvc(-1) })
+        }
+        if (q.trim()) chips.push({ key: 'q', text: `“${q.trim()}”`, clear: () => setQ('') })
+        if (!chips.length) return null
+        return (
+          <ul className={styles.chips} aria-label={d.filters}>
+            {chips.map((c) => (
+              <li key={c.key}>
+                <button
+                  type="button"
+                  className={cx('label', styles.chip)}
+                  onClick={c.clear}
+                  aria-label={`${d.chipClear} ${c.text}`}
+                >
+                  {c.text}
+                  <span aria-hidden="true">×</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )
+      })()}
+
       <p className={cx('small', styles.matched)} role="status">
         {matched.length > 0
           ? d.matched
@@ -419,36 +516,74 @@ export function BiDashboard({ labels: d, src }: { labels: BiLabels; src: string 
 
       {matched.length === 0 ? null : (
         <>
-          {/* ---- tiles, recomputed --------------------------------- */}
-          <dl className={styles.tiles}>
-            {(
-              [
-                [d.kpiMrr, KRW(agg.endSub)],
-                [d.kpiGrowth, `${agg.growth > 0 ? '+' : ''}${Math.round(agg.growth * 10) / 10}%`],
-                /* NOT the same number as the match count above it, and the
-                   labels say so. `matched` is "billed anything at any point
-                   in the range"; this is "billing in the range's LAST month".
-                   With the full window they differ by about 280 — the
-                   accounts that churned somewhere in three years — and two
-                   counts on one screen that mean different things have to be
-                   named differently or the reader assumes one is wrong. */
-                [d.kpiComplexes, NUM(agg.endLive)],
-                [d.kpiArpu, `${NUM(agg.arpu)}원`],
-                [d.kpiUsage, PCT(agg.usageShare)],
-              ] as const
-            ).map(([term, value]) => (
-              <div key={term} className={styles.tile}>
-                <dt className={cx('label', 'muted')}>{term}</dt>
-                <dd className={styles.tileValue}>{value}</dd>
-              </div>
-            ))}
-          </dl>
+          {/* ---- the readout: one hero, four beside it --------------- */}
+          {/**
+            * NOT FIVE EQUAL TILES, which is what this was and what made it
+            * read as a report rather than an instrument. A dashboard is
+            * scanned, and scanning needs somewhere to land first — so MRR is
+            * large, wears the accent as letters, and carries its own 36-point
+            * shape; the other four sit beside it at a size that says
+            * "secondary" without saying it in words.
+            *
+            * EVERY TILE HAS A SPARKLINE AND A DELTA. A number alone answers
+            * "how much" and nothing else; the same number with its own trend
+            * beside it answers "and is that unusual", which is the question
+            * somebody actually opened this page with.
+            */}
+          <div className={styles.readoutGrid}>
+            <Tile
+              lead
+              term={d.kpiMrr}
+              value={KRW(agg.sub[agg.n - 1] ?? 0)}
+              series={agg.sub}
+              now={agg.sub[agg.n - 1] ?? 0}
+              was={prev?.endSub}
+              labels={d}
+            />
+            <div className={styles.tileGrid}>
+              <Tile
+                term={d.kpiComplexes}
+                value={NUM(agg.live[agg.n - 1] ?? 0)}
+                series={agg.live}
+                now={agg.live[agg.n - 1] ?? 0}
+                was={prev?.endLive}
+                labels={d}
+              />
+              <Tile
+                term={d.kpiArpu}
+                value={`${NUM(agg.arpu[agg.n - 1] ?? 0)}원`}
+                series={agg.arpu}
+                now={agg.arpu[agg.n - 1] ?? 0}
+                was={prev?.arpu}
+                labels={d}
+              />
+              <Tile
+                term={d.kpiUsage}
+                value={PCT(agg.share[agg.n - 1] ?? 0)}
+                series={agg.share}
+                now={agg.share[agg.n - 1] ?? 0}
+                was={prev?.share}
+                labels={d}
+              />
+              <Tile
+                term={d.kpiChurn}
+                value={NUM(agg.gone.reduce((t, v) => t + v, 0))}
+                series={agg.gone}
+                labels={d}
+                /* Departures have no like-for-like previous figure: the
+                   comparison window is scored over complexes the current
+                   filter selected, and a complex that left before the window
+                   is not in that set. A delta here would be an artefact. */
+              />
+            </div>
+          </div>
 
           <Series
             labels={d}
             months={months}
             sub={agg.sub}
             use={agg.use}
+            ghost={prev?.sub}
           />
 
           <div className={styles.trio}>
@@ -587,6 +722,73 @@ function Pick({
   )
 }
 
+/**
+ * A figure, its own shape, and what it was.
+ *
+ * The sparkline is a path and nothing else — no axis, no labels, no
+ * interaction. At this size a tick would be noise and a tooltip would
+ * compete with the chart below it, which carries the same series properly.
+ * What it is for is the one question a bare number cannot answer: whether
+ * the value arrived smoothly or jumped.
+ */
+function Tile({
+  term, value, series, now, was, lead, labels: d,
+}: {
+  term: string
+  value: string
+  series: readonly number[]
+  now?: number
+  was?: number
+  lead?: boolean
+  labels: BiLabels
+}) {
+  const delta = now !== undefined && was !== undefined && was !== 0
+    ? ((now - was) / was) * 100
+    : null
+  return (
+    <div className={cx(styles.tile, lead && styles.tileLead)}>
+      <dt className={cx('label', 'muted', styles.tileTerm)}>{term}</dt>
+      <dd className={styles.tileBody}>
+        <span className={styles.tileValue}>{value}</span>
+        {delta === null ? null : (
+          <span
+            className={cx('label', styles.delta, delta < 0 && styles.deltaDown)}
+            title={d.deltaTitle}
+          >
+            {delta > 0 ? '▲' : delta < 0 ? '▼' : '·'}
+            {Math.abs(Math.round(delta * 10) / 10)}%
+          </span>
+        )}
+      </dd>
+      <Spark values={series} tall={lead} />
+    </div>
+  )
+}
+
+function Spark({ values, tall }: { values: readonly number[]; tall?: boolean }) {
+  const n = values.length
+  if (n < 2) return null
+  const w = 100
+  const h = tall ? 28 : 18
+  const top = Math.max(...values)
+  const bottom = Math.min(0, ...values)
+  const span = top - bottom || 1
+  const x = (i: number) => (i / (n - 1)) * w
+  const y = (v: number) => h - ((v - bottom) / span) * h
+  const line = values.map((v, i) => `${i ? 'L' : 'M'} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ')
+  return (
+    <svg
+      className={styles.spark}
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <path d={`${line} L ${w} ${h} L 0 ${h} Z`} className={styles.sparkFill} />
+      <path d={line} className={styles.sparkLine} />
+    </svg>
+  )
+}
+
 const W = 720
 const H = 200
 const PAD = { t: 12, r: 10, b: 24, l: 10 }
@@ -605,19 +807,21 @@ const PAD = { t: 12, r: 10, b: 24, l: 10 }
  * date — the pointer never has to land on a mark to get a value.
  */
 function Series({
-  labels: d, months, sub, use,
+  labels: d, months, sub, use, ghost,
 }: {
   labels: BiLabels
   months: string[]
   sub: number[]
   use: number[]
+  /** The same complexes over the preceding window, or undefined. */
+  ghost?: readonly number[]
 }) {
   const [at, setAt] = useState<number | null>(null)
   const box = useRef<SVGSVGElement>(null)
   const n = months.length
   const pw = W - PAD.l - PAD.r
   const ph = H - PAD.t - PAD.b
-  const top = Math.max(1, ...sub, ...use)
+  const top = Math.max(1, ...sub, ...use, ...(ghost ?? []))
   const bw = pw / n
   const x = (i: number) => PAD.l + i * bw
   const y = (v: number) => PAD.t + ph * (1 - v / top)
@@ -648,6 +852,9 @@ function Series({
       <ul className={cx('label', styles.legend)}>
         <li><span className={cx(styles.key, styles.keySub)} />{d.legendSub}</li>
         <li><span className={cx(styles.key, styles.keyUse)} />{d.legendUsage}</li>
+        {ghost ? (
+          <li><span className={cx(styles.key, styles.keyGhost)} />{d.legendPrev}</li>
+        ) : null}
       </ul>
       <svg
         ref={box}
@@ -668,6 +875,17 @@ function Series({
             y2={y(top * f)}
           />
         ))}
+        {/* The preceding window, behind. Dashed and dim so it reads as a
+            reference rather than a second measurement — and drawn first, so
+            the current series is never obscured by its own history. */}
+        {ghost && ghost.length === n ? (
+          <path
+            className={styles.ghostLine}
+            d={ghost
+              .map((v, i) => `${i ? 'L' : 'M'} ${(x(i) + bw / 2).toFixed(1)} ${y(v).toFixed(1)}`)
+              .join(' ')}
+          />
+        ) : null}
         <path className={styles.subFill} d={`${line} L ${W - PAD.r} ${PAD.t + ph} L ${PAD.l} ${PAD.t + ph} Z`} />
         <path className={styles.subLine} d={line} />
         <path className={styles.useLine} d={useLine} />

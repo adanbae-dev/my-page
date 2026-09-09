@@ -75,8 +75,16 @@ export default async function BiDashboardPage({
         ])}
       />
 
+      {/* DARK, and that is the design decision this page turned on.
+          docs/ART-DIRECTION.md: the accent measures 3.05:1 on paper and
+          5.91:1 on ink, so on the light ground it may only be a fill, and on
+          the dark ground it IS the text colour. An instrument is the dense
+          beat of this site's light-dark-light arc, and putting it on ink is
+          what lets the numbers themselves carry the accent instead of being
+          black text next to an orange box. The first version of this route
+          was light throughout and read like a printed report. */}
       <section
-        data-tone="light"
+        data-tone="dark"
         data-density="dense"
         className={styles.route}
         aria-labelledby="bi-title"

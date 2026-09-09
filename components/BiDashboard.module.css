@@ -1,85 +1,112 @@
 /**
- * The instrument's chrome.
+ * The instrument's chrome, in this site's own vocabulary.
  *
- * Unlike RevenueBoard.module.css, nothing here needs `:global()`: every mark
- * on this page is a React element rather than a string built at build time,
- * so CSS Modules can hash the class the normal way. That is the one real
- * upside of moving the figures to the client — the styling and the markup
- * are checked against each other by the compiler instead of by a gate.
+ * THE FIRST VERSION LOOKED LIKE A 2012 ADMIN PANEL and it is worth writing
+ * down why, because none of it was an accident of taste — every one of them
+ * was this file ignoring a decision docs/ART-DIRECTION.md had already made.
  *
- * SAME TWO COLOURS. `--accent` for subscription and every bar, `--decline`
- * for usage, both measured against both grounds by `pnpm check:contrast`.
- * The filters are ordinary form controls wearing the chart chrome, which is
- * what the interaction spec asks for — a select that looks like a chart mark
- * is a select nobody recognises.
+ *   ONE TONE. The route was light from top to bottom. This site's identity is
+ *   an inversion — light, dark, light — and the accent is only 3.05:1 on
+ *   paper, so on light it can be a fill and never a letter. A dashboard laid
+ *   out in black text with orange boxes beside it is the generic version of
+ *   this site. On ink the accent measures 5.91:1 and BECOMES the text colour,
+ *   which is where the look actually lives. The route is now dark.
+ *
+ *   BORDERED BOXES. Every select and button had a 1px grey border. The site
+ *   has no bordered controls anywhere: it has hairlines and it has the accent
+ *   block. Controls now sit on a bottom hairline, and a chosen preset is an
+ *   accent block with `--on-accent` text — the same mark the headlines use.
+ *
+ *   A GREY PROGRESS TRACK behind every bar. Not in the palette, and it is the
+ *   single most dated object in interface design. The bar is now an accent
+ *   mark with a hairline under the full scale, so the reference is a rule
+ *   rather than a slab.
+ *
+ *   NO WIDTH AXIS. Archivo is variable on `wght` AND `wdth`, and the width
+ *   axis is what carries the display voice — it is the reason the type reads
+ *   as set rather than defaulted. The figures were plain bold. They now use
+ *   `wdth` 125 at black weight, the same setting `.h1` uses.
+ *
+ *   NO MOTION AT ALL, justified in a comment as "a dashboard should not make
+ *   you wait for a chart". That is true of entrances and false of everything
+ *   else. `--dur-instant` is documented in lib/tokens.data.ts as "State echo
+ *   — a mark acknowledging a click", and a control that does not acknowledge
+ *   reads as broken. The bar widths transition too, which is information
+ *   rather than decoration: when a filter changes you SEE which categories
+ *   moved instead of getting a jump cut between two unrelated pictures.
+ *
+ * Under `prefers-reduced-motion: reduce` every duration here collapses to 1ms
+ * and the state still changes — the site's rule, not a local invention.
  */
 
 .board {
-  --gap: clamp(0.75rem, 2vw, 1.5rem);
+  --gap: clamp(0.875rem, 2vw, 1.75rem);
   width: min(100% - 2rem, 84rem);
   margin-inline: auto;
-  padding-block: clamp(1rem, 3vh, 2rem) clamp(2rem, 6vh, 4rem);
+  padding-block: var(--space-s) clamp(2rem, 6vh, 4rem);
 }
 
 .state {
   width: min(100% - 2rem, 84rem);
-  margin: 3rem auto;
+  margin: var(--space-l) auto;
 }
 
 /* ---- one filter row ------------------------------------------------ */
 
 /**
- * A single row above everything it scopes, wrapping rather than scrolling.
+ * A single row above everything it scopes, on one hairline.
  *
- * Never inside a chart, never per-chart: the tiles, the four figures and the
- * table all describe the same rectangle, and a control that scoped only one
- * of them would make two numbers on one screen disagree for a reason the
- * reader cannot see.
+ * Two rules around it boxed it in; one under it reads as a header. Never
+ * inside a chart, never per-chart: the tiles, the figures and the table all
+ * describe the same rectangle, and a control that scoped one of them would
+ * make two numbers on one screen disagree for a reason nobody can see.
  */
 .filters {
   display: flex;
   flex-wrap: wrap;
   align-items: end;
-  gap: 0.5rem var(--gap);
-  border-block: var(--rule-w) solid var(--rule);
-  padding-block: 0.75rem;
+  gap: var(--space-2xs) var(--gap);
+  border-block-end: var(--rule-w) solid var(--rule);
+  padding-block-end: var(--space-xs);
 }
 
 .presets {
   display: flex;
-  gap: 2px;
+  gap: 1px;
 }
 
-/* 24px minimum, which is the hit target the interaction spec asks for. */
+/**
+ * Text, not buttons with borders. 1.75rem of height keeps the 24px hit
+ * target the interaction spec asks for without drawing a box to get it.
+ */
 .preset,
 .reset,
 .sortBtn {
   min-height: 1.75rem;
   padding: 0.25rem 0.5rem;
-  border: var(--rule-w) solid var(--rule);
+  border: 0;
   background: none;
   color: var(--muted);
   cursor: pointer;
+  transition: color var(--dur-instant) var(--ease-standard),
+    background-color var(--dur-instant) var(--ease-standard);
 }
 
 .preset:hover,
 .reset:hover,
 .sortBtn:hover {
   color: var(--accent-text);
-  border-color: var(--accent);
 }
 
-/* Selection is a fill, not a border — a border reads as focus. */
+/* The accent block, which is how this site marks a chosen thing. */
 .presetOn,
 .presetOn:hover {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--on-accent);
 }
 
 .sortBtn[aria-pressed='true'] {
   color: var(--accent-text);
-  border-color: var(--accent);
 }
 
 .field {
@@ -89,16 +116,31 @@
   min-width: 0;
 }
 
+/**
+ * Borderless, on a hairline. `color-scheme` is declared per tone in
+ * styles/tokens.css, so the native dropdown and its arrow follow the ground
+ * without this file naming a colour.
+ */
 .select,
 .input {
   min-height: 1.75rem;
   max-width: 11rem;
-  border: var(--rule-w) solid var(--rule);
+  border: 0;
+  border-block-end: var(--rule-w) solid var(--rule);
+  border-radius: 0;
   background: none;
   color: var(--figure);
   font: inherit;
-  font-size: 0.8125rem;
-  padding: 0.125rem 0.25rem;
+  font-size: var(--t-small);
+  padding: 0.125rem 0;
+  transition: border-color var(--dur-instant) var(--ease-standard);
+}
+
+.select:hover,
+.input:hover,
+.select:focus-visible,
+.input:focus-visible {
+  border-color: var(--accent);
 }
 
 .searchField {
@@ -115,63 +157,208 @@
 }
 
 .matched {
-  margin: 0.75rem 0 0;
+  margin: var(--space-xs) 0 0;
+  color: var(--muted);
 }
 
-/* ---- tiles --------------------------------------------------------- */
+/* ---- the readout: one hero, four beside it ------------------------- */
 
-.tiles {
+/**
+ * A bento, not a row of five.
+ *
+ * Five equal tiles is a table of numbers wearing a grid, and it gave the page
+ * nowhere to land — which is most of why the first version read as a report.
+ * A dashboard is scanned, so one figure is large and the rest are visibly
+ * secondary. The proportion is 1 : 1.4 rather than 1 : 2 because the four
+ * together still have to be readable, not decorative.
+ */
+.readoutGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-  gap: var(--gap);
-  margin: var(--gap) 0 0;
-  border-block-start: var(--rule-w) solid var(--rule);
-  padding-block-start: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--gap) var(--space-l);
+  margin-block-start: var(--gap);
+}
+
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap) var(--space-m);
+}
+
+@media (max-width: 46rem) {
+  .readoutGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .tile {
   min-width: 0;
 }
 
-/* Proportional figures: these stand alone, and tabular digits read loose
-   at display size. `tabular-nums` is on the table below, where they align. */
-.tileValue {
+.tileTerm {
+  margin: 0;
+}
+
+.tileBody {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
   margin: 0.125rem 0 0;
-  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
-  font-weight: 700;
+  min-width: 0;
+}
+
+/**
+ * The display voice at readout size.
+ *
+ * `wdth` 125 at black weight is what `.h1` uses; only the size changes here.
+ * Proportional figures, not tabular — these stand alone rather than in a
+ * column, and equal-width digits read loose at this size. `tabular-nums`
+ * belongs to the table below, where they do line up.
+ */
+.tileValue {
+  font-size: clamp(1.125rem, 2.1vw, 1.5rem);
+  font-weight: var(--wt-black);
+  font-variation-settings: 'wdth' var(--wd-expanded);
   font-variant-numeric: proportional-nums;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tr-tight);
+}
+
+/**
+ * The lead figure, and the accent as LETTERS.
+ *
+ * Only legal because this route is dark — `--accent` is 5.91:1 on ink and
+ * 3.05:1 on paper, so the same mark on the light ground would have to be a
+ * block. One figure of the five, because an accent on everything is an
+ * accent on nothing.
+ */
+.tileLead .tileValue {
+  color: var(--accent);
+  font-size: clamp(2rem, 4.6vw, 3.25rem);
+}
+
+/**
+ * The delta, against the same complexes over the preceding window.
+ *
+ * Direction wears the diverging pair the rest of the site uses: `--accent`
+ * rising, `--decline` falling. Every tile carrying a delta is one where up
+ * is the good direction — departures deliberately have none, because the
+ * comparison set is defined by the current filter and a complex that left
+ * before the window is not in it. A delta there would be an artefact.
+ */
+.delta {
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.deltaDown {
+  color: var(--decline);
+}
+
+/**
+ * The sparkline is a path and nothing else.
+ *
+ * No axis, no label, no interaction: at this height a tick is noise and a
+ * tooltip would compete with the chart below, which carries the same series
+ * properly. It answers the one question a bare number cannot — whether the
+ * value arrived smoothly or jumped.
+ */
+.spark {
+  display: block;
+  width: 100%;
+  height: 1.125rem;
+  margin-block-start: 0.375rem;
+}
+
+.tileLead .spark {
+  height: 1.75rem;
+}
+
+.sparkLine {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.sparkFill {
+  fill: color-mix(in oklab, var(--accent) 18%, var(--ground));
+  stroke: none;
+}
+
+/* ---- active filters ------------------------------------------------ */
+
+/**
+ * A chip per applied filter, and clicking it drops that one.
+ *
+ * The row of selects can say what a filter IS but not, at a glance, which
+ * ones are doing anything — and six controls is enough to lose track. The
+ * row is absent when nothing is applied, which is the state it should be in
+ * most of the time.
+ */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin: var(--space-2xs) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.5rem;
+  padding: 0.1875rem 0.4375rem;
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  cursor: pointer;
+  transition: opacity var(--dur-instant) var(--ease-standard);
+}
+
+.chip:hover {
+  opacity: 0.72;
 }
 
 /* ---- blocks -------------------------------------------------------- */
 
+/**
+ * Space, not boxes.
+ *
+ * The first version put a hairline above every block, so the page was a stack
+ * of ruled containers — the report look the route was supposed to be the
+ * opposite of. Blocks are now separated by their own margin, and a rule
+ * appears only where something is genuinely a header.
+ */
 .seriesBlock,
 .barsBlock,
 .tableBlock {
   min-width: 0;
-  border-block-start: var(--rule-w) solid var(--rule);
-  padding-block-start: 0.75rem;
-  margin-block-start: var(--gap);
+  margin-block-start: var(--space-m);
 }
 
 .blockTitle {
   margin: 0;
+  color: var(--muted);
 }
 
 .blockNote {
-  margin: 0.375rem 0 0.5rem;
-  max-width: 68ch;
+  margin: 0.375rem 0 var(--space-2xs);
+  max-width: var(--measure);
+  color: var(--muted);
 }
 
 .trio {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: var(--gap);
+  gap: var(--gap) var(--space-l);
 }
 
 .foot {
-  margin: 0.5rem 0 0;
+  margin: var(--space-2xs) 0 0;
 }
 
 /* ---- the time series ----------------------------------------------- */
@@ -190,8 +377,10 @@
   fill: none;
 }
 
+/* Mixed toward the ground, so the fill inverts with the tone instead of
+   being maintained twice. */
 .subFill {
-  fill: color-mix(in oklab, var(--accent) 20%, var(--ground));
+  fill: color-mix(in oklab, var(--accent) 24%, var(--ground));
 }
 
 .subLine {
@@ -206,8 +395,15 @@
   stroke-width: 2;
 }
 
-/* The crosshair finds the X. It snaps to a month, so the reader aims at a
-   date instead of at a two-pixel line. */
+/* The preceding window: dashed and dim, so it reads as a reference rather
+   than a second measurement competing for the same space. */
+.ghostLine {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
 .cross {
   stroke: var(--muted);
   stroke-width: 1;
@@ -232,33 +428,33 @@
 }
 
 /**
- * The readout is text outside the SVG.
- *
- * Selectable, and a live region a screen reader announces — a tooltip drawn
- * inside the picture would be neither. `min-height` holds the line so the
- * page does not jump when the pointer enters and leaves the plot.
+ * The readout is text outside the SVG: selectable, and a live region a
+ * screen reader announces. A tooltip drawn inside the picture would be
+ * neither. `min-height` holds the line so the page does not jump when the
+ * pointer enters and leaves the plot.
  */
 .readout {
   min-height: 1.5rem;
   margin: 0.25rem 0 0;
   font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
 }
 
 /* ---- bars ---------------------------------------------------------- */
 
 .bars {
-  margin: 0.5rem 0 0;
+  margin: var(--space-2xs) 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 0.25rem;
+  gap: 0.375rem;
 }
 
 .bar {
   display: grid;
-  grid-template-columns: 6rem 1fr auto;
+  grid-template-columns: 5.5rem 1fr auto;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2xs);
   min-width: 0;
 }
 
@@ -269,16 +465,33 @@
   white-space: nowrap;
 }
 
+.barValue {
+  font-variant-numeric: tabular-nums;
+}
+
+/**
+ * The full scale is a hairline UNDER the mark, not a grey slab behind it.
+ *
+ * A filled track is the most dated object in interface design and it is not
+ * in this palette. The rule does the same job — it shows where 100% is —
+ * with the one ink the site already uses for exactly that.
+ */
 .barTrack {
   display: block;
+  position: relative;
   height: 0.625rem;
-  background: color-mix(in oklab, var(--rule) 60%, var(--ground));
+  border-block-end: var(--rule-w) solid var(--rule);
 }
 
 .barFill {
   display: block;
-  height: 100%;
+  position: absolute;
+  inset-block: 0 0;
+  inset-inline-start: 0;
   background: var(--accent);
+  /* The width transition is information: on a filter change the reader sees
+     WHICH rows moved, instead of two unrelated pictures cutting together. */
+  transition: width var(--dur-instant) var(--ease-standard);
 }
 
 /* ---- the table ----------------------------------------------------- */
@@ -287,7 +500,7 @@
   overflow-x: auto;
   max-height: 30rem;
   overflow-y: auto;
-  margin-block-start: 0.5rem;
+  margin-block-start: var(--space-2xs);
 }
 
 .table {
@@ -299,43 +512,55 @@
 .table th,
 .table td {
   text-align: start;
-  padding: 0.25rem 0.5rem 0.25rem 0;
-  border-block-end: var(--rule-w) solid var(--rule);
+  padding: 0.3125rem var(--space-2xs) 0.3125rem 0;
   white-space: nowrap;
 }
 
+/* One rule, under the header. Not a grid — a line per row turns a table into
+   a spreadsheet, and the reader is scanning it, not auditing it. */
 .table thead th {
   position: sticky;
   inset-block-start: 0;
+  z-index: 1;
   background: var(--ground);
+  border-block-end: var(--rule-w) solid var(--rule);
   color: var(--muted);
-  font-weight: 500;
+  font-weight: var(--wt-medium);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
   padding-block: 0.25rem;
 }
 
-.num {
-  text-align: end;
+.table tbody tr {
+  transition: background-color var(--dur-instant) var(--ease-standard);
 }
 
-.table td.num,
-.table th.num {
+.table tbody tr:hover {
+  background: color-mix(in oklab, var(--accent) 10%, var(--ground));
+}
+
+.table .num {
   text-align: end;
 }
 
 .nameCell {
-  font-weight: 400;
+  font-weight: var(--wt-regular);
   max-width: 14rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* ---- legends ------------------------------------------------------- */
+
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 1rem;
-  margin: 0 0 0.5rem;
+  gap: 0.25rem var(--space-s);
+  margin: 0 0 var(--space-2xs);
   padding: 0;
   list-style: none;
+  color: var(--muted);
 }
 
 .legend li {
@@ -353,3 +578,30 @@
 
 .keySub { background: var(--accent); }
 .keyUse { background: var(--decline); }
+.keyGhost {
+  background: repeating-linear-gradient(to right, var(--muted) 0 4px, transparent 4px 7px);
+}
+
+/* ---- motion, and the readers who asked for less -------------------- */
+
+/**
+ * Collapsed to 1ms, and the state still changes.
+ *
+ * docs/ART-DIRECTION.md sets this rule for the whole site: a visitor who
+ * asks for less motion gets the structure as cuts instead of transitions,
+ * and nothing is hidden. None of the transitions above carry content, so
+ * there is nothing here that could disappear — only the acknowledgement
+ * becomes instant.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .preset,
+  .reset,
+  .sortBtn,
+  .select,
+  .input,
+  .barFill,
+  .chip,
+  .table tbody tr {
+    transition-duration: 1ms;
+  }
+}

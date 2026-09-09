@@ -834,6 +834,10 @@ export const ko = {
     kpiComplexes: '마지막 달 청구 단지',
     kpiArpu: '세대당',
     kpiUsage: '사용량 비중',
+    kpiChurn: '기간 내 이탈',
+    deltaTitle: '같은 단지들의 직전 동일 기간 대비',
+    legendPrev: '직전 동일 기간',
+    chipClear: '해제:',
 
     chartSeries: '구독과 사용량',
     chartSeriesNote:
