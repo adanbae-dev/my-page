@@ -1,0 +1,95 @@
+---
+title: Eight heads in ten flips — is the coin rigged?
+summary: I worked out what a p-value is, and writing it down showed a missing word. That one word makes the same data give the opposite answer.
+authored: false
+---
+
+I flipped a coin ten times and got heads eight times.
+
+**Is the coin rigged, or did I just get a lucky run?**
+
+Statistics has a set procedure for answering that. The number at the centre of
+it is the **p-value**.
+
+## You start from the side you are not suspicious of
+
+Statistics does not start at "this coin is rigged!" It starts at the opposite.
+
+- **The null hypothesis** — "the coin is fine." Nothing is going on.
+- **The alternative hypothesis** — "the coin is rigged." Something is.
+
+It works like a trial. You **assume** innocence to begin with. Then, if
+something happens that the assumption cannot reasonably explain, you drop the
+assumption.
+
+## The p-value answers this question
+
+**"If the coin really is fine, how often does something like this happen?"**
+
+If it happens often, there is no reason to suspect the coin.
+If it almost never happens, the assumption starts to look wrong.
+
+That much I had. Then I wrote it down and found a missing word.
+
+## The missing words are "or worse"
+
+I had the p-value as **the chance of getting exactly this result**.
+It is really **the chance of getting this result or a more lopsided one**.
+
+It sounds like a small difference. It reverses the answer.
+
+| How you count | Chance | Verdict |
+|:--|:--:|:--|
+| **Exactly 8** heads | 4.4% | Under 5%, so "rigged" |
+| **8 or more**, counting the tails side too | 10.9% | Over 5%, so **"cannot call it rigged"** |
+
+Same coin, same data, opposite conclusions.
+The only difference is two words.
+
+The reason the worse cases get counted is that the question was never about
+one exact number. It is about **how common a run this lopsided is** — so nine
+heads and ten heads, being even more lopsided, belong to the same question.
+
+## The second mistake: direction
+
+I had written the conclusion as "so the coin is not fine."
+
+Here is what a p-value actually answers:
+
+> **If the coin is fine**, how likely is a result like this
+
+Here is what we actually want to know:
+
+> **Given a result like this**, how likely is the coin to be fine
+
+**Those are two different numbers.** Swapping the two halves makes it a
+different question. A p-value of 1% does not mean "99% chance the coin is
+rigged". That is a question the p-value does not answer.
+
+This is why statistics says **"reject"** rather than "false". It is a verdict,
+not a proof.
+
+And it runs the same way in reverse. Failing to reject does not prove the coin
+is fine. It only means **there was not enough reason to doubt it** — the same
+way a not-guilty verdict is not a proof of innocence.
+
+## Who picked 5%?
+
+**Nobody discovered it. A person chose it.**
+
+What matters is that it has to be chosen **before looking at the data**. Pick
+the threshold after seeing the result and you can slide it to wherever the
+answer you wanted lives. That is not a test, it is an excuse.
+
+And 5% is not free. Test twenty perfectly fine coins and **about one of them
+gets wrongly labelled "rigged".** That is the cost that comes with setting the
+bar there.
+
+## In short
+
+1. A p-value is the chance of **this result or a more extreme one** — not of
+   exactly this result.
+2. A p-value is **not the probability that a hypothesis is true.** The
+   question runs the other way round.
+3. 5% is a threshold people set in advance, and it has a known rate of being
+   wrong built into it.

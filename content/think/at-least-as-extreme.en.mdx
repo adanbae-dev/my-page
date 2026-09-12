@@ -1,0 +1,126 @@
+---
+title: One missing word flips the conclusion
+date: 2026-09-12
+summary: A p-value is not the probability of the result you got, but of a result at least as extreme. With 8 heads in 10 flips, that phrase flips the verdict.
+topics: [knowledge]
+tags: [statistics, hypothesis-testing, p-value]
+---
+
+There is a row in the table in `think/statistics-notation`.
+
+| Symbol | Reading | Meaning |
+|:--:|:--|:--|
+| p-value | pi baelyu | p-value |
+
+The reading column is filled in. The meaning column is **the name written a
+second time**. That entry argued that if you can read a symbol its structure
+becomes visible; on this row it did not. I could read it and did not know what
+it meant.
+
+## What I have now
+
+A hypothesis test has two hypotheses.
+
+- `H₀`, the null — nothing is going on
+- `H₁`, the alternative — something is
+
+**Assume the null is true.** Under that assumption, count the probability of
+getting a result as extreme as the one observed, or more so. That is the
+p-value. If it is small enough, drop the assumption.
+
+That is the part I worked out. Writing it down showed two places where I had
+it wrong.
+
+## The missing words: at least as
+
+I first read the p-value as **the probability of getting this result**.
+It is not. It is **the probability of getting a result at least as extreme as
+this one**.
+
+It looks like a qualifier. It reverses the conclusion.
+
+Ten coin flips, eight heads. `H₀` is a fair coin, heads probability 0.5.
+
+```
+P(X = 8)     =  45/1024  =  0.04395     ← what I thought it meant
+P(X ≥ 8)     =  56/1024  =  0.05469     one-sided
+two-sided p  = 112/1024  =  0.10938     ← the actual p-value
+```
+
+`0.04395` is below 0.05. On my reading, that is a **rejection**.
+The real p-value, `0.10938`, is more than twice 0.05. It **does not reject**.
+
+Same data, same significance level, opposite verdict. The difference is three
+words.
+
+## Why it has to be "at least as"
+
+In the discrete case it is one phrase. In the continuous case the other
+reading does not define anything at all.
+
+The probability that someone is exactly 173.2400… cm tall is **0**. A
+continuous random variable has probability zero at any single point — the
+`f(x)` in that same table is not a probability but a probability *density*,
+and a probability only appears once you integrate over an interval.
+
+```
+P(X = x) = 0                for every x
+P(X ≥ x) = ∫ₓ^∞ f(t) dt     an interval is what produces a value
+```
+
+So if a p-value were "the probability of this result", **every p-value would
+be 0 and every null hypothesis would be rejected.** The definition collapses
+on the spot.
+
+"At least as extreme" is not a caveat bolted on. It is what keeps the p-value
+from being zero.
+
+## The direction was wrong too
+
+The second thing was how I stated the conclusion — **"so the null hypothesis
+is false"**.
+
+A p-value measures this direction:
+
+```
+p  =  P( a result like this | H₀ is true )
+```
+
+Knowing how likely the null is to be false needs the other direction:
+
+```
+      P( H₀ is true | a result like this )
+```
+
+**These are not the same number.** Swap the condition and the outcome and you
+have a different quantity. A p-value of 0.01 does not mean "99% chance the
+null is false". That is a different calculation, and the p-value does not
+contain it.
+
+Which is why the word is **reject**, not *false*. Rejecting is a verdict, not
+a proof. The same holds in the other direction: failing to reject does not
+mean the null is true, it means **there is not enough reason to drop it**.
+
+## 0.05 is chosen, not discovered
+
+`α`, the significance level, is fixed before looking at the data. Fix it
+afterwards and the threshold can move to wherever the desired conclusion is,
+which makes it an explanation rather than a test.
+
+And α is a price. It is the probability of rejecting a null that is actually
+true — set it at 0.05 and roughly one in twenty true nulls gets rejected. The
+`β` in the same table is the error on the other side.
+
+## What I am taking from this
+
+1. **Being able to read something is not knowing it.** The table taught me to
+   pronounce fifty symbols, and one of them was never going to survive being
+   only pronounced. Reading was necessary and not sufficient.
+2. **"At least as" carries the definition.** Remove it and the discrete case
+   reverses its verdict while the continuous case collapses to zero.
+3. **A p-value is not the probability of a hypothesis.** The condition runs
+   the other way, and turning it around needs information the p-value does
+   not carry.
+
+Filed next to the entry about reading the symbols: one I could read and did
+not know.
